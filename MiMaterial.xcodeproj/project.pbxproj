@@ -15,6 +15,7 @@
 		BA43507D1D1B7687004CD5EB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BA43507B1D1B7687004CD5EB /* LaunchScreen.storyboard */; };
 		BA4350881D1B7687004CD5EB /* MiMaterialTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BA4350871D1B7687004CD5EB /* MiMaterialTests.m */; };
 		BA4350931D1B7687004CD5EB /* MiMaterialUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = BA4350921D1B7687004CD5EB /* MiMaterialUITests.m */; };
+		BA4350A61D1B9E68004CD5EB /* NavViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BA4350A51D1B9E68004CD5EB /* NavViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,10 @@
 		BA43508E1D1B7687004CD5EB /* MiMaterialUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MiMaterialUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA4350921D1B7687004CD5EB /* MiMaterialUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MiMaterialUITests.m; sourceTree = "<group>"; };
 		BA4350941D1B7687004CD5EB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BA4350A41D1B9E68004CD5EB /* NavViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavViewController.h; sourceTree = "<group>"; };
+		BA4350A51D1B9E68004CD5EB /* NavViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavViewController.m; sourceTree = "<group>"; };
+		BA4350A91D1BAB3C004CD5EB /* MiMaterial.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MiMaterial.pch; sourceTree = "<group>"; };
+		BA4350AA1D1BACE3004CD5EB /* MiMaterialColor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MiMaterialColor.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,14 +106,8 @@
 		BA43506C1D1B7687004CD5EB /* MiMaterial */ = {
 			isa = PBXGroup;
 			children = (
-				BA4350701D1B7687004CD5EB /* AppDelegate.h */,
-				BA4350711D1B7687004CD5EB /* AppDelegate.m */,
-				BA4350731D1B7687004CD5EB /* ViewController.h */,
-				BA4350741D1B7687004CD5EB /* ViewController.m */,
-				BA4350761D1B7687004CD5EB /* Main.storyboard */,
-				BA4350791D1B7687004CD5EB /* Assets.xcassets */,
-				BA43507B1D1B7687004CD5EB /* LaunchScreen.storyboard */,
-				BA43507E1D1B7687004CD5EB /* Info.plist */,
+				BA4350A11D1B8ED2004CD5EB /* Other */,
+				BA4350A01D1B8EA8004CD5EB /* Controller */,
 				BA43506D1D1B7687004CD5EB /* Supporting Files */,
 			);
 			path = MiMaterial;
@@ -117,6 +116,12 @@
 		BA43506D1D1B7687004CD5EB /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				BA4350761D1B7687004CD5EB /* Main.storyboard */,
+				BA4350A91D1BAB3C004CD5EB /* MiMaterial.pch */,
+				BA4350AA1D1BACE3004CD5EB /* MiMaterialColor.h */,
+				BA4350791D1B7687004CD5EB /* Assets.xcassets */,
+				BA43507B1D1B7687004CD5EB /* LaunchScreen.storyboard */,
+				BA43507E1D1B7687004CD5EB /* Info.plist */,
 				BA43506E1D1B7687004CD5EB /* main.m */,
 			);
 			name = "Supporting Files";
@@ -138,6 +143,34 @@
 				BA4350941D1B7687004CD5EB /* Info.plist */,
 			);
 			path = MiMaterialUITests;
+			sourceTree = "<group>";
+		};
+		BA4350A01D1B8EA8004CD5EB /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				BA4350A31D1B9E12004CD5EB /* Nav */,
+				BA4350731D1B7687004CD5EB /* ViewController.h */,
+				BA4350741D1B7687004CD5EB /* ViewController.m */,
+			);
+			name = Controller;
+			sourceTree = "<group>";
+		};
+		BA4350A11D1B8ED2004CD5EB /* Other */ = {
+			isa = PBXGroup;
+			children = (
+				BA4350701D1B7687004CD5EB /* AppDelegate.h */,
+				BA4350711D1B7687004CD5EB /* AppDelegate.m */,
+			);
+			name = Other;
+			sourceTree = "<group>";
+		};
+		BA4350A31D1B9E12004CD5EB /* Nav */ = {
+			isa = PBXGroup;
+			children = (
+				BA4350A41D1B9E68004CD5EB /* NavViewController.h */,
+				BA4350A51D1B9E68004CD5EB /* NavViewController.m */,
+			);
+			name = Nav;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -272,6 +305,7 @@
 			files = (
 				BA4350751D1B7687004CD5EB /* ViewController.m in Sources */,
 				BA4350721D1B7687004CD5EB /* AppDelegate.m in Sources */,
+				BA4350A61D1B9E68004CD5EB /* NavViewController.m in Sources */,
 				BA43506F1D1B7687004CD5EB /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -413,6 +447,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/MiMaterial/MiMaterial.pch";
 				INFOPLIST_FILE = MiMaterial/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.emi365.MiMaterial;
@@ -424,6 +459,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/MiMaterial/MiMaterial.pch";
 				INFOPLIST_FILE = MiMaterial/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.emi365.MiMaterial;
