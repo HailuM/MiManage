@@ -29,8 +29,12 @@
     NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
     NSDictionary *myDictionary  = [userDefaultes  objectForKey:@"getServerInfo"];
     NSString *serverip=[myDictionary valueForKey:@"ServerIP"];//取出上次验证通过的用户名
+    if(serverip.length>0){
+        self.etServer.text = serverip;
+    }else{
+        self.etServer.text = tempServer;
+    }
     
-    self.etServer.text = serverip;
 }
 
 - (void)didReceiveMemoryWarning {

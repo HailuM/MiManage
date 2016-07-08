@@ -8,7 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ServerConfigViewController : UIViewController
+NSString *const tempServer = @"fdcwzm.zhongnangroup.cn:82";
+
+@interface ServerConfigViewController : UIViewController{
+    
+}
 @property (weak, nonatomic) IBOutlet UITextField *etServer;
 
 @end
