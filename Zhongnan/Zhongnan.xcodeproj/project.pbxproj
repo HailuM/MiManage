@@ -77,6 +77,7 @@
 		A58FC3661D265E4F00CA3A81 /* ConfirmInViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A58FC3651D265E4F00CA3A81 /* ConfirmInViewController.m */; };
 		A58FC3691D2668F600CA3A81 /* DateTool.m in Sources */ = {isa = PBXBuildFile; fileRef = A58FC3681D2668F600CA3A81 /* DateTool.m */; };
 		C805198B1D26B2FA000164E4 /* DownloadOrderInfoInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = C805198A1D26B2FA000164E4 /* DownloadOrderInfoInterface.m */; };
+		C8197F531D2F47370031FCE0 /* order.png in Resources */ = {isa = PBXBuildFile; fileRef = C8197F521D2F47370031FCE0 /* order.png */; };
 		C8C378D01D26DA12008D184B /* MJExtensionConst.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378BD1D26DA12008D184B /* MJExtensionConst.m */; };
 		C8C378D11D26DA12008D184B /* MJFoundation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378BF1D26DA12008D184B /* MJFoundation.m */; };
 		C8C378D21D26DA12008D184B /* MJProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378C11D26DA12008D184B /* MJProperty.m */; };
@@ -210,6 +211,7 @@
 		A58FC3681D2668F600CA3A81 /* DateTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DateTool.m; path = tools/DateTool.m; sourceTree = "<group>"; };
 		C80519891D26B2FA000164E4 /* DownloadOrderInfoInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DownloadOrderInfoInterface.h; path = webinterface/DownloadOrderInfoInterface.h; sourceTree = "<group>"; };
 		C805198A1D26B2FA000164E4 /* DownloadOrderInfoInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DownloadOrderInfoInterface.m; path = webinterface/DownloadOrderInfoInterface.m; sourceTree = "<group>"; };
+		C8197F521D2F47370031FCE0 /* order.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = order.png; path = imgs/order.png; sourceTree = "<group>"; };
 		C8C378BB1D26DA12008D184B /* MJExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MJExtension.h; path = mjextension/MJExtension.h; sourceTree = "<group>"; };
 		C8C378BC1D26DA12008D184B /* MJExtensionConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MJExtensionConst.h; path = mjextension/MJExtensionConst.h; sourceTree = "<group>"; };
 		C8C378BD1D26DA12008D184B /* MJExtensionConst.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MJExtensionConst.m; path = mjextension/MJExtensionConst.m; sourceTree = "<group>"; };
@@ -346,6 +348,7 @@
 		A52CB3701D22434800402E3F /* imgs */ = {
 			isa = PBXGroup;
 			children = (
+				C8197F521D2F47370031FCE0 /* order.png */,
 				A52CB3711D22437D00402E3F /* 29.png */,
 				A52CB3721D22437D00402E3F /* 40.png */,
 				A52CB3731D22437D00402E3F /* 58.png */,
@@ -673,6 +676,7 @@
 				A52CB3AD1D22437D00402E3F /* misspassword.png in Resources */,
 				A52CB3AF1D22437D00402E3F /* person.png in Resources */,
 				A52CB3B01D22437D00402E3F /* print.png in Resources */,
+				C8197F531D2F47370031FCE0 /* order.png in Resources */,
 				A52CB39A1D22437D00402E3F /* 80.png in Resources */,
 				A52CB3AA1D22437D00402E3F /* left.png in Resources */,
 				A52CB3B41D22437D00402E3F /* tbrk.png in Resources */,

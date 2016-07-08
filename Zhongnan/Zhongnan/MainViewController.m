@@ -12,6 +12,7 @@
 #import "UIView+Toast.h"
 #import "SCDBTool.h"
 #import "MJExtension.h"
+#import "UIBarButtonItem+Extension.h"
 
 @interface MainViewController (){
     NSMutableArray *outPrintArray;//当前打印出库单
@@ -22,11 +23,17 @@
 
 @implementation MainViewController
 
+
+-(void)back:(id)sender {
+    
+}
+
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.title = @"新物资系统";
-    self.navigationItem.leftBarButtonItem = nil;
+    self.navigationItem.leftBarButtonItem = [UIBarButtonItem itemWithImageName:@"" highImageName:@"" target:self action:@selector(back:)];
     
     //第一次查看网络是否连接
     if (![self isConnectionAvailable:@"http:\\www.baidu.com"]) {
@@ -315,8 +322,28 @@
                           "</soap:Envelope>\n",self.user.UserOID,rkToken];
         WebServiceConnect *da = [[WebServiceConnect alloc] initWithConnect:connectUrl :data :@"http://tempuri.org/Mobile_DownLoadOrderComplete" :@"Mobile_DownLoadOrderCompleteResult"];
         [da getTestConnet];
-        
-        //        [self.view makeToast:da.tempStr duration:3.0 position:CSToastPositionCenter];
+        //todo
+        if(da.tempStr.length>6){
+            if([[da.tempStr substringToIndex:5] isEqualToString:@"false"]){
+                //无数据
+                NSArray<NSString *> *stringArray = [da.tempStr componentsSeparatedByString:@":"];
+                UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                              message:stringArray[1]
+                                                             delegate:self
+                                                    cancelButtonTitle:@"确定"
+                                                    otherButtonTitles:nil, nil];
+                [alert show];//提示框的显示 必须写 不然没有任何反映
+                
+            }else{
+            }
+        }else{
+            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                          message:@"网络错误!"
+                                                         delegate:self
+                                                cancelButtonTitle:@"确定"
+                                                otherButtonTitles:nil, nil];
+            [alert show];//提示框的显示 必须写 不然没有任何反映
+        }
     }
 }
 //直入直出
@@ -351,6 +378,8 @@
         
         WebServiceConnect *da = [[WebServiceConnect alloc] initWithConnect:connectUrl :data :@"http://tempuri.org/Mobile_downloadReceiveInfo" :@"Mobile_downloadReceiveInfoResult"];
         [da getTestConnet];
+        NSLog(@"出入单表头数据:%@",da.tempStr);
+        if(da.tempStr.length>6){
         if([[da.tempStr substringToIndex:5] isEqualToString:@"false"]){
             //无数据
             NSArray<NSString *> *stringArray = [da.tempStr componentsSeparatedByString:@":"];
@@ -387,10 +416,12 @@
                     [self getOrderOutMatWithOrderId:orderout.id withCkToken:ckToken];
                     [self getOrderOutConsumerWithOrderId:orderout.id withCkToken:ckToken];
                 }
+                //结束下载出库订单
+                [self getOrderOutCompleteWithCkToken:outToken];
             }
         }
-        //结束下载出库订单
-        [self getOrderOutCompleteWithCkToken:outToken];
+        }
+        
         
     }
 }
@@ -419,6 +450,7 @@
                           "</soap:Envelope>\n",self.user.UserOID,orderid,ckToken];
         WebServiceConnect *da = [[WebServiceConnect alloc] initWithConnect:connectUrl :data :@"http://tempuri.org/Mobile_DownloadReceiveMaterial" :@"Mobile_DownloadReceiveMaterialResult"];
         [da getTestConnet];
+        if(da.tempStr.length>6){
         if([[da.tempStr substringToIndex:5] isEqualToString:@"false"]){
             //无数据
             NSArray<NSString *> *stringArray = [da.tempStr componentsSeparatedByString:@":"];
@@ -438,6 +470,7 @@
                     [mat saveOrUpdate];
                 }
             }
+        }
         }
     }
 }
@@ -468,24 +501,26 @@
         WebServiceConnect *da = [[WebServiceConnect alloc] initWithConnect:connectUrl :data :@"http://tempuri.org/Mobile_DownloadReceiveconsumer" :@"Mobile_DownloadReceiveconsumerResult"];
         [da getTestConnet];
         //保存出库领料商
-        
-        if([[da.tempStr substringToIndex:5] isEqualToString:@"false"]){
-            //无数据
-            NSArray<NSString *> *stringArray = [da.tempStr componentsSeparatedByString:@":"];
-            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                          message:stringArray[1]
-                                                         delegate:self
-                                                cancelButtonTitle:@"确定"
-                                                otherButtonTitles:nil, nil];
-            [alert show];//提示框的显示 必须写 不然没有任何反映
+        NSLog(@"出库领料商:%@",da.tempStr);
+        if(da.tempStr.length>6){
+            if([[da.tempStr substringToIndex:5] isEqualToString:@"false"]){
+                //无数据
+                NSArray<NSString *> *stringArray = [da.tempStr componentsSeparatedByString:@":"];
+                UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                              message:stringArray[1]
+                                                             delegate:self
+                                                    cancelButtonTitle:@"确定"
+                                                    otherButtonTitles:nil, nil];
+                [alert show];//提示框的显示 必须写 不然没有任何反映
             
-        }else{
-            NSArray *array = [SCDBTool arrayWithJSONString:da.tempStr];
-            if(array){
-                NSArray *matArray = [OutConsumer mj_objectArrayWithKeyValuesArray:array];
-                //保存出库领料商
-                for(OutConsumer *consumer in matArray){
-                    [consumer saveOrUpdate];
+            }else{
+                NSArray *array = [SCDBTool arrayWithJSONString:da.tempStr];
+                if(array){
+                    NSArray *matArray = [OutConsumer mj_objectArrayWithKeyValuesArray:array];
+                    //保存出库领料商
+                    for(OutConsumer *consumer in matArray){
+                        [consumer saveOrUpdate];
+                    }
                 }
             }
         }
@@ -514,7 +549,7 @@
                           "</soap:Envelope>\n",self.user.UserOID,ckToken];
         WebServiceConnect *da = [[WebServiceConnect alloc] initWithConnect:connectUrl :data :@"http://tempuri.org/Mobile_DownLoadReceiveComplete" :@"Mobile_DownLoadReceiveCompleteResult"];
         [da getTestConnet];
-        
+        NSLog(@"下载出库订单结束:%@",da.tempStr);
         NSArray<NSString *> *stringArray = [da.tempStr componentsSeparatedByString:@":"];
         if([stringArray[0] isEqualToString:@"false"]){
             //无数据

@@ -51,9 +51,9 @@
     }
     
     self.matNameLabel.text = name;
-    self.qtyLabel.text = [NSString stringWithFormat:@"%.2f",qty];
+    self.qtyLabel.text = [NSString stringWithFormat:@"%d",qty];
     self.modelLabel.text = model;
-    self.sourceQtyLabel.text = [NSString stringWithFormat:@"%.2f",sourceQty];
+    self.sourceQtyLabel.text = [NSString stringWithFormat:@"%d",sourceQty];
     self.unitLabel.text = unit;
     self.brandLabel.text = brand;
     self.noteLabel.text = note;
