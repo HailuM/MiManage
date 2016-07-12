@@ -182,6 +182,24 @@
         //保存数据库
         // TODO 涉及到出入库的数量判断
         NSDate *now = [NSDate date];
+        NSString *deliverNo = [NSString stringWithFormat:@"%@%@",[DateTool dateToString:now],[DateTool randomNumber]];
+        //保存入库单
+        mIn = [[SCOrderMIn alloc] init];
+        
+        mIn.id = self.order.id;
+        mIn.OrderId = self.order.OrderId;
+        mIn.number = self.order.number;
+        mIn.date = self.order.date;
+        mIn.supplier = self.order.supplier;
+        mIn.materialDesc = self.order.materialDesc;
+        mIn.Addr = self.order.Addr;
+        mIn.ProjectName= self.order.ProjectName;
+        mIn.Company = self.order.Company;
+        
+        mIn.gid = [UUIDUtil getUUID];
+        mIn.time = now;
+        mIn.deliverNo = deliverNo;
+        [mIn saveOrUpdate];//保存直入直出单
         
         
         for (int i = 0; i<self.selArray.count; i++) {
@@ -197,8 +215,9 @@
             [inMat saveOrUpdate];
             //生成入库单
             SCIn *scIn = [[SCIn alloc] init];
-            scIn.preparetime = now;
-            scIn.receiveid = [NSString stringWithFormat:@"%@%@",[DateTool dateToString:now],[StringUtil create:i]];
+            scIn.time = now;
+            scIn.receiveid = mIn.gid;
+            scIn.deliverNo = deliverNo;
             scIn.orderid = inMat.orderid;
             scIn.orderEntryid = inMat.orderentryid;
             scIn.qty = inMat.qty;

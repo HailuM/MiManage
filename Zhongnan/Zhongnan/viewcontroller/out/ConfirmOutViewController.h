@@ -10,6 +10,7 @@
 #import "OutDealViewController.h"
 #import "ChooseConsumerViewController.h"
 #import "UartLib.h"
+#import "SCOrderMOut.h"
 
 @interface ConfirmOutViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,PassConsumerDelegate,UartDelegate,UIAlertViewDelegate>
 

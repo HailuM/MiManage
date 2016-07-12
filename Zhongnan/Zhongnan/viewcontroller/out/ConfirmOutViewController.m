@@ -10,6 +10,7 @@
 #import "OrderDetailTableViewCell.h"
 #import "DateTool.h"
 #import "StringUtil.h"
+#import "UUIDUtil.h"
 #import "UIView+Toast.h"
 
 @interface ConfirmOutViewController (){
@@ -17,6 +18,8 @@
     UartLib *uartLib;
     CBPeripheral *connectPeripheral;
     NSString *printContant;
+    
+    SCOrderMOut *mOut;
 }
 
 @end
@@ -181,7 +184,30 @@
             //保存数据库
             // TODO 涉及到出入库的数量判断
             NSDate *now = [NSDate date];
-            NSString *deliverNo = [NSString stringWithFormat:@"%@%@",[DateTool dateToString:now],[StringUtil create:0]];
+            NSString *deliverNo = [NSString stringWithFormat:@"%@%@",[DateTool dateToString:now],[DateTool randomNumber]];
+            
+            
+            
+            //生成出库单主表
+            mOut = [[SCOrderMOut alloc] init];
+            
+            mOut.id = self.order.id;
+            mOut.OrderId = self.order.OrderId;
+            mOut.number = self.order.number;
+            mOut.date = self.order.date;
+            mOut.supplier = self.order.supplier;
+            mOut.materialDesc = self.order.materialDesc;
+            mOut.Addr = self.order.Addr;
+            mOut.ProjectName= self.order.ProjectName;
+            mOut.Company = self.order.Company;
+            
+            mOut.gid = [UUIDUtil getUUID];
+            mOut.time = now;
+            mOut.deliverNo = deliverNo;
+            mOut.consumerid = self.consumer.consumerid;
+            mOut.consumerName = self.consumer.Name;
+            [mOut saveOrUpdate];//保存直入直出单
+            
             
             self.array = [[NSMutableArray alloc] init];
             for (int i = 0; i<self.selArray.count; i++) {
@@ -193,11 +219,13 @@
                 [outMat saveOrUpdate];
                 //生成入库单
                 SCOut *scOut = [[SCOut alloc] init];
-                scOut.preparetime = now;
+                scOut.time = now;
                 scOut.deliverNo = deliverNo;
+                scOut.deliverid = mOut.gid;
                 scOut.receiveid = self.order.id;
                 scOut.orderEntryid = outMat.orderentryid;
                 scOut.qty = outMat.qty;
+                scOut.wareentry = outMat.wareentry;
                 [scOut saveOrUpdate];
                 [self.array addObject:scOut];
             }
@@ -221,12 +249,13 @@
             
             [self.order saveOrUpdate];
             //开始打印
-            printContant=[NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@",
+            printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
                           @"------------------------------",
+                          (mOut.printcount+1),
                           @"\n出库单号:",deliverNo,
-                          @"\n项目:",self.order.ProjectName,
-                          @"\n领用商:",self.consumer.Name,
-                          @"\n地产公司:",self.order.Company,
+                          @"\n项目:",mOut.ProjectName,
+                          @"\n领用商:",mOut.consumerName,
+                          @"\n地产公司:",mOut.Company,
                           @"\n------------------------------"];
             for (int i = 0; i<self.selArray.count; i++) {
                 SCOrderOutMat *outMat = self.selArray[i];
@@ -240,9 +269,10 @@
                                        @"\n备注:",outMat.note];
                 printContant = [printContant stringByAppendingString:matString];
             }
-            printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
-                            @"\n收货人:",
-                            @"\n证明人:"];
+            printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
+                            @"\n收货人:__________________________",
+                            @"\n                                ",
+                            @"\n证明人:__________________________"];
             
             //准备好的打印字符串
             //--------------
@@ -289,9 +319,14 @@
         
         [self PrintWithFormat:printed];
         for(SCOut *scout in self.array){
-            scout.hasPrint = 1;
+            scout.printcount ++;
+            scout.isPrint = 1;
             [scout saveOrUpdate];
         }
+        mOut.isPrint = 1;
+        mOut.printcount ++;
+        
+        [mOut saveOrUpdate];
     }
     [uartLib scanStop];
     [uartLib disconnectPeripheral:connectPeripheral];

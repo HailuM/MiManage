@@ -86,22 +86,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Zhongnan/MainViewController.m"
-            timestampString = "489635449.778195"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "193"
-            endingLineNumber = "193"
-            landmarkName = "-getOrderInTitle"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -138,22 +122,6 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Zhongnan/MainViewController.m"
-            timestampString = "489635449.778195"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "324"
-            endingLineNumber = "324"
-            landmarkName = "-orderCompletewithRkToken:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Zhongnan/MainViewController.m"
             timestampString = "489638084.266167"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
@@ -170,7 +138,7 @@
                   moduleName = "Zhongnan"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/wongsuechang/Documents/iOSProject/MiManage/Zhongnan/Zhongnan/MainViewController.m"
-                  timestampString = "489638085.324201"
+                  timestampString = "489664881.03037"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "564"
@@ -185,7 +153,7 @@
                   moduleName = "Zhongnan"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/wongsuechang/Documents/iOSProject/MiManage/Zhongnan/Zhongnan/MainViewController.m"
-                  timestampString = "489638085.324304"
+                  timestampString = "489664881.030579"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "564"
@@ -240,6 +208,22 @@
             startingLineNumber = "557"
             endingLineNumber = "557"
             landmarkName = "-getOrderOutCompleteWithCkToken:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Zhongnan/MainViewController.m"
+            timestampString = "489664867.266894"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "205"
+            endingLineNumber = "205"
+            landmarkName = "-getOrderInTitle"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

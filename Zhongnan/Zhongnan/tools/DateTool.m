@@ -12,8 +12,15 @@
 
 +(NSString *)dateToString:(NSDate *)date {
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"yyyyMMddhhmmssSSS"];
+    [formatter setDateFormat:@"yyyy-MM-dd"];
     return [formatter stringFromDate:date];
+}
+
++(NSString *)randomNumber {
+    NSString *randomNumber;
+    int num = (arc4random() % 1000000);
+    randomNumber = [NSString stringWithFormat:@"%.6d", num];
+    return randomNumber;
 }
 
 @end

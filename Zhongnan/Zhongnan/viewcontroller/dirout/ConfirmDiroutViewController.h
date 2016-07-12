@@ -17,6 +17,7 @@
 #import "DiroutDealViewController.h"
 #import "ChooseConsumerViewController.h"
 #import "UartLib.h"
+#import "SCOrderMDirout.h"
 
 @interface ConfirmDiroutViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,PassConsumerDelegate,UartDelegate>
 

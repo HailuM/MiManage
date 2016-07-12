@@ -15,12 +15,14 @@
 
 @property (nonatomic, copy) NSString *orderid;
 @property (nonatomic, copy) NSString *OrderMXID;
+@property (nonatomic, copy) NSString *wareentry;//材料在入库单的记录id
 @property (nonatomic, copy) NSString *orderentryid;
 @property (nonatomic, copy) NSString *Name;
 @property (nonatomic, copy) NSString *model;
 @property (nonatomic, copy) NSString *unit;
 @property (nonatomic, copy) NSString *brand;
 @property (nonatomic, copy) NSString *note;
+@property (nonatomic, copy) NSString *consumerName;//补打时显示领料商
 @property (nonatomic, assign) double sourceQty;
 @property (nonatomic, assign) double limitQty;
 @property (nonatomic, assign) double qty;//这次处理的数量

@@ -21,10 +21,12 @@
 
 @interface SCIn : JKDBModel
 
-@property (nonatomic, copy) NSDate *preparetime;
+@property (nonatomic, copy) NSDate *time;
 @property (nonatomic, copy) NSString *receiveid;
 @property (nonatomic, copy) NSString *orderid;
+@property (nonatomic, copy) NSString *deliverNo;
 @property (nonatomic, copy) NSString *orderEntryid;
+@property (nonatomic, copy) NSString *wareentry;//材料在入库单的记录id
 @property (nonatomic, assign) double qty;
 
 @end

@@ -27,6 +27,8 @@
 
 @property (nonatomic, copy) NSString *orderid;
 @property (nonatomic, copy) NSString *orderentryid;
+@property (nonatomic, copy) NSString *OrderMXID;
+@property (nonatomic, copy) NSString *wareentry;//材料在入库单的记录id
 @property (nonatomic, copy) NSString *Name;
 @property (nonatomic, copy) NSString *model;
 @property (nonatomic, copy) NSString *unit;
@@ -37,7 +39,6 @@
 @property (nonatomic, assign) double qty;//这次处理的数量
 @property (nonatomic, assign) double hasQty;//这次处理的数量
 @property (nonatomic, assign) double price;
-
 @property (nonatomic, assign) int isFinish;//0,未结束  1,已结束
 
 @end

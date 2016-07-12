@@ -1,17 +1,16 @@
 //
-//  SCOrderOut.h
+//  SCOrderMIn.h
 //  Zhongnan
 //
-//  Created by WongSuechang on 2016/7/2.
+//  Created by WongSuechang on 2016/7/12.
 //  Copyright © 2016年 EMI. All rights reserved.
 //
 
 #import "JKDBModel.h"
-/**
- *  出库订单
- */
-@interface SCOrderOut : JKDBModel
-@property (nonatomic, copy) NSString *id;//订单id
+
+@interface SCOrderMIn : JKDBModel
+@property (nonatomic, copy) NSString *id;//来源入库订单的id,不是直入直出的id
+@property (nonatomic, copy) NSString *OrderId;//不明
 @property (nonatomic, copy) NSString *number;//订单号
 @property (nonatomic, copy) NSString *date;//订单制单时间
 @property (nonatomic, copy) NSString *supplier;//供应商
@@ -19,11 +18,11 @@
 @property (nonatomic, copy) NSString *Addr;//地址楼栋
 @property (nonatomic, copy) NSString *ProjectName;//项目名称
 @property (nonatomic, copy) NSString *Company;//公司
-@property (nonatomic, copy) NSString *OrderId;//
+//以上信息是入库订单即SCOrderIn的信息
 
-@property (nonatomic, assign) int isFinish;//0,未结束    1,已结束
+//@property (nonatomic, copy) NSString *zrzcid;//直入直出的id
+@property (nonatomic, copy) NSString *gid;//直入直出的id主键
+@property (nonatomic, copy) NSDate *time;
+@property (nonatomic, copy) NSString *deliverNo;
 
-//
-//@property (nonatomic, assign) int printcount;//0,未打印,其他,打印次数
-// TODO 收货联系人 未知
 @end

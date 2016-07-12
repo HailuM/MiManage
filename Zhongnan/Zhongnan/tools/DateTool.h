@@ -11,5 +11,5 @@
 @interface DateTool : NSObject
 
 +(NSString *)dateToString:(NSDate *)date;
-
++(NSString *)randomNumber;
 @end

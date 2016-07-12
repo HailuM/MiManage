@@ -16,6 +16,8 @@
 #import "SCDirout.h"
 #import "SCOrderOut.h"
 #import "SCOrderOutMat.h"
+#import "SCOrderMOut.h"
+#import "SCOrderMDirout.h"
 
 @interface SCDBTool : NSObject
 

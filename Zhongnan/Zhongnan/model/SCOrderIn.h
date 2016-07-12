@@ -15,6 +15,7 @@
 @interface SCOrderIn : JKDBModel
 
 @property (nonatomic, copy) NSString *id;//订单id
+@property (nonatomic, copy) NSString *OrderId;//不明
 @property (nonatomic, copy) NSString *number;//订单号
 @property (nonatomic, copy) NSString *date;//订单制单时间
 @property (nonatomic, copy) NSString *supplier;//供应商
@@ -25,6 +26,7 @@
 
 @property (nonatomic, assign) int isDirout;//1,直入直出  0,非直入直出
 @property (nonatomic, assign) int isFinish;//0,未结束    1,已结束
+
 // TODO 收货联系人 未知
 
 //@property (nonatomic, assign) int inOrOut;//0,出库  1,入库

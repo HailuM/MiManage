@@ -787,51 +787,41 @@
     //查询出所有未打印的出库单和直入直出单
     
     //查询出库单
-    NSArray *orderOutArray = [SCOrderOut findAll];
-    NSArray *outArray = [SCOut findByCriteria:@" WHERE hasPrint = 0 "];
-    for(SCOrderOut *orderout in orderOutArray){
+    NSArray *orderOutArray = [SCOrderMOut findByCriteria:@" WHERE isPrint = 0 "];//未打印的出库单
+//    NSArray *outArray = [SCOut findByCriteria:@" WHERE printcount = 0 "];//
+    for(SCOrderMOut *orderout in orderOutArray){
         //待打印的材料数组
-        NSMutableArray *printArray = [[NSMutableArray alloc] init];
-        NSString *deliverNo;
-        OutConsumer *consumer;
-        outPrintArray = [[NSMutableArray alloc] init];
-        for(SCOut *scout in outArray){
-            if([scout.receiveid isEqualToString:orderout.id]){
-                [outPrintArray addObject:scout];
-                //查询供应商
-                consumer = [OutConsumer findFirstByCriteria:[NSString stringWithFormat:@" WHERE consumerid = '%@'",scout.consumerid]];
-                deliverNo = scout.deliverNo;
-                //查询材料明细
-                SCOrderOutMat *mat = [SCOrderOutMat findFirstByCriteria:[NSString stringWithFormat:@" WHERE orderentryid =  '%@'",scout.orderEntryid]];
-                //让查询到的处理数量为出库单上的数量
-                mat.qty = scout.qty;
-                [printArray addObject:mat];
-            }
-        }
+        NSArray *outArray = [SCOut findByCriteria:[NSString stringWithFormat:@" WHERE  deliverid = '%@' ",orderout.gid]];
         //准备打印出库单数据
-        if(printArray.count>0){
-           printContant=[NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@",
+        if(outArray.count>0){
+            printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
                           @"------------------------------",
-                          @"\n出库单号:",deliverNo,
+                          (orderout.printcount+1),
+                          @"\n出库单号:",orderout.deliverNo,
                           @"\n项目:",orderout.ProjectName,
-                          @"\n领用商:",consumer.Name,
+                          @"\n领用商:",orderout.consumerName,
                           @"\n地产公司:",orderout.Company,
                           @"\n------------------------------"];
-            for (int i = 0; i<printArray.count; i++) {
-                SCOrderOutMat *outMat = printArray[i];
+            for (int i = 0; i<outArray.count; i++) {
+                SCOut *outM = outArray[i];
+                outM.isPrint = 1;
+                outM.printcount ++;
+                [outM saveOrUpdate];
+                SCOrderOutMat *outMat = [SCOrderOutMat findFirstByCriteria:[NSString stringWithFormat:@" WHERE wareentry = '%@'",outM.wareentry]];
                 NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%f%@%f%@%@\n ",
                                        @"\n材料名称:",outMat.Name,
                                        @"\n品牌:",outMat.brand,
                                        @"\n规格型号:",outMat.model,
-                                       @"\n数量:",outMat.qty,
+                                       @"\n数量:",outM.qty,
                                        @"\n单价:",outMat.price,
-                                       @"\n金额:",outMat.qty*outMat.price,
+                                       @"\n金额:",outM.qty*outMat.price,
                                        @"\n备注:",outMat.note];
                 printContant = [printContant stringByAppendingString:matString];
             }
-            printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
-                            @"\n收货人:",
-                            @"\n证明人:"];
+            printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
+                            @"\n收货人:__________________",
+                            @"\n                        ",
+                            @"\n证明人:__________________"];
             //开始打印
             //--------------
             [uartLib scanStart];//scan
@@ -839,56 +829,49 @@
             
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
         }
+        orderout.isPrint = 1;
+        orderout.printcount ++;
+        [orderout saveOrUpdate];
     }
     
     
     
     //查询直入直出单
-    NSArray *orderInArray = [SCOrderIn findAll];//入库单
-    NSArray *inArray = [SCDirout findByCriteria:@" WHERE hasPrint = 0 "];//直入直出单
-    for(SCOrderIn *orderin in orderInArray){
+    NSArray *orderInArray = [SCOrderMDirout findByCriteria:@" WHERE isPrint = 0 "];//未打印的直入直出单
+//    NSArray *inArray = [SCDirout findByCriteria:@" WHERE printcount = 0 "];//直入直出单
+    for(SCOrderMDirout *orderDirout in orderInArray){
         //待打印的材料数组
-        NSMutableArray *printArray = [[NSMutableArray alloc] init];
-        NSString *deliverNo;
-        InConsumer *consumer;
-        dirPrintArray = [[NSMutableArray alloc] init];
-        for(SCDirout *dirout in inArray){
-            if([dirout.orderid isEqualToString:orderin.id]){
-                [dirPrintArray addObject:dirout];
-                //查询供应商
-                consumer = [InConsumer findFirstByCriteria:[NSString stringWithFormat:@" WHERE consumerid = '%@'",dirout.consumerid]];
-                deliverNo = dirout.zrzcid;
-                //查询材料明细
-                SCOrderInMat *mat = [SCOrderInMat findFirstByCriteria:[NSString stringWithFormat:@" WHERE orderentryid =  '%@'",dirout.orderEntryid]];
-                //让查询到的处理数量为出库单上的数量
-                mat.qty = dirout.qty;
-                [printArray addObject:mat];
-            }
-        }
+        NSArray *diroutArray = [SCDirout findByCriteria:[NSString stringWithFormat:@" WHERE  zrzcid = '%@' ",orderDirout.gid]];
         //准备打印出库单数据
-        if(printArray.count>0){
-            printContant=[NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@",
+        if(diroutArray.count>0){
+            printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
                           @"------------------------------",
-                          @"\n出库单号:",deliverNo,
-                          @"\n项目:",orderin.ProjectName,
-                          @"\n领用商:",consumer.Name,
-                          @"\n地产公司:",orderin.Company,
+                          (orderDirout.printcount+1),
+                          @"\n出库单号:",orderDirout.deliverNo,
+                          @"\n项目:",orderDirout.ProjectName,
+                          @"\n领用商:",orderDirout.consumerName,
+                          @"\n地产公司:",orderDirout.Company,
                           @"\n------------------------------"];
-            for (int i = 0; i<printArray.count; i++) {
-                SCOrderInMat *inMat = printArray[i];
+            for (int i = 0; i<diroutArray.count; i++) {
+                SCDirout *dirout = diroutArray[i];
+                dirout.isPrint = 1;
+                dirout.printcount ++;
+                [dirout saveOrUpdate];
+                SCOrderInMat *inMat = [SCOrderInMat findFirstByCriteria:[NSString stringWithFormat:@" WHERE wareentry = '%@'",dirout.wareentry]];
                 NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%f%@%f%@%@\n ",
                                        @"\n材料名称:",inMat.Name,
                                        @"\n品牌:",inMat.brand,
                                        @"\n规格型号:",inMat.model,
-                                       @"\n数量:",inMat.qty,
+                                       @"\n数量:",dirout.qty,
                                        @"\n单价:",inMat.price,
-                                       @"\n金额:",inMat.qty*inMat.price,
+                                       @"\n金额:",dirout.qty*inMat.price,
                                        @"\n备注:",inMat.note];
                 printContant = [printContant stringByAppendingString:matString];
             }
-            printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
-                            @"\n收货人:",
-                            @"\n证明人:"];
+            printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
+                            @"\n收货人:____________________",
+                            @"\n                          ",
+                            @"\n证明人:____________________"];
             //开始打印
             //--------------
             [uartLib scanStart];//scan
@@ -896,7 +879,9 @@
             
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
         }
-        
+        orderDirout.isPrint = 1;
+        orderDirout.printcount ++;
+        [orderDirout saveOrUpdate];
         
     }
     
@@ -927,7 +912,7 @@
         //打印完成 记得该状态  todo
         if(outPrintArray.count>0){
             for(SCOut *scout in outPrintArray){
-                scout.hasPrint = 1;
+                scout.isPrint = 1;
                 [scout saveOrUpdate];
             }
             outPrintArray = nil;
@@ -935,7 +920,7 @@
         
         if(dirPrintArray.count>0){
             for (SCDirout *dirout in dirPrintArray) {
-                dirout.hasPrint = 1;
+                dirout.isPrint = 1;
                 [dirout saveOrUpdate];
             }
             dirPrintArray = nil;

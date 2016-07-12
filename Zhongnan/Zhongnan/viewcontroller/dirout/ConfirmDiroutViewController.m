@@ -8,6 +8,7 @@
 
 #import "ConfirmDiroutViewController.h"
 #import "UIView+Toast.h"
+#import "UUIDUtil.h"
 
 
 @interface ConfirmDiroutViewController (){
@@ -15,6 +16,10 @@
     UartLib *uartLib;
     CBPeripheral *connectPeripheral;
     NSString *printContant;
+    
+    
+    SCOrderMDirout *mDirout;
+    
 }
 
 @end
@@ -230,7 +235,9 @@
             // TODO 涉及到出入库的数量判断
             self.array = [[NSMutableArray alloc] init];
             NSDate *now = [NSDate date];
-            NSString *deliverNo = [NSString stringWithFormat:@"%@%@",[DateTool dateToString:now],[StringUtil create:0]];
+            
+            //直入直出单号
+            NSString *deliverNo = [NSString stringWithFormat:@"%@%@",[DateTool dateToString:now],[DateTool randomNumber]];
             int finish = 0;//判断单据是否结束:0,已结束  >0,未结束
             for (int i = 0; i<self.selArray.count; i++) {
                 SCOrderInMat *inMat = self.selArray[i];
@@ -242,6 +249,28 @@
             }
             //订单已结束
             if(finish==0){
+                
+                //生成直入直出单
+                mDirout = [[SCOrderMDirout alloc] init];
+                
+                mDirout.id = self.order.id;
+                mDirout.OrderId = self.order.OrderId;
+                mDirout.number = self.order.number;
+                mDirout.date = self.order.date;
+                mDirout.supplier = self.order.supplier;
+                mDirout.materialDesc = self.order.materialDesc;
+                mDirout.Addr = self.order.Addr;
+                mDirout.ProjectName= self.order.ProjectName;
+                mDirout.Company = self.order.Company;
+                
+                mDirout.gid = [UUIDUtil getUUID];
+                mDirout.time = now;
+                mDirout.deliverNo = deliverNo;
+                mDirout.consumerid = self.consumer.consumerid;
+                mDirout.consumerName = self.consumer.Name;
+                [mDirout saveOrUpdate];//保存直入直出单
+                
+                
                 for (int i = 0; i<self.selArray.count; i++) {
                     SCOrderInMat *inMat = self.selArray[i];
                     //更新已处理数量
@@ -250,9 +279,11 @@
                     [inMat saveOrUpdate];
                     //生成入库单
                     SCDirout *scDirout = [[SCDirout alloc] init];
+                    scDirout.wareentry = inMat.wareentry;
+                    scDirout.deliverNo = deliverNo;
                     scDirout.preparetime = now;
                     scDirout.consumerid = self.consumer.consumerid;
-                    scDirout.zrzcid = deliverNo;
+                    scDirout.zrzcid = mDirout.gid;
                     scDirout.orderid = inMat.orderid;
                     scDirout.orderEntryid = inMat.orderentryid;
                     scDirout.qty = inMat.qty;
@@ -268,12 +299,13 @@
                 [self.order saveOrUpdate];
                 
                 //开始打印
-                printContant=[NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@",
+                printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
                               @"------------------------------",
+                              (mDirout.printcount+1),
                               @"\n出库单号:",deliverNo,
-                              @"\n项目:",self.order.ProjectName,
-                              @"\n领用商:",self.consumer.Name,
-                              @"\n地产公司:",self.order.Company,
+                              @"\n项目:",mDirout.ProjectName,
+                              @"\n领用商:",mDirout.consumerName,
+                              @"\n地产公司:",mDirout.Company,
                               @"\n------------------------------"];
                 for (int i = 0; i<self.selArray.count; i++) {
                     SCOrderInMat *outMat = self.selArray[i];
@@ -288,8 +320,8 @@
                     printContant = [printContant stringByAppendingString:matString];
                 }
                 printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
-                                @"\n收货人:",
-                                @"\n证明人:"];
+                                @"\n收货人:_________________________",
+                                @"\n证明人:_________________________"];
                 
                 //准备好的打印字符串
                 //--------------
@@ -347,10 +379,15 @@
         NSString *printed = [curPrintContent stringByAppendingFormat:@"%c%c%c", '\n', '\n', '\n'];
         
         [self PrintWithFormat:printed];
-        for(SCDirout *scout in self.array){
-            scout.hasPrint = 1;
+        for(SCOut *scout in self.array){
+            scout.printcount ++;
+            scout.isPrint = 1;
             [scout saveOrUpdate];
         }
+        mDirout.printcount++;
+        mDirout.isPrint = 1;
+        
+        [mDirout saveOrUpdate];
     }
     [uartLib scanStop];
     [uartLib disconnectPeripheral:connectPeripheral];

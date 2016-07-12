@@ -15,8 +15,12 @@
 #import "StringUtil.h"
 #import "UIView+Toast.h"
 #import "InDealViewController.h"
+#import "SCOrderMIn.h"
+#import "UUIDUtil.h"
 
-@interface ConfirmInViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
+@interface ConfirmInViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>{
+    SCOrderMIn *mIn;
+}
 
 @property (nonatomic, strong) SCOrderIn *order;
 @property (nonatomic, strong) NSMutableArray *selArray;//保存已选中材料的数组

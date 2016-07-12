@@ -78,6 +78,10 @@
 		A58FC3691D2668F600CA3A81 /* DateTool.m in Sources */ = {isa = PBXBuildFile; fileRef = A58FC3681D2668F600CA3A81 /* DateTool.m */; };
 		C805198B1D26B2FA000164E4 /* DownloadOrderInfoInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = C805198A1D26B2FA000164E4 /* DownloadOrderInfoInterface.m */; };
 		C8197F531D2F47370031FCE0 /* order.png in Resources */ = {isa = PBXBuildFile; fileRef = C8197F521D2F47370031FCE0 /* order.png */; };
+		C8197F561D339B720031FCE0 /* UUIDUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = C8197F541D339B720031FCE0 /* UUIDUtil.m */; };
+		C8197F591D3480EB0031FCE0 /* SCOrderMOut.m in Sources */ = {isa = PBXBuildFile; fileRef = C8197F581D3480EB0031FCE0 /* SCOrderMOut.m */; };
+		C8197F5C1D3481100031FCE0 /* SCOrderMDirout.m in Sources */ = {isa = PBXBuildFile; fileRef = C8197F5B1D3481100031FCE0 /* SCOrderMDirout.m */; };
+		C8197F5F1D3481430031FCE0 /* SCOrderMIn.m in Sources */ = {isa = PBXBuildFile; fileRef = C8197F5E1D3481430031FCE0 /* SCOrderMIn.m */; };
 		C8C378D01D26DA12008D184B /* MJExtensionConst.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378BD1D26DA12008D184B /* MJExtensionConst.m */; };
 		C8C378D11D26DA12008D184B /* MJFoundation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378BF1D26DA12008D184B /* MJFoundation.m */; };
 		C8C378D21D26DA12008D184B /* MJProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378C11D26DA12008D184B /* MJProperty.m */; };
@@ -212,6 +216,14 @@
 		C80519891D26B2FA000164E4 /* DownloadOrderInfoInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DownloadOrderInfoInterface.h; path = webinterface/DownloadOrderInfoInterface.h; sourceTree = "<group>"; };
 		C805198A1D26B2FA000164E4 /* DownloadOrderInfoInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DownloadOrderInfoInterface.m; path = webinterface/DownloadOrderInfoInterface.m; sourceTree = "<group>"; };
 		C8197F521D2F47370031FCE0 /* order.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = order.png; path = imgs/order.png; sourceTree = "<group>"; };
+		C8197F541D339B720031FCE0 /* UUIDUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UUIDUtil.m; path = tools/UUIDUtil.m; sourceTree = "<group>"; };
+		C8197F551D339B720031FCE0 /* UUIDUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UUIDUtil.h; path = tools/UUIDUtil.h; sourceTree = "<group>"; };
+		C8197F571D3480EB0031FCE0 /* SCOrderMOut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCOrderMOut.h; path = model/SCOrderMOut.h; sourceTree = "<group>"; };
+		C8197F581D3480EB0031FCE0 /* SCOrderMOut.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCOrderMOut.m; path = model/SCOrderMOut.m; sourceTree = "<group>"; };
+		C8197F5A1D3481100031FCE0 /* SCOrderMDirout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCOrderMDirout.h; path = model/SCOrderMDirout.h; sourceTree = "<group>"; };
+		C8197F5B1D3481100031FCE0 /* SCOrderMDirout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCOrderMDirout.m; path = model/SCOrderMDirout.m; sourceTree = "<group>"; };
+		C8197F5D1D3481430031FCE0 /* SCOrderMIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCOrderMIn.h; path = model/SCOrderMIn.h; sourceTree = "<group>"; };
+		C8197F5E1D3481430031FCE0 /* SCOrderMIn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCOrderMIn.m; path = model/SCOrderMIn.m; sourceTree = "<group>"; };
 		C8C378BB1D26DA12008D184B /* MJExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MJExtension.h; path = mjextension/MJExtension.h; sourceTree = "<group>"; };
 		C8C378BC1D26DA12008D184B /* MJExtensionConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MJExtensionConst.h; path = mjextension/MJExtensionConst.h; sourceTree = "<group>"; };
 		C8C378BD1D26DA12008D184B /* MJExtensionConst.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MJExtensionConst.m; path = mjextension/MJExtensionConst.m; sourceTree = "<group>"; };
@@ -403,6 +415,8 @@
 		A52CB3C31D224A6D00402E3F /* tools */ = {
 			isa = PBXGroup;
 			children = (
+				C8197F541D339B720031FCE0 /* UUIDUtil.m */,
+				C8197F551D339B720031FCE0 /* UUIDUtil.h */,
 				A56562171D24C3E1003D6E2B /* StringUtil.h */,
 				A56562181D24C3E1003D6E2B /* StringUtil.m */,
 				A58FC3671D2668F600CA3A81 /* DateTool.h */,
@@ -455,10 +469,16 @@
 				C8C379081D26F023008D184B /* SCOrderOutMat.m */,
 				A57FF59A1D23A9CF004F9C67 /* SCDirout.h */,
 				A57FF59B1D23A9CF004F9C67 /* SCDirout.m */,
+				C8197F5A1D3481100031FCE0 /* SCOrderMDirout.h */,
+				C8197F5B1D3481100031FCE0 /* SCOrderMDirout.m */,
 				A57FF5A01D23ABE3004F9C67 /* SCOut.h */,
 				A57FF5A11D23ABE3004F9C67 /* SCOut.m */,
+				C8197F571D3480EB0031FCE0 /* SCOrderMOut.h */,
+				C8197F581D3480EB0031FCE0 /* SCOrderMOut.m */,
 				A57FF5A31D23AC09004F9C67 /* SCIn.h */,
 				A57FF5A41D23AC09004F9C67 /* SCIn.m */,
+				C8197F5D1D3481430031FCE0 /* SCOrderMIn.h */,
+				C8197F5E1D3481430031FCE0 /* SCOrderMIn.m */,
 			);
 			name = model;
 			sourceTree = "<group>";
@@ -700,6 +720,8 @@
 				A58FC3691D2668F600CA3A81 /* DateTool.m in Sources */,
 				A56562191D24C3E1003D6E2B /* StringUtil.m in Sources */,
 				C8C378D81D26DA12008D184B /* NSObject+MJProperty.m in Sources */,
+				C8197F591D3480EB0031FCE0 /* SCOrderMOut.m in Sources */,
+				C8197F5F1D3481430031FCE0 /* SCOrderMIn.m in Sources */,
 				C8C378F11D26E540008D184B /* OutDealViewController.m in Sources */,
 				C8C378EA1D26DA2F008D184B /* FMDatabasePool.m in Sources */,
 				A52CB3DA1D227E8000402E3F /* MainViewController.m in Sources */,
@@ -710,12 +732,14 @@
 				A52CB3D71D227AD600402E3F /* User.m in Sources */,
 				A57FF5A51D23AC09004F9C67 /* SCIn.m in Sources */,
 				C8C378D51D26DA12008D184B /* NSObject+MJClass.m in Sources */,
+				C8197F5C1D3481100031FCE0 /* SCOrderMDirout.m in Sources */,
 				A52CB3D31D225D1200402E3F /* LoginInterface.m in Sources */,
 				C8C378EB1D26DA2F008D184B /* FMDatabaseAdditions.m in Sources */,
 				C8C379061D26EFA1008D184B /* SCOrderOut.m in Sources */,
 				A57FF5A21D23ABE3004F9C67 /* SCOut.m in Sources */,
 				C8C378D21D26DA12008D184B /* MJProperty.m in Sources */,
 				C8C378DC1D26DA21008D184B /* UIView+Toast.m in Sources */,
+				C8197F561D339B720031FCE0 /* UUIDUtil.m in Sources */,
 				C8C378F71D26EB37008D184B /* ConfirmOutViewController.m in Sources */,
 				A52CB3C21D22490300402E3F /* UIBarButtonItem+Extension.m in Sources */,
 				A52CB3BF1D2248AC00402E3F /* SCNavigationController.m in Sources */,
