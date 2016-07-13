@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="16A201w" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="ue1-WU-0pu">
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
         <capability name="Alignment constraints to the first baseline" minToolsVersion="6.0"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
@@ -1084,7 +1085,6 @@
                     </view>
                     <navigationItem key="navigationItem" id="JNH-DN-FWI"/>
                     <connections>
-                        <outlet property="reciversTv" destination="y2s-vU-4qp" id="Aq2-l6-Xj3"/>
                         <outlet property="tableView" destination="y2s-vU-4qp" id="HuQ-oj-ihc"/>
                     </connections>
                 </viewController>
@@ -2424,7 +2424,7 @@
         <image name="cspz.png" width="286" height="41"/>
         <image name="cssz.png" width="51" height="51"/>
         <image name="grxx.png" width="286" height="85"/>
-        <image name="logo.png" width="801" height="346"/>
+        <image name="logo.png" width="361" height="133"/>
         <image name="misspassword.png" width="26" height="26"/>
         <image name="person.png" width="69" height="70"/>
         <image name="print.png" width="208" height="208"/>

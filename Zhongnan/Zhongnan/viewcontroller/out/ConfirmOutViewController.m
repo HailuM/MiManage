@@ -110,6 +110,14 @@
     cell.addBtn.tag = 1000+indexPath.row;
     [cell.addBtn setImage:[UIImage imageNamed:@"del"] forState:UIControlStateNormal];
     [cell.addBtn addTarget:self action:@selector(delToCheck:) forControlEvents:UIControlEventTouchUpInside];
+    
+    //减号"-"事件
+    cell.delLabel.tag = 2000+indexPath.row;
+    [cell.delLabel addTarget:self action:@selector(delQty:) forControlEvents:UIControlEventTouchUpInside];
+    
+    //加号"+"事件
+    cell.addLabel.tag = 3000+indexPath.row;[cell.addLabel addTarget:self action:@selector(addQty:) forControlEvents:UIControlEventTouchUpInside];
+    
     return cell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -154,6 +162,31 @@
     }
     
 }
+
+-(void)delQty:(id)sender{
+    UILabel *label = sender;
+    NSInteger tag = label.tag-2000;
+    SCOrderInMat *inMat = self.selArray[tag];
+    if(inMat.qty-1<=0){
+        inMat.qty = 0.0;
+    }else{
+        inMat.qty = inMat.qty-1;
+    }
+    [self.tableView reloadData];
+}
+
+-(void)addQty:(id)sender {
+    UILabel *label = sender;
+    NSInteger tag = label.tag-3000;
+    SCOrderInMat *inMat = self.selArray[tag];
+    if(inMat.qty+1>inMat.limitQty-inMat.hasQty){
+        inMat.qty = inMat.limitQty-inMat.hasQty;
+    }else{
+        inMat.qty = inMat.qty+1;
+    }
+    [self.tableView reloadData];
+}
+
 -(void)delToCheck:(id)sender {
     UIButton *btn = sender;
     NSInteger position = btn.tag - 1000;

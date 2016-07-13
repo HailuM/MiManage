@@ -143,15 +143,11 @@
     [cell.addBtn addTarget:self action:@selector(addToCheck:) forControlEvents:UIControlEventTouchUpInside];
     
     //减号"-"事件
-    UITapGestureRecognizer *delTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(delQty:)];
     cell.delLabel.tag = 2000+indexPath.row;
-    cell.delLabel.userInteractionEnabled = YES;
-    [cell.delLabel addGestureRecognizer:delTap];
+    [cell.delLabel addTarget:self action:@selector(delQty:) forControlEvents:UIControlEventTouchUpInside];
+    
     //加号"+"事件
-    UITapGestureRecognizer *addTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(addQty:)];
-    cell.addLabel.tag = 3000+indexPath.row;
-    cell.addLabel.userInteractionEnabled = YES;
-    [cell.addLabel addGestureRecognizer:addTap];
+    cell.addLabel.tag = 3000+indexPath.row;[cell.addLabel addTarget:self action:@selector(addQty:) forControlEvents:UIControlEventTouchUpInside];
     
     return cell;
 }
@@ -182,7 +178,7 @@
 
 -(void)addQty:(id)sender {
     UILabel *label = sender;
-    NSInteger tag = label.tag-2000;
+    NSInteger tag = label.tag-3000;
     SCOrderOutMat *outMat = unSelArray[tag];
     if(outMat.qty+1>outMat.limitQty-outMat.hasQty){
         outMat.qty = outMat.limitQty-outMat.hasQty;

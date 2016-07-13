@@ -29,6 +29,19 @@
 }
 
 
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
+    NSDictionary *myDictionary  = [userDefaultes  objectForKey:@"getServerInfo"];
+    serverUrl=[myDictionary valueForKey:@"ServerIP"];//
+    //读取入库的token
+    NSDictionary *tokenDic  = [userDefaultes  objectForKey:@"getToken"];
+    inToken = [tokenDic valueForKey:@"rkToken"];//
+    
+    //读取出库的token
+    outToken = [tokenDic valueForKey:@"ckToken"];//
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -228,7 +241,9 @@
                 }
             }
         }
-        [self orderCompletewithRkToken:inToken];
+        if(inToken){
+            [self orderCompletewithRkToken:inToken];
+        }
     }
 }
 
@@ -417,7 +432,10 @@
                     [self getOrderOutConsumerWithOrderId:orderout.id withCkToken:ckToken];
                 }
                 //结束下载出库订单
-                [self getOrderOutCompleteWithCkToken:outToken];
+                if(outToken){
+                    [self getOrderOutCompleteWithCkToken:outToken];
+                }
+                
             }
         }
         }

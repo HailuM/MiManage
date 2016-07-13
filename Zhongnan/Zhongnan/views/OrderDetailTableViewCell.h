@@ -27,8 +27,8 @@
 @property (strong, nonatomic) IBOutlet UILabel *unitLabel;
 @property (strong, nonatomic) IBOutlet UILabel *brandLabel;
 @property (strong, nonatomic) IBOutlet UILabel *noteLabel;
-@property (weak, nonatomic) IBOutlet UILabel *delLabel;
-@property (weak, nonatomic) IBOutlet UILabel *addLabel;
+@property (weak, nonatomic) IBOutlet UIButton *delLabel;
+@property (weak, nonatomic) IBOutlet UIButton *addLabel;
 @property (weak, nonatomic) IBOutlet UILabel *qtyLabel;
 
 @end
