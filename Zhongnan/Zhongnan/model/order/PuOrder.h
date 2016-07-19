@@ -25,16 +25,18 @@
  */
 @interface PuOrder : JKDBModel
 
-@property(nonatomic,copy) NSString* id;//订单主表id
-@property(nonatomic,copy) NSString* number;
-@property(nonatomic,copy) NSString* supplier;
-@property(nonatomic,copy) NSString* materialDesc;
-@property(nonatomic,copy) NSString* Addr;
-@property(nonatomic,copy) NSString* type;  //"rkck":手机上的入库之后做的出库  "zrzc":直入直出  "rk":入库  "ck":出库
+@property(nonatomic,copy) NSString *id;//主表id
+@property(nonatomic,copy) NSString *sourceid;//手机生成的出库单,来源是手机下载的入库单的id
+@property(nonatomic,copy) NSString *OrderId;//下载出库任务单id
+@property(nonatomic,copy) NSString *number;
+@property(nonatomic,copy) NSString *supplier;
+@property(nonatomic,copy) NSString *materialDesc;
+@property(nonatomic,copy) NSString *Addr;
+@property(nonatomic,copy) NSString *type;  //"rkck":手机上的入库之后做的出库  "zrzc":直入直出  "rk":入库  "ck":出库
 @property(nonatomic,assign) BOOL zcwc;//是否直出完成
-@property(nonatomic,copy) NSString* name;
-@property(nonatomic,copy) NSString* ProjectName;
-@property(nonatomic,copy) NSString* Company;
+@property(nonatomic,copy) NSString *name;
+@property(nonatomic,copy) NSString *ProjectName;
+@property(nonatomic,copy) NSString *Company;
 @property(nonatomic,copy) NSString *time;//存在数据库的修改或者new的时间
 
 @property(nonatomic,copy) NSString *date;//从服务器下载的订单的Date,用来显示订单时间

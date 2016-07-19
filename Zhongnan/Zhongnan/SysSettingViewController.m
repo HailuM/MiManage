@@ -69,22 +69,13 @@
         //清除出入库token
         NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
         
-        //读取入库的token
-        NSDictionary *tokenDic  = [userDefaultes  objectForKey:@"getToken"];
-        NSString *inToken = [tokenDic valueForKey:@"rkToken"];//
-        //读取出库的token
-        NSString *outToken = [tokenDic valueForKey:@"ckToken"];//
+        [userDefaultes setObject:@"" forKey:@"rkToken"];
         
-        
-        NSDictionary *rkDic = [NSDictionary dictionaryWithObjectsAndKeys:@"",@"rkToken", nil];
-        [userDefaultes setObject:rkDic forKey:@"GetToken"];
-        
-        NSDictionary *ckDic = [NSDictionary dictionaryWithObjectsAndKeys:@"",@"ckToken", nil];
-        [userDefaultes setObject:ckDic forKey:@"GetToken"];
+        [userDefaultes setObject:@"" forKey:@"ckToken"];
         
         //删除缓存数据
-        [SCDBTool clearInData:inToken];
-        [SCDBTool clearOutData:outToken];
+        [SCDBTool clearInData:@""];
+        [SCDBTool clearOutData:@""];
         
         [self.view makeToast:@"清除数据成功" duration:3.0 position:CSToastPositionCenter];
     }

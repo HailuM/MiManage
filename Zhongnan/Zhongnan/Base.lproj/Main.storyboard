@@ -2238,6 +2238,7 @@
                         <outlet property="confirmBtn" destination="BsO-9p-jmn" id="wX8-hP-bBf"/>
                         <outlet property="consumerLabel" destination="ZhN-mH-4TB" id="Gef-I4-4gb"/>
                         <outlet property="numberLabel" destination="x7H-nU-cbi" id="fJA-uE-Mdp"/>
+                        <outlet property="supplierLabel" destination="ZtL-GZ-bBD" id="FV8-zb-Zbv"/>
                         <outlet property="tableView" destination="0JN-dD-huS" id="KVe-tx-E29"/>
                         <segue destination="85n-wA-OSr" kind="push" identifier="confirmdirout" id="HLy-VQ-Ycj"/>
                         <segue destination="KTW-iT-WUx" kind="push" identifier="diroutdetailtochoose" id="9Bw-a9-Cn9"/>
@@ -2498,6 +2499,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="RRM-PX-kyP"/>
-        <segue reference="cxX-04-KNb"/>
+        <segue reference="9Bw-a9-Cn9"/>
     </inferredMetricsTieBreakers>
 </document>

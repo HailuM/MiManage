@@ -102,7 +102,7 @@
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
     NSString *identifier = segue.identifier;
-    if([identifier isEqualToString:@"orderintodetail"]){
+    if([identifier isEqualToString:@"orderdirouttodetail"]){
         DiroutDealDetailViewController *viewController = segue.destinationViewController;
         viewController.order = selOrder;
     }

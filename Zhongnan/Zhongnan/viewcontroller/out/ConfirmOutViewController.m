@@ -89,7 +89,11 @@
     if([segue.identifier isEqualToString:@"outconfirmtochoose"]){
         ChooseConsumerViewController *viewController = segue.destinationViewController;
         viewController.flag = 0;
-        viewController.orderid = self.order.id;
+        if([self.order.type isEqualToString:@"rkck"]){
+            viewController.orderid = self.order.sourceid;
+        }else{
+            viewController.orderid = self.order.OrderId;
+        }
         viewController.delegate = self;
     }
 }
@@ -249,7 +253,7 @@
             outBill.ProjectName= self.order.ProjectName;
             outBill.Company = self.order.Company;
             
-            [outBill saveOrUpdate];//保存直入直出单
+            [outBill saveOrUpdate];//保存出库单主表
             
             
             self.array = [[NSMutableArray alloc] init];
@@ -260,7 +264,7 @@
                     outMat.isFinish = 1;
                 }
                 [outMat saveOrUpdate];
-                //生成入库单
+                //生成出库单子表
                 OutBillChild *outChild = [[OutBillChild alloc] init];
                 outChild.outgid = outBill.gid;
                 outChild.orderid = outBill.orderid;
@@ -270,6 +274,7 @@
                 outChild.consumerid = self.consumer.consumerid;
                 outChild.orderEntryid = outMat.orderentryid;
                 outChild.printcount = 0;
+                outChild.qty = outMat.curQty;
                 // TODO
                 outChild.receiveid = outBill.receiveid;
                 outChild.receiverOID = self.consumer.receiverOID;
@@ -314,13 +319,11 @@
                           @"\n------------------------------"];
             for (int i = 0; i<self.array.count; i++) {
                 OutBillChild *outMat = self.array[i];
-                NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%f%@%f%@%@\n ",
+                NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%@\n",
                                        @"\n材料名称:",outMat.Name,
                                        @"\n品牌:",outMat.brand,
                                        @"\n规格型号:",outMat.model,
                                        @"\n数量:",outMat.qty,
-                                       @"\n单价:",outMat.price,
-                                       @"\n金额:",outMat.qty*outMat.price,
                                        @"\n备注:",outMat.note];
                 printContant = [printContant stringByAppendingString:matString];
             }

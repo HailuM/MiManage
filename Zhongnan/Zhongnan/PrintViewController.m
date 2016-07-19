@@ -141,13 +141,11 @@
                       @"\n------------------------------"];
         for (int i = 0; i<outChildArray.count; i++) {
             OutBillChild *outMat = outChildArray[i];
-            NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%f%@%f%@%@\n ",
+            NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%@\n ",
                                    @"\n材料名称:",outMat.Name,
                                    @"\n品牌:",outMat.brand,
                                    @"\n规格型号:",outMat.model,
                                    @"\n数量:",outMat.qty,
-                                   @"\n单价:",outMat.price,
-                                   @"\n金额:",outMat.qty*outMat.price,
                                    @"\n备注:",outMat.note];
             printContant = [printContant stringByAppendingString:matString];
         }
@@ -175,13 +173,11 @@
                       @"\n-----------------------------"];
         for (int i = 0; i<dirChildArray.count; i++) {
             DirBillChild *billChild = dirChildArray[i];
-            NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%f%@%f%@%@\n ",
+            NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%@\n ",
                                    @"\n材料名称:",billChild.Name,
                                    @"\n品牌:",billChild.brand,
                                    @"\n规格型号:",billChild.model,
                                    @"\n数量:",billChild.qty,
-                                   @"\n单价:",billChild.price,
-                                   @"\n金额:",billChild.qty*billChild.price,
                                    @"\n备注:",billChild.note];
             printContant = [printContant stringByAppendingString:matString];
         }

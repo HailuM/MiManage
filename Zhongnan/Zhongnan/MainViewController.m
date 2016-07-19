@@ -37,6 +37,10 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
+    
+    
+    self.user = [User findFirstByCriteria:@""];
     NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
     NSDictionary *myDictionary  = [userDefaultes  objectForKey:@"getServerInfo"];
     serverUrl=[myDictionary valueForKey:@"ServerIP"];//
@@ -45,11 +49,11 @@
     }
     
     //读取入库的token
-    NSDictionary *tokenDic  = [userDefaultes  objectForKey:@"getToken"];
-    inToken = [tokenDic valueForKey:@"rkToken"];//
+    
+    inToken = [userDefaultes valueForKey:@"rkToken"];//
     
     //读取出库的token
-    outToken = [tokenDic valueForKey:@"ckToken"];//
+    outToken = [userDefaultes valueForKey:@"ckToken"];//
 }
 
 - (void)viewDidLoad {
@@ -79,11 +83,10 @@
     serverUrl=[myDictionary valueForKey:@"ServerIP"];//
     
     //读取入库的token
-    NSDictionary *tokenDic  = [userDefaultes  objectForKey:@"getToken"];
-    inToken = [tokenDic valueForKey:@"rkToken"];//
+    inToken = [userDefaultes valueForKey:@"rkToken"];//
     
     //读取出库的token
-    outToken = [tokenDic valueForKey:@"ckToken"];//
+    outToken = [userDefaultes valueForKey:@"ckToken"];//
     
 //    db = [FMDatabase databaseWithPath:@"/tmp/zn.db"];
     
@@ -181,6 +184,7 @@
             [self.view addSubview:HUD];
             HUD.mode = MBProgressHUDModeAnnularDeterminate;
             HUD.label.text = @"上传中......";
+            
             [HUD showAnimated:YES whileExecutingBlock:^{
                 float f = 0.f;
                 while(f<1.f){
@@ -188,14 +192,14 @@
                     for(DirBillChild *dir in diroutArray){
                         NSString *json = [SCDBTool stringWithData:dir.mj_keyValues];
                         [self uploadDiroutWithRkToken:inToken withData:json];
-                        f = f + (1/sum);
+                        f = f + (float)(1.0/sum);
                         HUD.progress = f;
                     }
                     for (InBillChild *inChild in inArray) {
                         //生成入库单jsonString
                         NSString *json = [SCDBTool stringWithData:inChild.mj_keyValues];
                         [self uploadInWithRkToken:inToken withData:json];
-                        f = f + (1/sum);
+                        f = f + (float)(1.0/sum);
                         HUD.progress = f;
                     }
                     //需要上传出库单
@@ -203,7 +207,8 @@
                         for(OutBillChild *outChild in outArray){
                             NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
                             [self uploadOutWithCkToken:inToken withData:json withType:@"rkck"];
-                            f = f + (1/sum);
+                            [outChild deleteObject];
+                            f = f + (float)(1.0/sum);
                             HUD.progress = f;
                         }
                     }
@@ -258,9 +263,12 @@
                 HUD.mode = MBProgressHUDModeAnnularDeterminate;
                 HUD.label.text = @"上传中......";
                 [HUD showAnimated:YES whileExecutingBlock:^{
+                    float f = 0.f;
                     for (OutBillChild *outChild in outArray) {
                         NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
                         [self uploadOutWithCkToken:outToken withData:json withType:@"ck"];
+                        f = f + (float)(1.0/outArray.count);
+                        HUD.progress = f;
                     }
                     //上传出库单结束
                     [self uploadOutCompleteWithCkToken:outToken withOutCount:outArray.count];
@@ -330,8 +338,8 @@
                 NSArray *orderInArray = [PuOrder mj_objectArrayWithKeyValuesArray:details];
                 //保存rktoken
                 NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
-                NSDictionary *rkDic = [NSDictionary dictionaryWithObjectsAndKeys:rkToken,@"rkToken", nil];
-                [userDefaultes setObject:rkDic forKey:@"GetToken"];
+                
+                [userDefaultes setObject:inToken forKey:@"rkToken"];
                 //保存入库订单
                 
                 if(![PuOrder isExistInTable]){
@@ -342,15 +350,14 @@
                     [order saveOrUpdate];
                 }
                 //遍历下载订单对应的物料信息和领料商
-                
-                for(PuOrder *order in orderInArray){
-                    [self getOrderInMatWithOrderId:order.id withRkToken:rkToken];
-                    [self getConsumerForDiroutWithOrderId:order.id withRkToken:rkToken];
+                if(rkToken.length>0){
+                    for(PuOrder *order in orderInArray){
+                        [self getOrderInMatWithOrderId:order.id withRkToken:rkToken];
+                        [self getConsumerForDiroutWithOrderId:order.id withRkToken:rkToken];
+                    }
+                    [self orderCompletewithRkToken:inToken];
                 }
             }
-        }
-        if(inToken){
-            [self orderCompletewithRkToken:inToken];
         }
     }
 }
@@ -523,8 +530,7 @@
                 NSArray *orderOutArray = [PuOrder mj_objectArrayWithKeyValuesArray:details];
                 //保存cktoken
                 NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
-                NSDictionary *rkDic = [NSDictionary dictionaryWithObjectsAndKeys:ckToken,@"ckToken", nil];
-                [userDefaultes setObject:rkDic forKey:@"GetToken"];
+                [userDefaultes setObject:outToken forKey:@"ckToken"];
                 //保存出库订单
                 
                 if(![PuOrder isExistInTable]){
@@ -535,13 +541,13 @@
                     [orderOut saveOrUpdate];
                 }
                 //遍历下载订单对应的材料信息和领料商信息
-                
-                for(PuOrder *orderout in orderOutArray){
-                    [self getOrderOutMatWithOrderId:orderout.id withCkToken:ckToken];
-                    [self getOrderOutConsumerWithOrderId:orderout.id withCkToken:ckToken];
-                }
-                //结束下载出库订单
                 if(outToken){
+                    for(PuOrder *orderout in orderOutArray){
+                        [self getOrderOutMatWithOrderId:orderout.id withCkToken:ckToken];
+                        [self getOrderOutConsumerWithOrderId:orderout.id withCkToken:ckToken];
+                    }
+                //结束下载出库订单
+                
                     [self getOrderOutCompleteWithCkToken:outToken];
                 }
                 
@@ -646,6 +652,7 @@
                     NSArray *matArray = [Consumer mj_objectArrayWithKeyValuesArray:array];
                     //保存出库领料商
                     for(Consumer *consumer in matArray){
+                        consumer.Orderid = [consumer.Orderid uppercaseString];
                         [consumer saveOrUpdate];
                     }
                 }

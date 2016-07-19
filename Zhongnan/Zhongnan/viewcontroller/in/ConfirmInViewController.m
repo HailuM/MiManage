@@ -249,6 +249,7 @@
         //手机根据刚刚做的入库单生成新的出库来源订单主表
         PuOrder *rkOrder = [[PuOrder alloc] init];
         rkOrder.id = [UUIDUtil getUUID];//手机生成的入库单id
+        rkOrder.sourceid = self.order.id;
         rkOrder.number = [StringUtil generateNo:@"SCRK"];
         rkOrder.supplier = self.order.supplier;
         rkOrder.materialDesc = self.order.materialDesc;

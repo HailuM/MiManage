@@ -239,7 +239,7 @@
                                                 cancelButtonTitle:@"确定"
                                                 otherButtonTitles:nil, nil];
             [alert show];//提示框的显示 必须写 不然没有任何反映
-        }else if(self.unSelArray.count!=0){
+        }else if(self.unSelArray.count==0){
             //保存数据库
             // TODO 涉及到出入库的数量判断
             self.array = [[NSMutableArray alloc] init];
@@ -258,13 +258,8 @@
             }
             //订单已结束
             if(finish==0){
-                
                 //生成直入直出单主表
-                
-                
-                
                 bill = [[DirBill alloc] init];
-                
                 bill.zrzcid = [UUIDUtil getUUID];
                 bill.orderid = self.order.id;
                 bill.number = [StringUtil generateNo:@"SCZRZC"];
@@ -280,7 +275,6 @@
                 bill.printcount = 0;
                 
                 [bill saveOrUpdate];//保存直入直出单主表
-                
                 
                 for (int i = 0; i<self.selArray.count; i++) {
                     PuOrderChild *inMat = self.selArray[i];
@@ -329,13 +323,11 @@
                               @"\n-----------------------------"];
                 for (int i = 0; i<self.array.count; i++) {
                     DirBillChild *billChild = self.array[i];
-                    NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%f%@%f%@%@\n ",
+                    NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%@\n ",
                                            @"\n材料名称:",billChild.Name,
                                            @"\n品牌:",billChild.brand,
                                            @"\n规格型号:",billChild.model,
                                            @"\n数量:",billChild.qty,
-                                           @"\n单价:",billChild.price,
-                                           @"\n金额:",billChild.qty*billChild.price,
                                            @"\n备注:",billChild.note];
                     printContant = [printContant stringByAppendingString:matString];
                 }
@@ -363,10 +355,6 @@
             }else{
                 [self.view makeToast:@"直入直出必须一次性处理完材料!" duration:3.0 position:CSToastPositionCenter];
             }
-            
-            
-            
-            
         }else{
             [self.view makeToast:@"直入直出必须一次性处理完材料!" duration:3.0 position:CSToastPositionCenter];
         }

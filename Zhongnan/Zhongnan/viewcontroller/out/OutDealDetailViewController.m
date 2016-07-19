@@ -119,6 +119,11 @@
         viewController.consumer = self.consumer;
     }else if([segue.identifier isEqualToString:@"outdetailtochoose"]){
         ChooseConsumerViewController *viewController = segue.destinationViewController;
+        if([self.order.type isEqualToString:@"rkck"]){
+            viewController.orderid = self.order.sourceid;
+        }else{
+            viewController.orderid = self.order.OrderId;
+        }
         viewController.flag = 0;
         viewController.delegate = self;
     }

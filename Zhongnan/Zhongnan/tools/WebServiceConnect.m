@@ -51,7 +51,7 @@
     NSData  * responseData = [NSURLConnection sendSynchronousRequest:theRequest returningResponse:nil error:nil];
     NSMutableString *result = [[NSMutableString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
     
-    NSLog(@"dd%@",soapMessage);
+//    NSLog(@"dd%@",result);
     if(responseData){
         xmlParser = [[NSXMLParser alloc] initWithData: responseData];
         [xmlParser setDelegate: self];
