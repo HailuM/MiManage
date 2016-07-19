@@ -48,25 +48,42 @@
  *  数据库读取数据
  */
 -(void)initDataWithOrder:(NSString *)order{
-    if([SCOrderOut isExistInTable]){
-        NSString *criteria;
-        NSArray *array;
-        if([StringUtil scString:order]){
-            criteria = [NSString stringWithFormat:@" WHERE number = '%@' and isFinish = 0 ",order];
-            array = [SCOrderOut findByCriteria:criteria];
-        }else {
-            array = [SCOrderOut findAll];
+    if([PuOrder isExistInTable]){
+        NSString *criteria1;
+        NSArray *array1;
+        if(order.length==0){
+            order = @"";
         }
-        if(array.count>0){
+        criteria1 = [NSString stringWithFormat:@" WHERE type = 'ck' and isFinish = 0 and number like '%%%@%%'",order];
+        //出库来源,1同步出库,2同步入库,做完入库生成的出库任务
+        array1 = [PuOrder findByCriteria:criteria1];
+        
+        NSString *criteria2;
+        NSArray *array2;
+        if(order.length==0){
+            order = @"";
+        }
+        criteria2 = [NSString stringWithFormat:@" WHERE type = 'rkck' and isFinish = 0 and number like '%%%@%%'",order];
+        //出库来源,1同步出库,2同步入库,做完入库生成的出库任务
+        array2 = [PuOrder findByCriteria:criteria2];
+        
+        
+        if(array1.count>0||array2.count>0){
             //重新加载数据
-            self.outArray = [NSArray arrayWithArray:array];
+            self.outArray = [[NSMutableArray alloc] init];
+            if(array1.count>0){
+                [self.outArray addObjectsFromArray:array1];
+            }
+            if(array2.count>0){
+                [self.outArray addObjectsFromArray:array2];
+            }
             [self.tableView reloadData];
         }else{
             [self.view makeToast:@"暂无数据,请返回主页同步出库订单" duration:3.0 position:CSToastPositionCenter];
         }
         
     }else{
-        [SCOrderOut createTable];
+        [PuOrder createTable];
         [self.view makeToast:@"暂无数据,请返回主页同步出库订单" duration:3.0 position:CSToastPositionCenter];
     }
 }
@@ -107,7 +124,7 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     OrderTableViewCell *cell = [OrderTableViewCell cellWithTableView:tableView];
-    SCOrderIn *order = self.outArray[indexPath.row];
+    PuOrder *order = self.outArray[indexPath.row];
     [cell showCell:order];
     return cell;
 }

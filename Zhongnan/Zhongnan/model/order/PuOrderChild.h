@@ -22,7 +22,6 @@
 @property(nonatomic,assign) double ckQty;//已出数量  直出
 @property(nonatomic,assign) double rkQty;//已入库数量
 @property(nonatomic,assign) double curQty;//当前选择数量
-@property(nonatomic,assign) double leftQty;
 @property(nonatomic,copy) NSDate *time;
 @property(nonatomic,assign) double price;
 @property(nonatomic,copy) NSString *orderid; // 来源订单 外键表id

@@ -8,6 +8,8 @@
 
 #import "SCTableViewCell.h"
 #import "PuOrder.h"
+#import "OutBill.h"
+#import "DirBill.h"
 
 @interface OrderTableViewCell : SCTableViewCell {
     NSString *number;//订单号
@@ -17,6 +19,9 @@
     NSString *addr;//楼栋,地址
     
 }
+@property(nonatomic,assign) NSInteger flag; //0,表示是订单显示  1,表示是打印显示
+
+
 @property (strong, nonatomic) IBOutlet UILabel *numberLabel;
 @property (strong, nonatomic) IBOutlet UILabel *timeLabel;
 @property (strong, nonatomic) IBOutlet UILabel *supplierLabel;

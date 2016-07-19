@@ -10,14 +10,13 @@
 #import "OutDealViewController.h"
 #import "ChooseConsumerViewController.h"
 #import "UartLib.h"
-#import "SCOrderMOut.h"
 
 @interface ConfirmOutViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,PassConsumerDelegate,UartDelegate,UIAlertViewDelegate>
 
-@property (nonatomic, strong) SCOrderOut *order;
+@property (nonatomic, strong) PuOrder *order;
 @property (nonatomic, strong) NSMutableArray *selArray;//保存已选中材料的数组
 @property (nonatomic, strong) NSMutableArray *unSelArray;//保存未选择的材料的数组
-@property (nonatomic, strong) InConsumer *consumer;//领料商
+@property (nonatomic, strong) Consumer *consumer;//领料商
 
 @property (nonatomic, strong) NSMutableArray *array;//出库单
 

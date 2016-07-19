@@ -22,6 +22,7 @@
     
     MBProgressHUD *HUD;
     UIAlertView *asyncRK;//同步入库,如果本地没有上传的单据,确认用户是否删除已下载的入库订单
+    UIAlertView *asyncCK;//同步出库,如果本地没有上传的单据,确认用户是否删除已下载的出库订单
 }
 
 @end
@@ -95,9 +96,9 @@
 //    [consumer save];
     
     
-    uartLib = [[UartLib alloc] init];
-    [uartLib setUartDelegate:self];
-    connectAlertView = [[UIAlertView alloc] initWithTitle:@"连接蓝牙打印机" message: @"连接中，请稍后!" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil,nil];
+//    uartLib = [[UartLib alloc] init];
+//    [uartLib setUartDelegate:self];
+//    connectAlertView = [[UIAlertView alloc] initWithTitle:@"连接蓝牙打印机" message: @"连接中，请稍后!" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil,nil];
 }
 
 //验证网络是否通畅
@@ -134,6 +135,14 @@
             [SCDBTool clearInData:inToken];
             //直接下载入库订单
             [self getOrderInTitle];
+        }
+    }else if([alertView isEqual:asyncCK]){
+        if(buttonIndex==1){
+            //删除数据库中的出库单及其关联表
+            [SCDBTool clearOutData:outToken];
+            
+            //下载当前出库订单表头
+            [self getOrderOutTitle];
         }
     }
 }
@@ -198,23 +207,21 @@
                 }
                 //上传入库单结束
                 [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
+                //删除数据库中的入库单及其关联表
+                [SCDBTool clearInData:inToken];
+                //直接下载入库订单
+                [self getOrderInTitle];
             } completionBlock:^{
                 [HUD removeFromSuperViewOnHide];
                 HUD = nil;
                 
                 [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单%ld条,出库单%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
             }];
-            //删除数据库中的入库单及其关联表
-            [SCDBTool clearInData:inToken];
-            //直接下载入库订单
-            [self getOrderInTitle];
+            
         }else{
             asyncRK = [[UIAlertView alloc] initWithTitle:@"重新下载" message:@"您想重新下载数据吗？若是则会清除已下载数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
             [asyncRK show];
         }
-        
-        
-        
     }else{
         //删除数据库中的入库单及其关联表
         [SCDBTool clearInData:inToken];
@@ -227,21 +234,48 @@
 - (IBAction)syncOut:(id)sender {
     //查询当前数据库中的出库单,并上传
     if(outToken && outToken.length>0){
-        //存在出库Token
-        //查询出库单
-        NSArray *outArray = [OutBillChild findAll];
-        for (OutBillChild *outChild in outArray) {
-            NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
-            [self uploadOutWithCkToken:outToken withData:json withType:@"ck"];
+        
+        
+        //查询入库单
+        NSArray *inArray = [InBillChild findAll];
+        //如果存在未上传的入库单,则提示先同步入库
+        if(inArray.count>0){
+            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先同步入库!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+            [alert show];
+        }else{
+        
+            //存在出库Token
+            //查询出库单
+            NSArray *outArray = [OutBillChild findAll];
+            
+            if(outArray.count>0){
+                HUD = [[MBProgressHUD alloc] initWithView:self.view];
+                [self.view addSubview:HUD];
+                HUD.mode = MBProgressHUDModeAnnularDeterminate;
+                HUD.label.text = @"上传中......";
+                [HUD showAnimated:YES whileExecutingBlock:^{
+                    for (OutBillChild *outChild in outArray) {
+                        NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
+                        [self uploadOutWithCkToken:outToken withData:json withType:@"ck"];
+                    }
+                    //上传出库单结束
+                    [self uploadOutCompleteWithCkToken:outToken withOutCount:outArray.count];
+                    //删除数据库中的出库单及其关联表
+                    [SCDBTool clearOutData:outToken];
+                    
+                    //下载当前出库订单表头
+                    [self getOrderOutTitle];
+                } completionBlock:^{
+                    [HUD removeFromSuperViewOnHide];
+                    HUD = nil;
+                    [self.view makeToast:[NSString stringWithFormat:@"本次上传出库单%ld条",outArray.count] duration:5.0 position:CSToastPositionCenter];
+                }];
+            }else{
+                [self uploadOutCompleteWithCkToken:outToken withOutCount:outArray.count];
+                asyncCK = [[UIAlertView alloc] initWithTitle:@"重新下载" message:@"您想重新下载数据吗？若是则会清除已下载数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+                [asyncCK show];
+            }
         }
-        
-        //上传出库单结束
-        [self uploadOutCompleteWithCkToken:outToken withOutCount:outArray.count];
-        //删除数据库中的出库单及其关联表
-        [SCDBTool clearOutData:outToken];
-        
-        //下载当前出库订单表头
-        [self getOrderOutTitle];
     }else{
         //删除数据库中的出库单及其关联表
         [SCDBTool clearOutData:outToken];
@@ -1021,20 +1055,20 @@
 //    
 //}
 //
-////参数设置
-//- (IBAction)toSetting:(id)sender {
-//}
-//
-///*
-//#pragma mark - Navigation
-//
-//// In a storyboard-based application, you will often want to do a little preparation before navigation
-//- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-//    // Get the new view controller using [segue destinationViewController].
-//    // Pass the selected object to the new view controller.
-//}
-//*/
-//
+//参数设置
+- (IBAction)toSetting:(id)sender {
+}
+
+
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+
+
 //#pragma mark -
 //#pragma mark UartDelegate
 ///****************************************************************************/

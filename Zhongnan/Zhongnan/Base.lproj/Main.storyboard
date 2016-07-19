@@ -656,7 +656,7 @@
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="rePrint:" destination="JW4-Tj-WK3" eventType="touchUpInside" id="gVD-HL-zD5"/>
+                                    <segue destination="Xdw-Sl-LON" kind="push" id="zbi-gv-3j5"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="补打" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xO3-EK-bQL">
@@ -1320,6 +1320,38 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0OB-dT-4wb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2342" y="1427"/>
+        </scene>
+        <!--Print View Controller-->
+        <scene sceneID="2Qj-at-wsA">
+            <objects>
+                <viewController id="Xdw-Sl-LON" customClass="PrintViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="XTW-UK-T8D"/>
+                        <viewControllerLayoutGuide type="bottom" id="lfU-5a-nMf"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="oOb-ZH-vSr">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Mrn-yY-tft">
+                                <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="Xdw-Sl-LON" id="Xuq-Za-V5e"/>
+                                    <outlet property="delegate" destination="Xdw-Sl-LON" id="f7A-cl-y0c"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="1ba-Cl-pwa"/>
+                    <connections>
+                        <outlet property="tableView" destination="Mrn-yY-tft" id="Y0u-wI-9ON"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="s1I-rM-Th4" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="780" y="-930"/>
         </scene>
         <!--Dirout Deal View Controller-->
         <scene sceneID="aJW-sR-Af5">

@@ -22,10 +22,10 @@
     NSArray *array;
     if(self.flag==1){
         //查询inconsumer
-        array = [InConsumer findByCriteria:[NSString stringWithFormat:@" WHERE Orderid = '%@'",self.orderid]];
+        array = [Consumer findByCriteria:[NSString stringWithFormat:@" WHERE Orderid = '%@'",self.orderid]];
     }else{
         //查询outconsumer
-        array = [OutConsumer findByCriteria:[NSString stringWithFormat:@" WHERE Orderid = '%@'",self.orderid]];
+        array = [Consumer findByCriteria:[NSString stringWithFormat:@" WHERE Orderid = '%@'",self.orderid]];
     }
     self.consumerArray = [NSArray arrayWithArray:array];
     [self.tableView reloadData];
@@ -65,11 +65,7 @@
     NSUInteger row = [indexPath row];
     NSString *name;
     id value = self.consumerArray[row];
-    if([value isKindOfClass:[InConsumer class]]){
-        name = ((InConsumer *)value).Name;
-    }else{
-        name = ((OutConsumer *)value).Name;
-    }
+    name = ((Consumer *)value).Name;
     cell.textLabel.text = name;
     return cell;
 }

@@ -7,8 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SCOrderOut.h"
-#import "SCOrderOutMat.h"
+#import "PuOrder.h"
+#import "Consumer.h"
 #import "OrderDetailTableViewCell.h"
 #import "ConfirmOutViewController.h"
 #import "UIView+Toast.h"
@@ -21,8 +21,8 @@
     
     NSArray *matArray;//数据库查询出来的材料数组
 }
-@property (nonatomic, strong) SCOrderOut *order;
-@property (nonatomic, strong) OutConsumer *consumer;//领料商
+@property (nonatomic, strong) PuOrder *order;
+@property (nonatomic, strong) Consumer *consumer;//领料商
 
 
 

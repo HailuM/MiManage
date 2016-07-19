@@ -31,20 +31,39 @@
 }
 
 -(void)showCell:(id)value{
-    
-    PuOrder *order = (PuOrder *)value;
-    number = order.number;
-    time = order.date;
-    supplier = order.supplier;
-    materiaDesc = order.materialDesc;
-    addr = order.Addr;
-    
+    if(self.flag==0){
+        PuOrder *order = (PuOrder *)value;
+        number = order.number;
+        time = order.date;
+        supplier = order.supplier;
+        materiaDesc = order.materialDesc;
+        addr = order.Addr;
+        
+        
+    }else if(self.flag==1){
+        if([value isKindOfClass:[OutBill class]]){
+            OutBill *outBill = value;
+            number = outBill.deliverNo;
+            time = outBill.preparertime;
+            supplier = outBill.supplier;
+            materiaDesc = outBill.materialDesc;
+            addr = outBill.Addr;
+        }
+        if([value isKindOfClass:[DirBill class]]){
+            DirBill *dirBill = value;
+            number = dirBill.number;
+            time = dirBill.preparertime;
+            supplier = dirBill.supplier;
+            materiaDesc = dirBill.materialDesc;
+            addr = dirBill.Addr;
+        }
+        
+    }
     self.numberLabel.text = number;
     self.timeLabel.text = time;
     self.supplierLabel.text = supplier;
     self.materialLabel.text = materiaDesc;
     self.addrLabel.text = addr;
-    
 }
 
 @end

@@ -7,22 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SCOrderIn.h"
-#import "SCOrderInMat.h"
 #import "OrderDetailTableViewCell.h"
 #import "DateTool.h"
 #import "StringUtil.h"
-#import "SCDirout.h"
-#import "InConsumer.h"
+#import "Consumer.h"
 #import "DiroutDealViewController.h"
 #import "ChooseConsumerViewController.h"
 #import "UartLib.h"
-#import "SCOrderMDirout.h"
 
 @interface ConfirmDiroutViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,PassConsumerDelegate,UartDelegate>
-
-@property (nonatomic, strong) InConsumer *consumer;//领料商
-@property (nonatomic, strong) SCOrderIn *order;
+@property (nonatomic, strong) Consumer *consumer;//领料商
+@property (nonatomic, strong) PuOrder *order;
 @property (nonatomic, strong) NSMutableArray *selArray;//保存已选中材料的数组
 @property (nonatomic, strong) NSMutableArray *unSelArray;//保存未选择的材料的数组
 @property (nonatomic, strong) NSMutableArray *array;//直入直出单

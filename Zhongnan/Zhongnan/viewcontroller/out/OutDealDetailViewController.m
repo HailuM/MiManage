@@ -70,7 +70,7 @@
  *  查询订单上的材料
  */
 -(void)initData {
-    matArray = [SCOrderOutMat findByCriteria:[NSString stringWithFormat:@" WHERE orderid = '%@' and isFinish = 0",self.order.id]];
+    matArray = [PuOrderChild findByCriteria:[NSString stringWithFormat:@" WHERE orderid = '%@' and isFinish = 0",self.order.id]];
     unSelArray = [[NSMutableArray alloc] initWithArray:matArray];
     [self.tableView reloadData];
 }
@@ -137,7 +137,7 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     OrderDetailTableViewCell *cell = [OrderDetailTableViewCell cellWithTableView:tableView];
-    SCOrderOutMat *outMat = unSelArray[indexPath.row];
+    PuOrderChild *outMat = unSelArray[indexPath.row];
     [cell showCell:outMat];
     cell.addBtn.tag = 1000+indexPath.row;
     [cell.addBtn addTarget:self action:@selector(addToCheck:) forControlEvents:UIControlEventTouchUpInside];
@@ -155,23 +155,24 @@
     //弹出对话框,填写数量
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:nil delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
     [alert setAlertViewStyle:UIAlertViewStylePlainTextInput];
-    alert.tag = 2000+indexPath.row;
-    SCOrderOutMat *outMat = unSelArray[indexPath.row];
+    alert.tag = 4000+indexPath.row;
+    PuOrderChild *outMat = unSelArray[indexPath.row];
     
     UITextField *countText = [alert textFieldAtIndex:0];
     [countText setKeyboardType:UIKeyboardTypeDecimalPad];
-    countText.text = [NSString stringWithFormat:@"%f",outMat.qty];
+    //尾数去0
+    countText.text = [StringUtil changeFloat:[NSString stringWithFormat:@"%f",outMat.curQty]];
     [alert show];
 }
 
 -(void)delQty:(id)sender{
     UILabel *label = sender;
     NSInteger tag = label.tag-2000;
-    SCOrderOutMat *outMat = unSelArray[tag];
-    if(outMat.qty-1<=0){
-        outMat.qty = 0.0;
+    PuOrderChild *outMat = unSelArray[tag];
+    if(outMat.curQty-1<=0){
+        outMat.curQty = 0.0;
     }else{
-        outMat.qty = outMat.qty-1;
+        outMat.curQty = outMat.curQty-1;
     }
     [self.tableView reloadData];
 }
@@ -179,11 +180,11 @@
 -(void)addQty:(id)sender {
     UILabel *label = sender;
     NSInteger tag = label.tag-3000;
-    SCOrderOutMat *outMat = unSelArray[tag];
-    if(outMat.qty+1>outMat.limitQty-outMat.hasQty){
-        outMat.qty = outMat.limitQty-outMat.hasQty;
+    PuOrderChild *outMat = unSelArray[tag];
+    if(outMat.curQty+1>outMat.sourceQty-outMat.ckQty){
+        outMat.curQty = outMat.sourceQty-outMat.ckQty;
     }else{
-        outMat.qty = outMat.qty+1;
+        outMat.curQty = outMat.curQty+1;
     }
     [self.tableView reloadData];
 }
@@ -191,16 +192,16 @@
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     if(buttonIndex==alertView.firstOtherButtonIndex){
-        NSInteger tag = alertView.tag-2000;
+        NSInteger tag = alertView.tag-4000;
         UITextField *countText = [alertView textFieldAtIndex:0];
         NSString *count = countText.text;
-        SCOrderOutMat *outMat = unSelArray[tag];
+        PuOrderChild *outMat = unSelArray[tag];
         double qty = [count doubleValue];
-        if(qty+outMat.hasQty>outMat.sourceQty){
+        if(qty+outMat.ckQty>outMat.sourceQty){
             //数量过大
             [self.view makeToast:@"数量超过上限,请重新输入!" duration:3.0 position:CSToastPositionCenter];
         }else{
-            outMat.qty = qty;
+            outMat.curQty = qty;
         }
         [self.tableView reloadData];
     }

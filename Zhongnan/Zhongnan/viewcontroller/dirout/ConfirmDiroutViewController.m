@@ -18,7 +18,9 @@
     NSString *printContant;
     
     
-    SCOrderMDirout *mDirout;
+    UIAlertView *printAlert;
+    
+    DirBill *bill;
     
 }
 
@@ -65,8 +67,8 @@
             self.selArray = [[NSMutableArray alloc] init];
         }
         double sum = 0;
-        for(SCOrderInMat *inMat in self.selArray){
-            sum = sum + inMat.qty;
+        for(PuOrderChild *inMat in self.selArray){
+            sum = sum + inMat.curQty;
         }
         self.checkedNumLabel.text = [NSString stringWithFormat:@"已选品种:%lu;总数量:%.2f",(unsigned long)self.selArray.count,sum];
         //        [self initData];
@@ -107,7 +109,7 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     OrderDetailTableViewCell *cell = [OrderDetailTableViewCell cellWithTableView:tableView];
-    SCOrderInMat *inMat = self.selArray[indexPath.row];
+    PuOrderChild *inMat = self.selArray[indexPath.row];
     [cell showCell:inMat];
     cell.addBtn.tag = 1000+indexPath.row;
     [cell.addBtn setImage:[UIImage imageNamed:@"del"] forState:UIControlStateNormal];
@@ -127,22 +129,28 @@
     //弹出对话框,填写数量
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:nil delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
     [alert setAlertViewStyle:UIAlertViewStylePlainTextInput];
-    alert.tag = 2000+indexPath.row;
-    SCOrderInMat *inMat = self.selArray[indexPath.row];
+    alert.tag = 4000+indexPath.row;
+    PuOrderChild *inMat = self.selArray[indexPath.row];
     
     UITextField *countText = [alert textFieldAtIndex:0];
     [countText setKeyboardType:UIKeyboardTypeDecimalPad];
-    countText.text = [NSString stringWithFormat:@"%f",inMat.qty];
+    //尾数去0
+    countText.text = [StringUtil changeFloat:[NSString stringWithFormat:@"%f",inMat.curQty]];
     [alert show];
 }
+/**
+ *  减号 不能小于0
+ *
+ *  @param sender <#sender description#>
+ */
 -(void)delQty:(id)sender{
     UILabel *label = sender;
     NSInteger tag = label.tag-2000;
-    SCOrderInMat *inMat = self.selArray[tag];
-    if(inMat.qty-1<=0){
-        inMat.qty = 0.0;
+    PuOrderChild *inMat = self.selArray[tag];
+    if(inMat.curQty-1<=0){
+        inMat.curQty = 0;
     }else{
-        inMat.qty = inMat.qty-1;
+        inMat.curQty = inMat.curQty-1;
     }
     [self.tableView reloadData];
 }
@@ -150,11 +158,11 @@
 -(void)addQty:(id)sender {
     UILabel *label = sender;
     NSInteger tag = label.tag-3000;
-    SCOrderInMat *inMat = self.selArray[tag];
-    if(inMat.qty+1>inMat.limitQty-inMat.hasQty){
-        inMat.qty = inMat.limitQty-inMat.hasQty;
+    PuOrderChild *inMat = self.selArray[tag];
+    if(inMat.curQty+1>inMat.limitQty){
+        inMat.curQty = inMat.limitQty;
     }else{
-        inMat.qty = inMat.qty+1;
+        inMat.curQty = inMat.curQty+1;
     }
     [self.tableView reloadData];
 }
@@ -170,20 +178,25 @@
             default:
                 break;
         }
+    }else if(alertView==printAlert){
+        if(buttonIndex==0){
+            [uartLib scanStart];//scan
+            NSLog(@"connect Peripheral");
+        }
     }else{
         if(buttonIndex==alertView.firstOtherButtonIndex){
-            NSInteger tag = alertView.tag-2000;
+            NSInteger tag = alertView.tag-4000;
             UITextField *countText = [alertView textFieldAtIndex:0];
             NSString *count = countText.text;
-            SCOrderInMat *inMat = self.selArray[tag];
+            PuOrderChild *inMat = self.selArray[tag];
             double qty = [count doubleValue];
-
-            if(qty+inMat.hasQty>inMat.sourceQty){
+            
+            if(qty>inMat.limitQty){
                 [self.view makeToast:@"数量超过上限,请重新输入!" duration:3.0 position:CSToastPositionCenter];
-            }else if(qty+inMat.hasQty<inMat.limitQty){
+            }else if(qty<inMat.sourceQty){
                 [self.view makeToast:@"数量未达到订单最低限制!" duration:3.0 position:CSToastPositionCenter];
             }else{
-                inMat.qty = qty;
+                inMat.curQty = qty;
             }
             
             
@@ -216,8 +229,8 @@
     if(self.consumer){
  
         double sum = 0;
-        for(SCOrderInMat *inMat in self.selArray){
-            sum = sum + inMat.qty;
+        for(PuOrderChild *inMat in self.selArray){
+            sum = sum + inMat.curQty;
         }
         if(self.selArray.count==0 || sum==0){
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
@@ -236,9 +249,9 @@
             NSString *deliverNo = [NSString stringWithFormat:@"%@%@",[DateTool dateToString:now],[DateTool randomNumber]];
             int finish = 0;//判断单据是否结束:0,已结束  >0,未结束
             for (int i = 0; i<self.selArray.count; i++) {
-                PuOrderChild v *inMat = self.selArray[i];
-                if(inMat.qty+inMat.hasQty>=inMat.sourceQty && inMat.qty+inMat.hasQty<=inMat.limitQty){
-                    finish = 0;
+                PuOrderChild *inMat = self.selArray[i];
+                if(inMat.curQty+inMat.rkQty>=inMat.sourceQty && inMat.curQty+inMat.rkQty<=inMat.limitQty){
+                    finish = finish;
                 }else{
                     finish ++;
                 }
@@ -246,73 +259,84 @@
             //订单已结束
             if(finish==0){
                 
-                //生成直入直出单
-                mDirout = [[SCOrderMDirout alloc] init];
+                //生成直入直出单主表
                 
-                mDirout.id = self.order.id;
-                mDirout.OrderId = self.order.OrderId;
-                mDirout.number = self.order.number;
-                mDirout.date = self.order.date;
-                mDirout.supplier = self.order.supplier;
-                mDirout.materialDesc = self.order.materialDesc;
-                mDirout.Addr = self.order.Addr;
-                mDirout.ProjectName= self.order.ProjectName;
-                mDirout.Company = self.order.Company;
                 
-                mDirout.gid = [UUIDUtil getUUID];
-                mDirout.time = now;
-                mDirout.deliverNo = deliverNo;
-                mDirout.consumerid = self.consumer.consumerid;
-                mDirout.consumerName = self.consumer.Name;
-                [mDirout saveOrUpdate];//保存直入直出单
+                
+                bill = [[DirBill alloc] init];
+                
+                bill.zrzcid = [UUIDUtil getUUID];
+                bill.orderid = self.order.id;
+                bill.number = [StringUtil generateNo:@"SCZRZC"];
+                bill.date = self.order.date;
+                bill.supplier = self.order.supplier;
+                bill.materialDesc = self.order.materialDesc;
+                bill.Addr = self.order.Addr;
+                bill.ProjectName= self.order.ProjectName;
+                bill.Company = self.order.Company;
+                bill.preparertime = [DateTool datetimeToString:now];
+                bill.consumerid = self.consumer.consumerid;
+                bill.consumername = self.consumer.Name;
+                bill.printcount = 0;
+                
+                [bill saveOrUpdate];//保存直入直出单主表
                 
                 
                 for (int i = 0; i<self.selArray.count; i++) {
-                    SCOrderInMat *inMat = self.selArray[i];
+                    PuOrderChild *inMat = self.selArray[i];
                     //更新已处理数量
-                    inMat.hasQty = inMat.qty+inMat.hasQty;
+                    inMat.ckQty = inMat.ckQty+inMat.curQty;//已出库数量
+                    inMat.rkQty = inMat.rkQty+inMat.curQty;//已入库数量
                     inMat.isFinish = 1;
                     [inMat saveOrUpdate];
                     //生成入库单
-                    SCDirout *scDirout = [[SCDirout alloc] init];
-                    scDirout.wareentry = inMat.wareentry;
-                    scDirout.deliverNo = deliverNo;
-                    scDirout.preparetime = now;
-                    scDirout.consumerid = self.consumer.consumerid;
-                    scDirout.zrzcid = mDirout.gid;
-                    scDirout.orderid = inMat.orderid;
-                    scDirout.orderEntryid = inMat.orderentryid;
-                    scDirout.qty = inMat.qty;
-                    [scDirout saveOrUpdate];
-                    [self.array addObject:scDirout];
+                    DirBillChild *billChild = [[DirBillChild alloc] init];
+                    billChild.orderid = bill.orderid;
+                    billChild.preparertime = bill.preparertime;
+                    billChild.consumerid = bill.consumerid;
+                    billChild.orderEntryid = inMat.orderentryid;
+                    billChild.zrzcid = bill.zrzcid;
+                    billChild.qty = inMat.curQty;
+                    billChild.printcount = bill.printcount;
+                    billChild.deliverNo = bill.number;
+                    billChild.receiverOID = self.consumer.receiverOID;
+                    billChild.Name = inMat.Name;
+                    billChild.model = inMat.model;
+                    billChild.unit = inMat.unit;
+                    billChild.brand = inMat.brand;
+                    billChild.note = inMat.note;
+                    billChild.price = inMat.price;
+                    
+                    [billChild saveOrUpdate];
+                    [self.array addObject:billChild];
                 }
                 
                 /**
                  *  设置订单只能直入直出
                  */
-                self.order.isDirout = 1;
+                self.order.type = @"zrzc";
                 self.order.isFinish = 1;
                 [self.order saveOrUpdate];
                 
                 //开始打印
                 printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
-                              @"------------------------------",
-                              (mDirout.printcount+1),
-                              @"\n出库单号:",deliverNo,
-                              @"\n项目:",mDirout.ProjectName,
-                              @"\n领用商:",mDirout.consumerName,
-                              @"\n地产公司:",mDirout.Company,
-                              @"\n------------------------------"];
-                for (int i = 0; i<self.selArray.count; i++) {
-                    SCOrderInMat *outMat = self.selArray[i];
+                              @"\n------------------------------",
+                              (bill.printcount+1),
+                              @"\n出库单号:",bill.number,
+                              @"\n项目:",bill.ProjectName,
+                              @"\n领用商:",bill.consumername,
+                              @"\n地产公司:",bill.Company,
+                              @"\n-----------------------------"];
+                for (int i = 0; i<self.array.count; i++) {
+                    DirBillChild *billChild = self.array[i];
                     NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%f%@%f%@%@\n ",
-                                           @"\n材料名称:",outMat.Name,
-                                           @"\n品牌:",outMat.brand,
-                                           @"\n规格型号:",outMat.model,
-                                           @"\n数量:",outMat.qty,
-                                           @"\n单价:",outMat.price,
-                                           @"\n金额:",outMat.qty*outMat.price,
-                                           @"\n备注:",outMat.note];
+                                           @"\n材料名称:",billChild.Name,
+                                           @"\n品牌:",billChild.brand,
+                                           @"\n规格型号:",billChild.model,
+                                           @"\n数量:",billChild.qty,
+                                           @"\n单价:",billChild.price,
+                                           @"\n金额:",billChild.qty*billChild.price,
+                                           @"\n备注:",billChild.note];
                     printContant = [printContant stringByAppendingString:matString];
                 }
                 printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
@@ -321,8 +345,9 @@
                 
                 //准备好的打印字符串
                 //--------------
-                [uartLib scanStart];//scan
-                NSLog(@"connect Peripheral");
+                
+                printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"打印" otherButtonTitles: nil];
+                [printAlert show];
                 
                 [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
                 
@@ -375,15 +400,18 @@
         NSString *printed = [curPrintContent stringByAppendingFormat:@"%c%c%c", '\n', '\n', '\n'];
         
         [self PrintWithFormat:printed];
-        for(SCOut *scout in self.array){
-            scout.printcount ++;
-            scout.isPrint = 1;
-            [scout saveOrUpdate];
-        }
-        mDirout.printcount++;
-        mDirout.isPrint = 1;
         
-        [mDirout saveOrUpdate];
+        //查找当前存入数据库的直入直出单,修改打印次数
+        DirBill *billPrint = [DirBill findFirstByCriteria:[NSString stringWithFormat:@" WHERE zrzcid = '%@'",bill.zrzcid]];
+        billPrint.printcount ++;
+        [billPrint saveOrUpdate];
+        
+        //根据当前存入数据库的直入直出单,修改对应材料的打印次数
+        NSArray *printArray = [DirBillChild findByCriteria:[NSString stringWithFormat:@" WHERE zrzcid = '%@'",billPrint.zrzcid]];
+        for(DirBillChild *childPrint in printArray){
+            childPrint.printcount ++;
+            [childPrint saveOrUpdate];
+        }
     }
     [uartLib scanStop];
     [uartLib disconnectPeripheral:connectPeripheral];

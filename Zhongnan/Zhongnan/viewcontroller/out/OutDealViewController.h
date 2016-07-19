@@ -13,10 +13,10 @@
     NSString *orderid;//订单号
     NSString *supplier;//供应商
     
-    SCOrderOut *selOrder;
+    PuOrder *selOrder;
 }
 
-@property (nonatomic, strong) NSArray *outArray;
+@property (nonatomic, strong) NSMutableArray *outArray;
 
 @property (weak, nonatomic) IBOutlet UITextField *etOrder;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;

@@ -11,7 +11,7 @@
 #import "SCDBTool.h"
 #import "UartLib.h"
 
-@interface MainViewController : UIViewController<UartDelegate,UIAlertViewDelegate>{
+@interface MainViewController : UIViewController<UIAlertViewDelegate>{
     
     NSString *isHaveNet;         //是否有网络
     NSString *serverUrl;         //服务地址
@@ -20,10 +20,10 @@
     NSString *inToken;      //入库token
     NSString *outToken;     //出库token
     
-    UIAlertView *connectAlertView;
-    UartLib *uartLib;
-    CBPeripheral *connectPeripheral;
-    NSString *printContant;
+//    UIAlertView *connectAlertView;
+//    UartLib *uartLib;
+//    CBPeripheral *connectPeripheral;
+//    NSString *printContant;
 }
 
 

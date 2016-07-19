@@ -87,6 +87,7 @@
 		C83E259B1D3BBECA00128C7C /* OutBill.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E259A1D3BBECA00128C7C /* OutBill.m */; };
 		C83E25A11D3BBF0600128C7C /* OutBillSer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25A01D3BBF0600128C7C /* OutBillSer.m */; };
 		C83E25A41D3BBF1B00128C7C /* OutBillChild.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25A31D3BBF1B00128C7C /* OutBillChild.m */; };
+		C83E25A71D3E09C600128C7C /* PrintViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25A61D3E09C600128C7C /* PrintViewController.m */; };
 		C8C378D01D26DA12008D184B /* MJExtensionConst.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378BD1D26DA12008D184B /* MJExtensionConst.m */; };
 		C8C378D11D26DA12008D184B /* MJFoundation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378BF1D26DA12008D184B /* MJFoundation.m */; };
 		C8C378D21D26DA12008D184B /* MJProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378C11D26DA12008D184B /* MJProperty.m */; };
@@ -236,6 +237,8 @@
 		C83E25A01D3BBF0600128C7C /* OutBillSer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OutBillSer.m; path = model/out/OutBillSer.m; sourceTree = "<group>"; };
 		C83E25A21D3BBF1B00128C7C /* OutBillChild.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OutBillChild.h; path = model/out/OutBillChild.h; sourceTree = "<group>"; };
 		C83E25A31D3BBF1B00128C7C /* OutBillChild.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OutBillChild.m; path = model/out/OutBillChild.m; sourceTree = "<group>"; };
+		C83E25A51D3E09C600128C7C /* PrintViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrintViewController.h; sourceTree = "<group>"; };
+		C83E25A61D3E09C600128C7C /* PrintViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrintViewController.m; sourceTree = "<group>"; };
 		C8C378BB1D26DA12008D184B /* MJExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MJExtension.h; path = mjextension/MJExtension.h; sourceTree = "<group>"; };
 		C8C378BC1D26DA12008D184B /* MJExtensionConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MJExtensionConst.h; path = mjextension/MJExtensionConst.h; sourceTree = "<group>"; };
 		C8C378BD1D26DA12008D184B /* MJExtensionConst.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MJExtensionConst.m; path = mjextension/MJExtensionConst.m; sourceTree = "<group>"; };
@@ -347,6 +350,8 @@
 				C8FD75A81D22C65E00E52D7A /* ServerConfigViewController.m */,
 				C8C3790D1D2A61C5008D184B /* SysSettingViewController.h */,
 				C8C3790E1D2A61C5008D184B /* SysSettingViewController.m */,
+				C83E25A51D3E09C600128C7C /* PrintViewController.h */,
+				C83E25A61D3E09C600128C7C /* PrintViewController.m */,
 				A52CB3621D22416500402E3F /* Main.storyboard */,
 				A52CB3651D22416500402E3F /* Assets.xcassets */,
 				A52CB3671D22416500402E3F /* LaunchScreen.storyboard */,
@@ -832,6 +837,7 @@
 				A565621E1D250815003D6E2B /* OrderTableViewCell.m in Sources */,
 				C83E25A41D3BBF1B00128C7C /* OutBillChild.m in Sources */,
 				C8C379001D26EC7A008D184B /* ConfirmDiroutViewController.m in Sources */,
+				C83E25A71D3E09C600128C7C /* PrintViewController.m in Sources */,
 				C8C378D01D26DA12008D184B /* MJExtensionConst.m in Sources */,
 				C8FD75A91D22C65E00E52D7A /* ServerConfigViewController.m in Sources */,
 				C8C378E91D26DA2F008D184B /* FMDatabaseQueue.m in Sources */,

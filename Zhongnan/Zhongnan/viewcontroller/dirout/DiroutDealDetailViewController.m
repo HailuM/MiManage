@@ -164,7 +164,7 @@
     //弹出对话框,填写数量
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:nil delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
     [alert setAlertViewStyle:UIAlertViewStylePlainTextInput];
-    alert.tag = 2000+indexPath.row;
+    alert.tag = 4000+indexPath.row;
     PuOrderChild *inMat = unSelArray[indexPath.row];
     
     UITextField *countText = [alert textFieldAtIndex:0];
@@ -210,7 +210,7 @@
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     if(buttonIndex==alertView.firstOtherButtonIndex){
-        NSInteger tag = alertView.tag-2000;
+        NSInteger tag = alertView.tag-4000;
         UITextField *countText = [alertView textFieldAtIndex:0];
         NSString *count = countText.text;
         PuOrderChild *inMat = unSelArray[tag];
