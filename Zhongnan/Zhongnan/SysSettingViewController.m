@@ -8,9 +8,13 @@
 
 #import "SysSettingViewController.h"
 #import "SCDBTool.h"
+#import "UIView+Toast.h"
 
 @interface SysSettingViewController ()
 @property (weak, nonatomic) IBOutlet UILabel *clearLabel;
+@property (weak, nonatomic) IBOutlet UILabel *usernameLabel;
+@property (weak, nonatomic) IBOutlet UILabel *serverlabel;
+@property (weak, nonatomic) IBOutlet UILabel *versionLabel;
 
 @end
 
@@ -25,6 +29,29 @@
     UITapGestureRecognizer *tapGr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clearData:)];
     self.clearLabel.userInteractionEnabled = YES;
     [self.clearLabel addGestureRecognizer:tapGr];
+    
+    NSArray *array = [User findAll];
+    User *user = array[0];
+    
+    self.usernameLabel.text = user.UserName;
+    
+    NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
+    NSDictionary *myDictionary  = [userDefaultes  objectForKey:@"getServerInfo"];
+    NSString *serverUrl=[myDictionary valueForKey:@"ServerIP"];//取出上次的服务器地址
+    if(serverUrl==nil||serverUrl.length==0){
+        serverUrl = @"fdcwzm.zhongnangroup.cn:82";
+    }
+    self.serverlabel.text = serverUrl;
+    
+    
+    self.versionLabel.text = [self getVersionFromLocal];
+}
+
+-(NSString *)getVersionFromLocal
+{
+    NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
+    NSString *currentVersion = [infoDict objectForKey:@"CFBundleShortVersionString"];
+    return currentVersion;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -33,33 +60,34 @@
 }
 
 -(void)clearData:(id)sender{
-    //清除出入库token
-    NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
-    
-    //读取入库的token
-    NSDictionary *tokenDic  = [userDefaultes  objectForKey:@"getToken"];
-    NSString *inToken = [tokenDic valueForKey:@"rkToken"];//
-    //读取出库的token
-    NSString *outToken = [tokenDic valueForKey:@"ckToken"];//
-    
-    
-    NSDictionary *rkDic = [NSDictionary dictionaryWithObjectsAndKeys:@"",@"rkToken", nil];
-    [userDefaultes setObject:rkDic forKey:@"GetToken"];
-    
-    NSDictionary *ckDic = [NSDictionary dictionaryWithObjectsAndKeys:@"",@"ckToken", nil];
-    [userDefaultes setObject:ckDic forKey:@"GetToken"];
-    
-    //删除缓存数据
-    [SCDBTool clearInData:inToken];
-    [SCDBTool clearOutData:outToken];
-    
-    UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                  message:@"离线数据清除成功!"
-                                                 delegate:self
-                                        cancelButtonTitle:@"确定"
-                                        otherButtonTitles:nil, nil];
-    [alert show];//提示框的显示 必须写 不然没有任何反映
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"提示" message:@"是否清除数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+    [alertView show];
+}
 
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if(buttonIndex==1){
+        //清除出入库token
+        NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
+        
+        //读取入库的token
+        NSDictionary *tokenDic  = [userDefaultes  objectForKey:@"getToken"];
+        NSString *inToken = [tokenDic valueForKey:@"rkToken"];//
+        //读取出库的token
+        NSString *outToken = [tokenDic valueForKey:@"ckToken"];//
+        
+        
+        NSDictionary *rkDic = [NSDictionary dictionaryWithObjectsAndKeys:@"",@"rkToken", nil];
+        [userDefaultes setObject:rkDic forKey:@"GetToken"];
+        
+        NSDictionary *ckDic = [NSDictionary dictionaryWithObjectsAndKeys:@"",@"ckToken", nil];
+        [userDefaultes setObject:ckDic forKey:@"GetToken"];
+        
+        //删除缓存数据
+        [SCDBTool clearInData:inToken];
+        [SCDBTool clearOutData:outToken];
+        
+        [self.view makeToast:@"清除数据成功" duration:3.0 position:CSToastPositionCenter];
+    }
 }
 
 /*

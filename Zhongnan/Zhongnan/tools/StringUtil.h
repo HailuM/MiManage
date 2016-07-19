@@ -14,4 +14,16 @@
 
 +(NSString *)create:(int)i;
 
+//尾数去0
++(NSString *)changeFloat:(NSString *)stringFloat;
+
+/**
+ *  根据type生成不同的单据号
+ *
+ *  @param type SCRK:入库 SCCK:出库 SCZRZC:直入直出
+ *
+ *  @return 
+ */
++(NSString *)generateNo:(NSString *)type;
+
 @end

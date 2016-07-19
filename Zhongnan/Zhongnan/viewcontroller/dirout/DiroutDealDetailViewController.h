@@ -7,8 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SCOrderIn.h"
-#import "SCOrderInMat.h"
 #import "OrderDetailTableViewCell.h"
 #import "ConfirmDiroutViewController.h"
 #import "ChooseConsumerViewController.h"
@@ -23,8 +21,8 @@
     
 }
 
-@property (nonatomic, strong) OutConsumer *consumer;//领料商
-@property (nonatomic, strong) SCOrderIn *order;
+@property (nonatomic, strong) Consumer *consumer;//领料商
+@property (nonatomic, strong) PuOrder *order;
 @property (strong, nonatomic) IBOutlet UILabel *numberLabel;
 @property (strong, nonatomic) IBOutlet UILabel *supplierLabel;
 @property (strong, nonatomic) IBOutlet UILabel *addrLabel;

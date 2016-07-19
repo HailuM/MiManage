@@ -30,30 +30,21 @@
 }
 
 -(void)showCell:(id)value {
-    if([value isKindOfClass:[SCOrderInMat class]]){
-        SCOrderInMat *inMat = (SCOrderInMat *)value;
-        name = inMat.Name;
-        model = inMat.model;//规格型号
-        sourceQty = inMat.sourceQty-inMat.hasQty;//未处理数量
-        qty = inMat.qty;//已处理数量
-        unit = inMat.unit;//单位
-        brand = inMat.brand;//品牌
-        note = inMat.note;//备注
-    }else if([value isKindOfClass:[SCOrderOutMat class]]){
-        SCOrderOutMat *outMat = (SCOrderOutMat *)value;
-        name = outMat.Name;
-        model = outMat.model;//规格型号
-        sourceQty = outMat.sourceQty-outMat.hasQty;//未处理数量
-        qty = outMat.qty;//已处理数量
-        unit = outMat.unit;//单位
-        brand = outMat.brand;//品牌
-        note = outMat.note;//备注
-    }
+
+    PuOrderChild *inMat = (PuOrderChild *)value;
+    name = inMat.Name;
+    model = inMat.model;//规格型号
+    sourceQty = inMat.sourceQty-inMat.rkQty;//未处理入库数量
+    qty = inMat.curQty;//当前已处理数量
+    unit = inMat.unit;//单位
+    brand = inMat.brand;//品牌
+    note = inMat.note;//备注
+    
     
     self.matNameLabel.text = name;
-    self.qtyLabel.text = [NSString stringWithFormat:@"%f",qty];
+    self.qtyLabel.text = [StringUtil changeFloat:[NSString stringWithFormat:@"%f",qty]];
     self.modelLabel.text = model;
-    self.sourceQtyLabel.text = [NSString stringWithFormat:@"%f",sourceQty];
+    self.sourceQtyLabel.text = [StringUtil changeFloat:[NSString stringWithFormat:@"%f",sourceQty]];
     self.unitLabel.text = unit;
     self.brandLabel.text = brand;
     self.noteLabel.text = note;

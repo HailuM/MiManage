@@ -62,15 +62,9 @@
 		A565621E1D250815003D6E2B /* OrderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A565621C1D250815003D6E2B /* OrderTableViewCell.m */; };
 		A565621F1D250815003D6E2B /* OrderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A565621D1D250815003D6E2B /* OrderTableViewCell.xib */; };
 		A56562221D250F8F003D6E2B /* SCTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A56562211D250F8F003D6E2B /* SCTableViewCell.m */; };
-		A57FF58B1D236B10004F9C67 /* InConsumer.m in Sources */ = {isa = PBXBuildFile; fileRef = A57FF58A1D236B10004F9C67 /* InConsumer.m */; };
 		A57FF58E1D239120004F9C67 /* SCDBTool.m in Sources */ = {isa = PBXBuildFile; fileRef = A57FF58D1D239120004F9C67 /* SCDBTool.m */; };
 		A57FF5931D23A39A004F9C67 /* JKDBHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = A57FF5901D23A39A004F9C67 /* JKDBHelper.m */; };
 		A57FF5941D23A39A004F9C67 /* JKDBModel.m in Sources */ = {isa = PBXBuildFile; fileRef = A57FF5921D23A39A004F9C67 /* JKDBModel.m */; };
-		A57FF5991D23A910004F9C67 /* SCOrderIn.m in Sources */ = {isa = PBXBuildFile; fileRef = A57FF5981D23A910004F9C67 /* SCOrderIn.m */; };
-		A57FF59C1D23A9CF004F9C67 /* SCDirout.m in Sources */ = {isa = PBXBuildFile; fileRef = A57FF59B1D23A9CF004F9C67 /* SCDirout.m */; };
-		A57FF59F1D23AA01004F9C67 /* SCOrderInMat.m in Sources */ = {isa = PBXBuildFile; fileRef = A57FF59E1D23AA01004F9C67 /* SCOrderInMat.m */; };
-		A57FF5A21D23ABE3004F9C67 /* SCOut.m in Sources */ = {isa = PBXBuildFile; fileRef = A57FF5A11D23ABE3004F9C67 /* SCOut.m */; };
-		A57FF5A51D23AC09004F9C67 /* SCIn.m in Sources */ = {isa = PBXBuildFile; fileRef = A57FF5A41D23AC09004F9C67 /* SCIn.m */; };
 		A58FC35E1D261A4C00CA3A81 /* InDealDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A58FC35D1D261A4C00CA3A81 /* InDealDetailViewController.m */; };
 		A58FC3621D26353E00CA3A81 /* OrderDetailTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A58FC3601D26353E00CA3A81 /* OrderDetailTableViewCell.m */; };
 		A58FC3631D26353E00CA3A81 /* OrderDetailTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A58FC3611D26353E00CA3A81 /* OrderDetailTableViewCell.xib */; };
@@ -79,9 +73,20 @@
 		C805198B1D26B2FA000164E4 /* DownloadOrderInfoInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = C805198A1D26B2FA000164E4 /* DownloadOrderInfoInterface.m */; };
 		C8197F531D2F47370031FCE0 /* order.png in Resources */ = {isa = PBXBuildFile; fileRef = C8197F521D2F47370031FCE0 /* order.png */; };
 		C8197F561D339B720031FCE0 /* UUIDUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = C8197F541D339B720031FCE0 /* UUIDUtil.m */; };
-		C8197F591D3480EB0031FCE0 /* SCOrderMOut.m in Sources */ = {isa = PBXBuildFile; fileRef = C8197F581D3480EB0031FCE0 /* SCOrderMOut.m */; };
-		C8197F5C1D3481100031FCE0 /* SCOrderMDirout.m in Sources */ = {isa = PBXBuildFile; fileRef = C8197F5B1D3481100031FCE0 /* SCOrderMDirout.m */; };
-		C8197F5F1D3481430031FCE0 /* SCOrderMIn.m in Sources */ = {isa = PBXBuildFile; fileRef = C8197F5E1D3481430031FCE0 /* SCOrderMIn.m */; };
+		C83E25751D3B7E7100128C7C /* PuOrder.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25741D3B7E7100128C7C /* PuOrder.m */; };
+		C83E25781D3B81A000128C7C /* PuOrderSer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25771D3B81A000128C7C /* PuOrderSer.m */; };
+		C83E257B1D3B81C500128C7C /* PuOrderChild.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E257A1D3B81C500128C7C /* PuOrderChild.m */; };
+		C83E257F1D3B87A200128C7C /* Consumer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E257E1D3B87A200128C7C /* Consumer.m */; };
+		C83E25851D3B8B1000128C7C /* InBill.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25841D3B8B1000128C7C /* InBill.m */; };
+		C83E25881D3B8DE200128C7C /* InBillSer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25871D3B8DE200128C7C /* InBillSer.m */; };
+		C83E258B1D3B8E0800128C7C /* InBillChild.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E258A1D3B8E0800128C7C /* InBillChild.m */; };
+		C83E258F1D3BB6CC00128C7C /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E258D1D3BB6CC00128C7C /* MBProgressHUD.m */; };
+		C83E25921D3BBE7F00128C7C /* DirBill.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25911D3BBE7F00128C7C /* DirBill.m */; };
+		C83E25951D3BBE9400128C7C /* DirBillSer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25941D3BBE9400128C7C /* DirBillSer.m */; };
+		C83E25981D3BBEAB00128C7C /* DirBillChild.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25971D3BBEAB00128C7C /* DirBillChild.m */; };
+		C83E259B1D3BBECA00128C7C /* OutBill.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E259A1D3BBECA00128C7C /* OutBill.m */; };
+		C83E25A11D3BBF0600128C7C /* OutBillSer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25A01D3BBF0600128C7C /* OutBillSer.m */; };
+		C83E25A41D3BBF1B00128C7C /* OutBillChild.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25A31D3BBF1B00128C7C /* OutBillChild.m */; };
 		C8C378D01D26DA12008D184B /* MJExtensionConst.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378BD1D26DA12008D184B /* MJExtensionConst.m */; };
 		C8C378D11D26DA12008D184B /* MJFoundation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378BF1D26DA12008D184B /* MJFoundation.m */; };
 		C8C378D21D26DA12008D184B /* MJProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378C11D26DA12008D184B /* MJProperty.m */; };
@@ -106,9 +111,6 @@
 		C8C378FD1D26EC63008D184B /* DiroutDealDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378FC1D26EC63008D184B /* DiroutDealDetailViewController.m */; };
 		C8C379001D26EC7A008D184B /* ConfirmDiroutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378FF1D26EC7A008D184B /* ConfirmDiroutViewController.m */; };
 		C8C379031D26ECD6008D184B /* ChooseConsumerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C379021D26ECD6008D184B /* ChooseConsumerViewController.m */; };
-		C8C379061D26EFA1008D184B /* SCOrderOut.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C379051D26EFA1008D184B /* SCOrderOut.m */; };
-		C8C379091D26F023008D184B /* SCOrderOutMat.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C379081D26F023008D184B /* SCOrderOutMat.m */; };
-		C8C3790C1D26F17E008D184B /* OutConsumer.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C3790B1D26F17E008D184B /* OutConsumer.m */; };
 		C8C3790F1D2A61C5008D184B /* SysSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C3790E1D2A61C5008D184B /* SysSettingViewController.m */; };
 		C8FD75A91D22C65E00E52D7A /* ServerConfigViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FD75A81D22C65E00E52D7A /* ServerConfigViewController.m */; };
 		C8FD75B01D2412CE00E52D7A /* InDealViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FD75AF1D2412CE00E52D7A /* InDealViewController.m */; };
@@ -186,24 +188,12 @@
 		A565621D1D250815003D6E2B /* OrderTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = OrderTableViewCell.xib; path = views/OrderTableViewCell.xib; sourceTree = "<group>"; };
 		A56562201D250F8F003D6E2B /* SCTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCTableViewCell.h; path = views/SCTableViewCell.h; sourceTree = "<group>"; };
 		A56562211D250F8F003D6E2B /* SCTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCTableViewCell.m; path = views/SCTableViewCell.m; sourceTree = "<group>"; };
-		A57FF5891D236B10004F9C67 /* InConsumer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InConsumer.h; path = model/InConsumer.h; sourceTree = "<group>"; };
-		A57FF58A1D236B10004F9C67 /* InConsumer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InConsumer.m; path = model/InConsumer.m; sourceTree = "<group>"; };
 		A57FF58C1D239120004F9C67 /* SCDBTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCDBTool.h; path = tools/SCDBTool.h; sourceTree = "<group>"; };
 		A57FF58D1D239120004F9C67 /* SCDBTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCDBTool.m; path = tools/SCDBTool.m; sourceTree = "<group>"; };
 		A57FF58F1D23A39A004F9C67 /* JKDBHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JKDBHelper.h; path = tools/JKDBHelper.h; sourceTree = "<group>"; };
 		A57FF5901D23A39A004F9C67 /* JKDBHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JKDBHelper.m; path = tools/JKDBHelper.m; sourceTree = "<group>"; };
 		A57FF5911D23A39A004F9C67 /* JKDBModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JKDBModel.h; path = tools/JKDBModel.h; sourceTree = "<group>"; };
 		A57FF5921D23A39A004F9C67 /* JKDBModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JKDBModel.m; path = tools/JKDBModel.m; sourceTree = "<group>"; };
-		A57FF5971D23A910004F9C67 /* SCOrderIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCOrderIn.h; path = model/SCOrderIn.h; sourceTree = "<group>"; };
-		A57FF5981D23A910004F9C67 /* SCOrderIn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCOrderIn.m; path = model/SCOrderIn.m; sourceTree = "<group>"; };
-		A57FF59A1D23A9CF004F9C67 /* SCDirout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCDirout.h; path = model/SCDirout.h; sourceTree = "<group>"; };
-		A57FF59B1D23A9CF004F9C67 /* SCDirout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCDirout.m; path = model/SCDirout.m; sourceTree = "<group>"; };
-		A57FF59D1D23AA01004F9C67 /* SCOrderInMat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCOrderInMat.h; path = model/SCOrderInMat.h; sourceTree = "<group>"; };
-		A57FF59E1D23AA01004F9C67 /* SCOrderInMat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCOrderInMat.m; path = model/SCOrderInMat.m; sourceTree = "<group>"; };
-		A57FF5A01D23ABE3004F9C67 /* SCOut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCOut.h; path = model/SCOut.h; sourceTree = "<group>"; };
-		A57FF5A11D23ABE3004F9C67 /* SCOut.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCOut.m; path = model/SCOut.m; sourceTree = "<group>"; };
-		A57FF5A31D23AC09004F9C67 /* SCIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCIn.h; path = model/SCIn.h; sourceTree = "<group>"; };
-		A57FF5A41D23AC09004F9C67 /* SCIn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCIn.m; path = model/SCIn.m; sourceTree = "<group>"; };
 		A58FC35C1D261A4C00CA3A81 /* InDealDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InDealDetailViewController.h; path = viewcontroller/in/InDealDetailViewController.h; sourceTree = "<group>"; };
 		A58FC35D1D261A4C00CA3A81 /* InDealDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InDealDetailViewController.m; path = viewcontroller/in/InDealDetailViewController.m; sourceTree = "<group>"; };
 		A58FC35F1D26353E00CA3A81 /* OrderDetailTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OrderDetailTableViewCell.h; path = views/OrderDetailTableViewCell.h; sourceTree = "<group>"; };
@@ -218,12 +208,34 @@
 		C8197F521D2F47370031FCE0 /* order.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = order.png; path = imgs/order.png; sourceTree = "<group>"; };
 		C8197F541D339B720031FCE0 /* UUIDUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UUIDUtil.m; path = tools/UUIDUtil.m; sourceTree = "<group>"; };
 		C8197F551D339B720031FCE0 /* UUIDUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UUIDUtil.h; path = tools/UUIDUtil.h; sourceTree = "<group>"; };
-		C8197F571D3480EB0031FCE0 /* SCOrderMOut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCOrderMOut.h; path = model/SCOrderMOut.h; sourceTree = "<group>"; };
-		C8197F581D3480EB0031FCE0 /* SCOrderMOut.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCOrderMOut.m; path = model/SCOrderMOut.m; sourceTree = "<group>"; };
-		C8197F5A1D3481100031FCE0 /* SCOrderMDirout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCOrderMDirout.h; path = model/SCOrderMDirout.h; sourceTree = "<group>"; };
-		C8197F5B1D3481100031FCE0 /* SCOrderMDirout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCOrderMDirout.m; path = model/SCOrderMDirout.m; sourceTree = "<group>"; };
-		C8197F5D1D3481430031FCE0 /* SCOrderMIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCOrderMIn.h; path = model/SCOrderMIn.h; sourceTree = "<group>"; };
-		C8197F5E1D3481430031FCE0 /* SCOrderMIn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCOrderMIn.m; path = model/SCOrderMIn.m; sourceTree = "<group>"; };
+		C83E25731D3B7E7100128C7C /* PuOrder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PuOrder.h; path = model/order/PuOrder.h; sourceTree = "<group>"; };
+		C83E25741D3B7E7100128C7C /* PuOrder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PuOrder.m; path = model/order/PuOrder.m; sourceTree = "<group>"; };
+		C83E25761D3B81A000128C7C /* PuOrderSer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PuOrderSer.h; path = model/order/PuOrderSer.h; sourceTree = "<group>"; };
+		C83E25771D3B81A000128C7C /* PuOrderSer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PuOrderSer.m; path = model/order/PuOrderSer.m; sourceTree = "<group>"; };
+		C83E25791D3B81C500128C7C /* PuOrderChild.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PuOrderChild.h; path = model/order/PuOrderChild.h; sourceTree = "<group>"; };
+		C83E257A1D3B81C500128C7C /* PuOrderChild.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PuOrderChild.m; path = model/order/PuOrderChild.m; sourceTree = "<group>"; };
+		C83E257D1D3B87A200128C7C /* Consumer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Consumer.h; path = model/consumer/Consumer.h; sourceTree = "<group>"; };
+		C83E257E1D3B87A200128C7C /* Consumer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Consumer.m; path = model/consumer/Consumer.m; sourceTree = "<group>"; };
+		C83E25831D3B8B1000128C7C /* InBill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InBill.h; path = model/in/InBill.h; sourceTree = "<group>"; };
+		C83E25841D3B8B1000128C7C /* InBill.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InBill.m; path = model/in/InBill.m; sourceTree = "<group>"; };
+		C83E25861D3B8DE200128C7C /* InBillSer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InBillSer.h; path = model/in/InBillSer.h; sourceTree = "<group>"; };
+		C83E25871D3B8DE200128C7C /* InBillSer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InBillSer.m; path = model/in/InBillSer.m; sourceTree = "<group>"; };
+		C83E25891D3B8E0800128C7C /* InBillChild.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InBillChild.h; path = model/in/InBillChild.h; sourceTree = "<group>"; };
+		C83E258A1D3B8E0800128C7C /* InBillChild.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InBillChild.m; path = model/in/InBillChild.m; sourceTree = "<group>"; };
+		C83E258D1D3BB6CC00128C7C /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBProgressHUD.m; path = hud/MBProgressHUD.m; sourceTree = "<group>"; };
+		C83E258E1D3BB6CC00128C7C /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBProgressHUD.h; path = hud/MBProgressHUD.h; sourceTree = "<group>"; };
+		C83E25901D3BBE7F00128C7C /* DirBill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DirBill.h; path = model/dir/DirBill.h; sourceTree = "<group>"; };
+		C83E25911D3BBE7F00128C7C /* DirBill.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DirBill.m; path = model/dir/DirBill.m; sourceTree = "<group>"; };
+		C83E25931D3BBE9400128C7C /* DirBillSer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DirBillSer.h; path = model/dir/DirBillSer.h; sourceTree = "<group>"; };
+		C83E25941D3BBE9400128C7C /* DirBillSer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DirBillSer.m; path = model/dir/DirBillSer.m; sourceTree = "<group>"; };
+		C83E25961D3BBEAB00128C7C /* DirBillChild.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DirBillChild.h; path = model/dir/DirBillChild.h; sourceTree = "<group>"; };
+		C83E25971D3BBEAB00128C7C /* DirBillChild.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DirBillChild.m; path = model/dir/DirBillChild.m; sourceTree = "<group>"; };
+		C83E25991D3BBECA00128C7C /* OutBill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OutBill.h; path = model/out/OutBill.h; sourceTree = "<group>"; };
+		C83E259A1D3BBECA00128C7C /* OutBill.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OutBill.m; path = model/out/OutBill.m; sourceTree = "<group>"; };
+		C83E259F1D3BBF0600128C7C /* OutBillSer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OutBillSer.h; path = model/out/OutBillSer.h; sourceTree = "<group>"; };
+		C83E25A01D3BBF0600128C7C /* OutBillSer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OutBillSer.m; path = model/out/OutBillSer.m; sourceTree = "<group>"; };
+		C83E25A21D3BBF1B00128C7C /* OutBillChild.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OutBillChild.h; path = model/out/OutBillChild.h; sourceTree = "<group>"; };
+		C83E25A31D3BBF1B00128C7C /* OutBillChild.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OutBillChild.m; path = model/out/OutBillChild.m; sourceTree = "<group>"; };
 		C8C378BB1D26DA12008D184B /* MJExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MJExtension.h; path = mjextension/MJExtension.h; sourceTree = "<group>"; };
 		C8C378BC1D26DA12008D184B /* MJExtensionConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MJExtensionConst.h; path = mjextension/MJExtensionConst.h; sourceTree = "<group>"; };
 		C8C378BD1D26DA12008D184B /* MJExtensionConst.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MJExtensionConst.m; path = mjextension/MJExtensionConst.m; sourceTree = "<group>"; };
@@ -273,12 +285,6 @@
 		C8C378FF1D26EC7A008D184B /* ConfirmDiroutViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ConfirmDiroutViewController.m; path = viewcontroller/dirout/ConfirmDiroutViewController.m; sourceTree = "<group>"; };
 		C8C379011D26ECD6008D184B /* ChooseConsumerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ChooseConsumerViewController.h; path = viewcontroller/ChooseConsumerViewController.h; sourceTree = "<group>"; };
 		C8C379021D26ECD6008D184B /* ChooseConsumerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ChooseConsumerViewController.m; path = viewcontroller/ChooseConsumerViewController.m; sourceTree = "<group>"; };
-		C8C379041D26EFA1008D184B /* SCOrderOut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCOrderOut.h; path = model/SCOrderOut.h; sourceTree = "<group>"; };
-		C8C379051D26EFA1008D184B /* SCOrderOut.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCOrderOut.m; path = model/SCOrderOut.m; sourceTree = "<group>"; };
-		C8C379071D26F023008D184B /* SCOrderOutMat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SCOrderOutMat.h; path = model/SCOrderOutMat.h; sourceTree = "<group>"; };
-		C8C379081D26F023008D184B /* SCOrderOutMat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SCOrderOutMat.m; path = model/SCOrderOutMat.m; sourceTree = "<group>"; };
-		C8C3790A1D26F17E008D184B /* OutConsumer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OutConsumer.h; path = model/OutConsumer.h; sourceTree = "<group>"; };
-		C8C3790B1D26F17E008D184B /* OutConsumer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OutConsumer.m; path = model/OutConsumer.m; sourceTree = "<group>"; };
 		C8C3790D1D2A61C5008D184B /* SysSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SysSettingViewController.h; sourceTree = "<group>"; };
 		C8C3790E1D2A61C5008D184B /* SysSettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SysSettingViewController.m; sourceTree = "<group>"; };
 		C8FD75A71D22C65E00E52D7A /* ServerConfigViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerConfigViewController.h; sourceTree = "<group>"; };
@@ -320,6 +326,7 @@
 		A52CB3581D22416500402E3F /* Zhongnan */ = {
 			isa = PBXGroup;
 			children = (
+				C83E258C1D3BB68F00128C7C /* hud */,
 				C8C378BA1D26D9FF008D184B /* mjextension */,
 				C8C378B91D26D8A8008D184B /* toast */,
 				C8C378B81D26D89F008D184B /* fmdb */,
@@ -453,32 +460,13 @@
 		A52CB3D41D227ABB00402E3F /* model */ = {
 			isa = PBXGroup;
 			children = (
+				C83E25821D3B8A4800128C7C /* dirout */,
+				C83E25811D3B8A4200128C7C /* out */,
+				C83E25801D3B8A3C00128C7C /* in */,
+				C83E257C1D3B877A00128C7C /* consumer */,
+				C83E25721D3B7E5500128C7C /* order */,
 				A52CB3D51D227AD600402E3F /* User.h */,
 				A52CB3D61D227AD600402E3F /* User.m */,
-				A57FF5891D236B10004F9C67 /* InConsumer.h */,
-				A57FF58A1D236B10004F9C67 /* InConsumer.m */,
-				C8C3790A1D26F17E008D184B /* OutConsumer.h */,
-				C8C3790B1D26F17E008D184B /* OutConsumer.m */,
-				A57FF5971D23A910004F9C67 /* SCOrderIn.h */,
-				A57FF5981D23A910004F9C67 /* SCOrderIn.m */,
-				C8C379041D26EFA1008D184B /* SCOrderOut.h */,
-				C8C379051D26EFA1008D184B /* SCOrderOut.m */,
-				A57FF59D1D23AA01004F9C67 /* SCOrderInMat.h */,
-				A57FF59E1D23AA01004F9C67 /* SCOrderInMat.m */,
-				C8C379071D26F023008D184B /* SCOrderOutMat.h */,
-				C8C379081D26F023008D184B /* SCOrderOutMat.m */,
-				A57FF59A1D23A9CF004F9C67 /* SCDirout.h */,
-				A57FF59B1D23A9CF004F9C67 /* SCDirout.m */,
-				C8197F5A1D3481100031FCE0 /* SCOrderMDirout.h */,
-				C8197F5B1D3481100031FCE0 /* SCOrderMDirout.m */,
-				A57FF5A01D23ABE3004F9C67 /* SCOut.h */,
-				A57FF5A11D23ABE3004F9C67 /* SCOut.m */,
-				C8197F571D3480EB0031FCE0 /* SCOrderMOut.h */,
-				C8197F581D3480EB0031FCE0 /* SCOrderMOut.m */,
-				A57FF5A31D23AC09004F9C67 /* SCIn.h */,
-				A57FF5A41D23AC09004F9C67 /* SCIn.m */,
-				C8197F5D1D3481430031FCE0 /* SCOrderMIn.h */,
-				C8197F5E1D3481430031FCE0 /* SCOrderMIn.m */,
 			);
 			name = model;
 			sourceTree = "<group>";
@@ -496,6 +484,76 @@
 				A56562211D250F8F003D6E2B /* SCTableViewCell.m */,
 			);
 			name = views;
+			sourceTree = "<group>";
+		};
+		C83E25721D3B7E5500128C7C /* order */ = {
+			isa = PBXGroup;
+			children = (
+				C83E25731D3B7E7100128C7C /* PuOrder.h */,
+				C83E25741D3B7E7100128C7C /* PuOrder.m */,
+				C83E25761D3B81A000128C7C /* PuOrderSer.h */,
+				C83E25771D3B81A000128C7C /* PuOrderSer.m */,
+				C83E25791D3B81C500128C7C /* PuOrderChild.h */,
+				C83E257A1D3B81C500128C7C /* PuOrderChild.m */,
+			);
+			name = order;
+			sourceTree = "<group>";
+		};
+		C83E257C1D3B877A00128C7C /* consumer */ = {
+			isa = PBXGroup;
+			children = (
+				C83E257D1D3B87A200128C7C /* Consumer.h */,
+				C83E257E1D3B87A200128C7C /* Consumer.m */,
+			);
+			name = consumer;
+			sourceTree = "<group>";
+		};
+		C83E25801D3B8A3C00128C7C /* in */ = {
+			isa = PBXGroup;
+			children = (
+				C83E25831D3B8B1000128C7C /* InBill.h */,
+				C83E25841D3B8B1000128C7C /* InBill.m */,
+				C83E25861D3B8DE200128C7C /* InBillSer.h */,
+				C83E25871D3B8DE200128C7C /* InBillSer.m */,
+				C83E25891D3B8E0800128C7C /* InBillChild.h */,
+				C83E258A1D3B8E0800128C7C /* InBillChild.m */,
+			);
+			name = in;
+			sourceTree = "<group>";
+		};
+		C83E25811D3B8A4200128C7C /* out */ = {
+			isa = PBXGroup;
+			children = (
+				C83E25991D3BBECA00128C7C /* OutBill.h */,
+				C83E259A1D3BBECA00128C7C /* OutBill.m */,
+				C83E259F1D3BBF0600128C7C /* OutBillSer.h */,
+				C83E25A01D3BBF0600128C7C /* OutBillSer.m */,
+				C83E25A21D3BBF1B00128C7C /* OutBillChild.h */,
+				C83E25A31D3BBF1B00128C7C /* OutBillChild.m */,
+			);
+			name = out;
+			sourceTree = "<group>";
+		};
+		C83E25821D3B8A4800128C7C /* dirout */ = {
+			isa = PBXGroup;
+			children = (
+				C83E25901D3BBE7F00128C7C /* DirBill.h */,
+				C83E25911D3BBE7F00128C7C /* DirBill.m */,
+				C83E25931D3BBE9400128C7C /* DirBillSer.h */,
+				C83E25941D3BBE9400128C7C /* DirBillSer.m */,
+				C83E25961D3BBEAB00128C7C /* DirBillChild.h */,
+				C83E25971D3BBEAB00128C7C /* DirBillChild.m */,
+			);
+			name = dirout;
+			sourceTree = "<group>";
+		};
+		C83E258C1D3BB68F00128C7C /* hud */ = {
+			isa = PBXGroup;
+			children = (
+				C83E258D1D3BB6CC00128C7C /* MBProgressHUD.m */,
+				C83E258E1D3BB6CC00128C7C /* MBProgressHUD.h */,
+			);
+			name = hud;
 			sourceTree = "<group>";
 		};
 		C8C378B81D26D89F008D184B /* fmdb */ = {
@@ -716,13 +774,13 @@
 			files = (
 				C8C3790F1D2A61C5008D184B /* SysSettingViewController.m in Sources */,
 				A58FC35E1D261A4C00CA3A81 /* InDealDetailViewController.m in Sources */,
-				A57FF59F1D23AA01004F9C67 /* SCOrderInMat.m in Sources */,
 				A58FC3691D2668F600CA3A81 /* DateTool.m in Sources */,
 				A56562191D24C3E1003D6E2B /* StringUtil.m in Sources */,
 				C8C378D81D26DA12008D184B /* NSObject+MJProperty.m in Sources */,
-				C8197F591D3480EB0031FCE0 /* SCOrderMOut.m in Sources */,
-				C8197F5F1D3481430031FCE0 /* SCOrderMIn.m in Sources */,
 				C8C378F11D26E540008D184B /* OutDealViewController.m in Sources */,
+				C83E258B1D3B8E0800128C7C /* InBillChild.m in Sources */,
+				C83E258F1D3BB6CC00128C7C /* MBProgressHUD.m in Sources */,
+				C83E257B1D3B81C500128C7C /* PuOrderChild.m in Sources */,
 				C8C378EA1D26DA2F008D184B /* FMDatabasePool.m in Sources */,
 				A52CB3DA1D227E8000402E3F /* MainViewController.m in Sources */,
 				C8C378F41D26EAE8008D184B /* OutDealDetailViewController.m in Sources */,
@@ -730,47 +788,49 @@
 				A58FC3661D265E4F00CA3A81 /* ConfirmInViewController.m in Sources */,
 				C8C378D91D26DA12008D184B /* NSString+MJExtension.m in Sources */,
 				A52CB3D71D227AD600402E3F /* User.m in Sources */,
-				A57FF5A51D23AC09004F9C67 /* SCIn.m in Sources */,
 				C8C378D51D26DA12008D184B /* NSObject+MJClass.m in Sources */,
-				C8197F5C1D3481100031FCE0 /* SCOrderMDirout.m in Sources */,
 				A52CB3D31D225D1200402E3F /* LoginInterface.m in Sources */,
+				C83E257F1D3B87A200128C7C /* Consumer.m in Sources */,
+				C83E25781D3B81A000128C7C /* PuOrderSer.m in Sources */,
 				C8C378EB1D26DA2F008D184B /* FMDatabaseAdditions.m in Sources */,
-				C8C379061D26EFA1008D184B /* SCOrderOut.m in Sources */,
-				A57FF5A21D23ABE3004F9C67 /* SCOut.m in Sources */,
 				C8C378D21D26DA12008D184B /* MJProperty.m in Sources */,
 				C8C378DC1D26DA21008D184B /* UIView+Toast.m in Sources */,
 				C8197F561D339B720031FCE0 /* UUIDUtil.m in Sources */,
 				C8C378F71D26EB37008D184B /* ConfirmOutViewController.m in Sources */,
 				A52CB3C21D22490300402E3F /* UIBarButtonItem+Extension.m in Sources */,
 				A52CB3BF1D2248AC00402E3F /* SCNavigationController.m in Sources */,
+				C83E25951D3BBE9400128C7C /* DirBillSer.m in Sources */,
 				C805198B1D26B2FA000164E4 /* DownloadOrderInfoInterface.m in Sources */,
 				A52CB3611D22416500402E3F /* LoginViewController.m in Sources */,
 				A52CB3CC1D22571500402E3F /* Reachability.m in Sources */,
-				A57FF5991D23A910004F9C67 /* SCOrderIn.m in Sources */,
 				A56562221D250F8F003D6E2B /* SCTableViewCell.m in Sources */,
 				C8C378D71D26DA12008D184B /* NSObject+MJKeyValue.m in Sources */,
 				C8FD75B01D2412CE00E52D7A /* InDealViewController.m in Sources */,
 				C8C378D61D26DA12008D184B /* NSObject+MJCoding.m in Sources */,
+				C83E25981D3BBEAB00128C7C /* DirBillChild.m in Sources */,
 				A58FC3621D26353E00CA3A81 /* OrderDetailTableViewCell.m in Sources */,
 				A52CB3C61D224A7700402E3F /* UIColor+Hex.m in Sources */,
 				A52CB35E1D22416500402E3F /* AppDelegate.m in Sources */,
 				C8C378EC1D26DA2F008D184B /* FMDatabase.m in Sources */,
-				C8C3790C1D26F17E008D184B /* OutConsumer.m in Sources */,
+				C83E25921D3BBE7F00128C7C /* DirBill.m in Sources */,
 				C8C378FD1D26EC63008D184B /* DiroutDealDetailViewController.m in Sources */,
-				A57FF58B1D236B10004F9C67 /* InConsumer.m in Sources */,
+				C83E25A11D3BBF0600128C7C /* OutBillSer.m in Sources */,
 				C8C378E81D26DA2F008D184B /* FMResultSet.m in Sources */,
 				C8C378FA1D26EB73008D184B /* DiroutDealViewController.m in Sources */,
 				C8C378D31D26DA12008D184B /* MJPropertyKey.m in Sources */,
 				A57FF58E1D239120004F9C67 /* SCDBTool.m in Sources */,
+				C83E25851D3B8B1000128C7C /* InBill.m in Sources */,
 				C8C378D11D26DA12008D184B /* MJFoundation.m in Sources */,
-				A57FF59C1D23A9CF004F9C67 /* SCDirout.m in Sources */,
+				C83E25751D3B7E7100128C7C /* PuOrder.m in Sources */,
 				A57FF5941D23A39A004F9C67 /* JKDBModel.m in Sources */,
+				C83E259B1D3BBECA00128C7C /* OutBill.m in Sources */,
 				A52CB35B1D22416500402E3F /* main.m in Sources */,
 				A57FF5931D23A39A004F9C67 /* JKDBHelper.m in Sources */,
-				C8C379091D26F023008D184B /* SCOrderOutMat.m in Sources */,
 				C8C379031D26ECD6008D184B /* ChooseConsumerViewController.m in Sources */,
 				A52CB3CF1D225BBE00402E3F /* WebServiceConnect.m in Sources */,
+				C83E25881D3B8DE200128C7C /* InBillSer.m in Sources */,
 				A565621E1D250815003D6E2B /* OrderTableViewCell.m in Sources */,
+				C83E25A41D3BBF1B00128C7C /* OutBillChild.m in Sources */,
 				C8C379001D26EC7A008D184B /* ConfirmDiroutViewController.m in Sources */,
 				C8C378D01D26DA12008D184B /* MJExtensionConst.m in Sources */,
 				C8FD75A91D22C65E00E52D7A /* ServerConfigViewController.m in Sources */,

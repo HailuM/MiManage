@@ -7,8 +7,7 @@
 //
 
 #import "SCTableViewCell.h"
-#import "SCOrderIn.h"
-#import "SCOrderOut.h"
+#import "PuOrder.h"
 
 @interface OrderTableViewCell : SCTableViewCell {
     NSString *number;//订单号

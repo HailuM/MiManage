@@ -53,22 +53,11 @@
  *  数据库读取数据
  */
 -(void)initDataWithOrder:(NSString *)order supplier:(NSString *)suppliername{
-    if([SCOrderIn isExistInTable]){
+    if([PuOrder isExistInTable]){
         NSString *criteria;
         NSArray *array;
-        if([StringUtil scString:order] && [StringUtil scString:suppliername]){
-            criteria = [NSString stringWithFormat:@" WHERE number = '%@' and supplier = '%@' and isDirout = 0 and isFinish = 0 ",order,suppliername];
-            array = [SCOrderIn findByCriteria:criteria];
-        }else if(![StringUtil scString:order] && ![StringUtil scString:suppliername]){
-            array = [SCOrderIn findByCriteria:@" WHERE isDirout = 0 and isFinish = 0 "];
-        }else{
-            if([StringUtil scString:order]){
-                criteria = [NSString stringWithFormat:@" WHERE number = '%@' and isDirout = 0 and isFinish = 0 ",order];
-            }else if([StringUtil scString:suppliername]){
-                criteria = [NSString stringWithFormat:@" WHERE supplier = '%@' and isDirout = 0 and isFinish = 0 ",suppliername];
-            }
-            array = [SCOrderIn findByCriteria:criteria];
-        }
+        criteria = @" WHERE type = 'rk' and isFinish = 0 ";
+        array = [PuOrder findByCriteria:criteria];
         
         if(array.count>0){
             //重新加载数据
@@ -79,7 +68,7 @@
         }
         
     }else{
-        [SCOrderIn createTable];
+        [PuOrder createTable];
         [self.view makeToast:@"暂无数据,请返回主页同步入库订单" duration:3.0 position:CSToastPositionCenter];
     }
 }
@@ -131,7 +120,7 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     OrderTableViewCell *cell = [OrderTableViewCell cellWithTableView:tableView];
-    SCOrderIn *order = self.inArray[indexPath.row];
+    PuOrder *order = self.inArray[indexPath.row];
     [cell showCell:order];
     return cell;
 }

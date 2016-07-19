@@ -38,8 +38,8 @@
             self.selArray = [[NSMutableArray alloc] init];
         }
         double sum = 0;
-        for(SCOrderInMat *inMat in self.selArray){
-            sum = sum + inMat.qty;
+        for(PuOrderChild *inMat in self.selArray){
+            sum = sum + inMat.curQty;
         }
         self.checkedNumLabel.text = [NSString stringWithFormat:@"已选品种:%lu;   总数量:%.2f",(unsigned long)self.selArray.count,sum];
 //        [self initData];
@@ -73,7 +73,7 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     OrderDetailTableViewCell *cell = [OrderDetailTableViewCell cellWithTableView:tableView];
-    SCOrderInMat *inMat = self.selArray[indexPath.row];
+    PuOrderChild *inMat = self.selArray[indexPath.row];
     [cell showCell:inMat];
     cell.addBtn.tag = 1000+indexPath.row;
     [cell.addBtn setImage:[UIImage imageNamed:@"del"] forState:UIControlStateNormal];
@@ -93,22 +93,23 @@
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:nil delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
     [alert setAlertViewStyle:UIAlertViewStylePlainTextInput];
     alert.tag = 2000+indexPath.row;
-    SCOrderInMat *inMat = self.selArray[indexPath.row];
+    PuOrderChild *inMat = self.selArray[indexPath.row];
     
     UITextField *countText = [alert textFieldAtIndex:0];
     [countText setKeyboardType:UIKeyboardTypeDecimalPad];
-    countText.text = [NSString stringWithFormat:@"%f",inMat.qty];
+    //尾数去0
+    countText.text = [StringUtil changeFloat:[NSString stringWithFormat:@"%f",inMat.curQty]];
     [alert show];
 }
 
 -(void)delQty:(id)sender{
     UILabel *label = sender;
     NSInteger tag = label.tag-2000;
-    SCOrderInMat *inMat = self.selArray[tag];
-    if(inMat.qty-1<=0){
-        inMat.qty = 0.0;
+    PuOrderChild *inMat = self.selArray[tag];
+    if(inMat.curQty-1<=0){
+        inMat.curQty = 0.0;
     }else{
-        inMat.qty = inMat.qty-1;
+        inMat.curQty = inMat.curQty-1;
     }
     [self.tableView reloadData];
 }
@@ -116,11 +117,11 @@
 -(void)addQty:(id)sender {
     UILabel *label = sender;
     NSInteger tag = label.tag-3000;
-    SCOrderInMat *inMat = self.selArray[tag];
-    if(inMat.qty+1>inMat.limitQty-inMat.hasQty){
-        inMat.qty = inMat.limitQty-inMat.hasQty;
+    PuOrderChild *inMat = self.selArray[tag];
+    if(inMat.curQty+1>inMat.limitQty-inMat.rkQty){
+        inMat.curQty = inMat.limitQty-inMat.rkQty;
     }else{
-        inMat.qty = inMat.qty+1;
+        inMat.curQty = inMat.curQty+1;
     }
     [self.tableView reloadData];
 }
@@ -131,13 +132,13 @@
         NSInteger tag = alertView.tag-2000;
         UITextField *countText = [alertView textFieldAtIndex:0];
         NSString *count = countText.text;
-        SCOrderInMat *inMat = self.selArray[tag];
+        PuOrderChild *inMat = self.selArray[tag];
         double qty = [count doubleValue];
-        if(qty+inMat.hasQty>inMat.limitQty){
+        if(qty+inMat.rkQty>inMat.limitQty){
             //数量过大
             [self.view makeToast:@"数量超过上限,请重新输入!" duration:3.0 position:CSToastPositionCenter];
-        }else {
-            inMat.qty = qty;
+        }else{
+            inMat.curQty = qty;
         }
         [self.tableView reloadData];
     }
@@ -150,8 +151,8 @@
     [self.selArray removeObjectAtIndex:position];
     [self.tableView reloadData];
     double sum = 0;
-    for(SCOrderInMat *inMat in self.selArray){
-        sum = sum + inMat.qty;
+    for(PuOrderChild *inMat in self.selArray){
+        sum = sum + inMat.curQty;
     }
     self.checkedNumLabel.text = [NSString stringWithFormat:@"已选品种:%lu;总数量:%.2f",(unsigned long)self.selArray.count,sum];
 }
@@ -163,8 +164,8 @@
  */
 - (void)confirmDealIn:(id)sender {
     double sum = 0;
-    for(SCOrderInMat *inMat in self.selArray){
-        sum = sum + inMat.qty;
+    for(PuOrderChild *inMat in self.selArray){
+        sum = sum + inMat.curQty;
     }
     if(self.selArray.count==0 || sum==0){
         UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
@@ -177,46 +178,54 @@
         //保存数据库
         // TODO 涉及到出入库的数量判断
         NSDate *now = [NSDate date];
-        NSString *deliverNo = [NSString stringWithFormat:@"%@%@",[DateTool dateToString:now],[DateTool randomNumber]];
+//        NSString *deliverNo = [NSString stringWithFormat:@"%@%@",[DateTool dateToString:now],[DateTool randomNumber]];
         //保存入库单
-        mIn = [[SCOrderMIn alloc] init];
+        bill = [[InBill alloc] init];
         
-        mIn.id = self.order.id;
-        mIn.OrderId = self.order.OrderId;
-        mIn.number = self.order.number;
-        mIn.date = self.order.date;
-        mIn.supplier = self.order.supplier;
-        mIn.materialDesc = self.order.materialDesc;
-        mIn.Addr = self.order.Addr;
-        mIn.ProjectName= self.order.ProjectName;
-        mIn.Company = self.order.Company;
         
-        mIn.gid = [UUIDUtil getUUID];
-        mIn.time = now;
-        mIn.deliverNo = deliverNo;
-        [mIn saveOrUpdate];//保存直入直出单
+        bill.receiveid = [UUIDUtil getUUID];
+        bill.orderid = self.order.id;
+        bill.date = self.order.date;
+        bill.supplier = self.order.supplier;
+        bill.materialDesc = self.order.materialDesc;
+        bill.Addr = self.order.Addr;
+        bill.ProjectName= self.order.ProjectName;
+        bill.Company = self.order.Company;
+        bill.preparertime = [DateTool datetimeToString:now];
+        
+        
+        
+        [bill saveOrUpdate];//保存入库单
         
         
         for (int i = 0; i<self.selArray.count; i++) {
-            SCOrderInMat *inMat = self.selArray[i];
+            PuOrderChild *inMat = self.selArray[i];
             //之前处理的数量+这一次的处理数量
-            inMat.hasQty = inMat.qty+inMat.hasQty;
+            inMat.rkQty = inMat.curQty+inMat.rkQty;
             //如果已处理数量介于sourceQty和limitQty
             //则说明此次材料已处理结束
-            if(inMat.hasQty>inMat.sourceQty && inMat.hasQty<inMat.limitQty){
+            if(inMat.rkQty>inMat.sourceQty && inMat.rkQty<inMat.limitQty){
                 //此次处理完成
                 inMat.isFinish = 1;
             }
             [inMat saveOrUpdate];
-            //生成入库单
-            SCIn *scIn = [[SCIn alloc] init];
-            scIn.time = now;
-            scIn.receiveid = mIn.gid;
-            scIn.deliverNo = deliverNo;
-            scIn.orderid = inMat.orderid;
-            scIn.orderEntryid = inMat.orderentryid;
-            scIn.qty = inMat.qty;
-            [scIn saveOrUpdate];
+            //生成入库单子表
+            InBillChild *billC = [[InBillChild alloc] init];
+            billC.receiveid = bill.receiveid;
+            billC.wareentryid = [UUIDUtil getUUID];
+            billC.qty = inMat.curQty;
+            billC.orderEntryid = inMat.orderentryid; //来源单据的表体id
+            billC.preparertime = bill.preparertime;
+            billC.orderid = bill.orderid;
+            
+            
+            
+            
+            
+            if(![InBillChild isExistInTable]){
+                [InBillChild createTable];
+            }
+            [billC saveOrUpdate];
         }
         int finish = 0;//判断单据是否结束:0,未结束  >0,已结束
         if(self.unSelArray.count>0){
@@ -224,7 +233,7 @@
             finish = 0;
         }else{
             for (int i = 0; i<self.selArray.count; i++) {
-                SCOrderInMat *inMat = self.selArray[i];
+                PuOrderChild *inMat = self.selArray[i];
                 if(inMat.isFinish==0){
                     finish++;
                 }
@@ -239,6 +248,42 @@
         }
         
         [self.order saveOrUpdate];
+        
+        
+        //手机根据刚刚做的入库单生成新的出库来源订单主表
+        PuOrder *rkOrder = [[PuOrder alloc] init];
+        rkOrder.id = [UUIDUtil getUUID];//手机生成的入库单id
+        rkOrder.number = [StringUtil generateNo:@"SCRK"];
+        rkOrder.supplier = self.order.supplier;
+        rkOrder.materialDesc = self.order.materialDesc;
+        rkOrder.Addr = self.order.Addr;
+        rkOrder.type = @"ck";
+        rkOrder.zcwc = NO;
+        rkOrder.name = self.order.name;
+        rkOrder.ProjectName = self.order.ProjectName;
+        rkOrder.Company = self.order.Company;
+        rkOrder.date = [DateTool dateWithString:now];
+        rkOrder.isFinish = 0;
+        
+        [rkOrder saveOrUpdate];
+        //手机根据刚刚做的入库单生成新的出库来源订单子表
+        for(PuOrderChild *child in self.selArray){
+            PuOrderChild *rkChild = [[PuOrderChild alloc] init];
+            rkChild.orderentryid = [UUIDUtil getUUID];
+            rkChild.orderid = rkOrder.id;
+            rkChild.sourceid = child.orderid;
+            rkChild.sourcecid = child.orderentryid;
+            rkChild.isFinish = 0;
+            rkChild.note = child.note;
+            rkChild.brand = child.brand;
+            rkChild.model = child.model;
+            rkChild.Name = child.Name;
+            rkChild.price = child.price;
+            rkChild.ckQty = 0;
+            rkChild.sourceQty = child.curQty;
+            [rkChild saveOrUpdate];
+        }
+        
         //返回首页
         NSArray *controllers = self.navigationController.viewControllers;
         for(UIViewController *viewController in controllers){

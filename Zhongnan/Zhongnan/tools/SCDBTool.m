@@ -62,69 +62,159 @@
 
 +(BOOL)clearInData:(NSString *)rkToken {
     //删除入库订单表
-    if([SCOrderIn isExistInTable]){
-        [SCOrderIn clearTable];
+    if([PuOrder isExistInTable]){
+        //删除直入直出订单
+        NSArray *zrzcArray = [PuOrder findByCriteria:@" where type = 'zrzc'"];
+        for(PuOrder *order in zrzcArray){
+            //删除材料子表
+            if([PuOrderChild isExistInTable]){
+                [PuOrderChild deleteObjectsByCriteria:[NSString stringWithFormat:@" where orderid = '%@'",order.id]];
+            }else{
+                [PuOrderChild createTable];
+            }
+            //删除入库订单的领料商
+            if([Consumer isExistInTable]){
+                [Consumer deleteObjectsByCriteria:[NSString stringWithFormat:@" where orderid = '%@'",order.id]];
+            }else{
+                [Consumer createTable];
+            }
+        }
+        [PuOrder deleteObjects:zrzcArray];
+        
+        //删除入库订单表
+        NSArray *rkArray = [PuOrder findByCriteria:@" where type = 'rk'"];
+        for(PuOrder *order in rkArray){
+            //删除材料子表
+            if([PuOrderChild isExistInTable]){
+                [PuOrderChild deleteObjectsByCriteria:[NSString stringWithFormat:@" where orderid = '%@'",order.id]];
+            }else{
+                [PuOrderChild createTable];
+            }
+            //删除入库订单的领料商
+            if([Consumer isExistInTable]){
+                [Consumer deleteObjectsByCriteria:[NSString stringWithFormat:@" where orderid = '%@'",order.id]];
+            }else{
+                [Consumer createTable];
+            }
+        }
+        [PuOrder deleteObjects:rkArray];
+        
+        //删除自制的入库出库订单
+        NSArray *rkckArray = [PuOrder findByCriteria:@" where type = 'rkck'"];
+        for(PuOrder *order in rkckArray){
+            //删除材料子表
+            if([PuOrderChild isExistInTable]){
+                [PuOrderChild deleteObjectsByCriteria:[NSString stringWithFormat:@" where orderid = '%@'",order.id]];
+            }else{
+                [PuOrderChild createTable];
+            }
+            //删除入库订单的领料商
+            if([Consumer isExistInTable]){
+                [Consumer deleteObjectsByCriteria:[NSString stringWithFormat:@" where orderid = '%@'",order.id]];
+            }else{
+                [Consumer createTable];
+            }
+            
+        }
+        [PuOrder deleteObjects:rkckArray];
     }else{
-        [SCOrderIn createTable];
+        [PuOrder createTable];
     }
     
-    //删除入库订单材料明细表
-    if([SCOrderInMat isExistInTable]){
-        [SCOrderInMat clearTable];
+    
+    
+    //删除直入直出主表
+    if([DirBill isExistInTable]){
+        [DirBill clearTable];
     }else{
-        [SCOrderInMat createTable];
+        [DirBill createTable];
     }
     
-    //删除入库订单领料商
-    if([InConsumer isExistInTable]){
-        [InConsumer clearTable];
+    //删除直入直出字表
+    if([DirBillChild isExistInTable]){
+        [DirBillChild clearTable];
     }else{
-        [InConsumer createTable];
+        [DirBillChild createTable];
     }
     
-    //删除直入直出
-    if([SCDirout isExistInTable]){
-        [SCDirout clearTable];
+    //删除入库单主表
+    if([InBill isExistInTable]){
+        [InBill clearTable];
     }else{
-        [SCDirout createTable];
+        [InBill createTable];
     }
     
-    //删除入库单
-    if([SCIn isExistInTable]){
-        [SCIn clearTable];
+    //删除入库单子表
+    if([InBillChild isExistInTable]){
+        [InBillChild clearTable];
     }else{
-        [SCIn createTable];
+        [InBillChild createTable];
     }
+    
+    //TODO
+    //删除入库出库主表
+    
+    //删除入库出库子表
     return YES;
 }
 
 +(BOOL)clearOutData:(NSString *)ckToken {
-    //删除出库订单
-    if([SCOrderOut isExistInTable]){
-        [SCOrderOut clearTable];
+    //删除入库订单表
+    if([PuOrder isExistInTable]){
+        //删除出库订单
+        NSArray *ckArray = [PuOrder findByCriteria:@" where type = 'ck'"];
+        for(PuOrder *order in ckArray){
+            //删除材料子表
+            if([PuOrderChild isExistInTable]){
+                [PuOrderChild deleteObjectsByCriteria:[NSString stringWithFormat:@" where orderid = '%@'",order.id]];
+            }else{
+                [PuOrderChild createTable];
+            }
+            //删除入库订单的领料商
+            if([Consumer isExistInTable]){
+                [Consumer deleteObjectsByCriteria:[NSString stringWithFormat:@" where orderid = '%@'",order.id]];
+            }else{
+                [Consumer createTable];
+            }
+        }
+        [PuOrder deleteObjects:ckArray];
+        
+        //删除入库出库订单表
+        NSArray *rkckArray = [PuOrder findByCriteria:@" where type = 'rkck'"];
+        for(PuOrder *order in rkckArray){
+            //删除材料子表
+            if([PuOrderChild isExistInTable]){
+                [PuOrderChild deleteObjectsByCriteria:[NSString stringWithFormat:@" where orderid = '%@'",order.id]];
+            }else{
+                [PuOrderChild createTable];
+            }
+            //删除入库订单的领料商
+            if([Consumer isExistInTable]){
+                [Consumer deleteObjectsByCriteria:[NSString stringWithFormat:@" where orderid = '%@'",order.id]];
+            }else{
+                [Consumer createTable];
+            }
+        }
+        [PuOrder deleteObjects:rkckArray];
+        
     }else{
-        [SCOrderOut createTable];
+        [PuOrder createTable];
     }
     
-    //删除出库订单材料明细表
-    if([SCOrderOutMat isExistInTable]){
-        [SCOrderOutMat clearTable];
+    
+    
+    //删除出库主表
+    if([OutBill isExistInTable]){
+        [OutBill clearTable];
     }else{
-        [SCOrderOutMat createTable];
+        [OutBill createTable];
     }
     
-    //删除出库订单领料商表
-    if([OutConsumer isExistInTable]){
-        [OutConsumer clearTable];
+    //删除出库子表
+    if([OutBillChild isExistInTable]){
+        [OutBillChild clearTable];
     }else{
-        [OutConsumer createTable];
-    }
-    
-    //删除出库单
-    if([SCOut isExistInTable]){
-        [SCOut clearTable];
-    }else{
-        [SCOut createTable];
+        [OutBillChild createTable];
     }
     
     return YES;

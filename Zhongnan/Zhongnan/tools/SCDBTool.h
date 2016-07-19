@@ -7,17 +7,27 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "InConsumer.h"
-#import "OutConsumer.h"
-#import "SCIn.h"
-#import "SCOrderIn.h"
-#import "SCOrderInMat.h"
-#import "SCOut.h"
-#import "SCDirout.h"
-#import "SCOrderOut.h"
-#import "SCOrderOutMat.h"
-#import "SCOrderMOut.h"
-#import "SCOrderMDirout.h"
+//#import "InConsumer.h"
+//#import "OutConsumer.h"
+//#import "SCIn.h"
+//#import "SCOrderIn.h"
+//#import "SCOrderInMat.h"
+//#import "SCOut.h"
+//#import "SCDirout.h"
+//#import "SCOrderOut.h"
+//#import "SCOrderOutMat.h"
+//#import "SCOrderMOut.h"
+//#import "SCOrderMDirout.h"
+#import "User.h"
+#import "Consumer.h"
+#import "PuOrder.h"
+#import "PuOrderChild.h"
+#import "InBill.h"
+#import "InBillChild.h"
+#import "OutBill.h"
+#import "OutBillChild.h"
+#import "DirBill.h"
+#import "DirBillChild.h"
 
 @interface SCDBTool : NSObject
 

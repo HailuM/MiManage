@@ -7,8 +7,8 @@
 //
 
 #import "SCTableViewCell.h"
-#import "SCOrderInMat.h"
-#import "SCOrderOutMat.h"
+#import "PuOrderChild.h"
+#import "StringUtil.h"
 
 @interface OrderDetailTableViewCell : SCTableViewCell {
     NSString *name;//材料名称

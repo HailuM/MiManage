@@ -66,7 +66,7 @@
  *  查询订单上的材料
  */
 -(void)initData {
-    matArray = [SCOrderInMat findByCriteria:[NSString stringWithFormat:@" WHERE orderid = '%@' and isFinish = 0 ",self.order.id]];
+    matArray = [PuOrderChild findByCriteria:[NSString stringWithFormat:@" WHERE orderid = '%@' and isFinish = 0 ",self.order.id]];
     unSelArray = [[NSMutableArray alloc] initWithArray:matArray];
     [self.tableView reloadData];
 }
@@ -129,7 +129,7 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     OrderDetailTableViewCell *cell = [OrderDetailTableViewCell cellWithTableView:tableView];
-    SCOrderInMat *inMat = unSelArray[indexPath.row];
+    PuOrderChild *inMat = unSelArray[indexPath.row];
     [cell showCell:inMat];
     cell.addBtn.tag = 1000+indexPath.row;
     [cell.addBtn addTarget:self action:@selector(addToCheck:) forControlEvents:UIControlEventTouchUpInside];
@@ -147,11 +147,11 @@
 -(void)delQty:(id)sender{
     UILabel *label = sender;
     NSInteger tag = label.tag-2000;
-    SCOrderInMat *inMat = unSelArray[tag];
-    if(inMat.qty-1<=0){
-        inMat.qty = 0.0;
+    PuOrderChild *inMat = unSelArray[tag];
+    if(inMat.curQty-1<=0){
+        inMat.curQty = 0.0;
     }else{
-        inMat.qty = inMat.qty-1;
+        inMat.curQty = inMat.curQty-1;
     }
     [self.tableView reloadData];
 }
@@ -159,11 +159,11 @@
 -(void)addQty:(id)sender {
     UILabel *label = sender;
     NSInteger tag = label.tag-3000;
-    SCOrderInMat *inMat = unSelArray[tag];
-    if(inMat.qty+1>inMat.limitQty-inMat.hasQty){
-        inMat.qty = inMat.limitQty-inMat.hasQty;
+    PuOrderChild *inMat = unSelArray[tag];
+    if(inMat.curQty+1>inMat.limitQty-inMat.rkQty){
+        inMat.curQty = inMat.limitQty-inMat.rkQty;
     }else{
-        inMat.qty = inMat.qty+1;
+        inMat.curQty = inMat.curQty+1;
     }
     [self.tableView reloadData];
 }
@@ -174,11 +174,12 @@
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:nil delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
     [alert setAlertViewStyle:UIAlertViewStylePlainTextInput];
     alert.tag = 2000+indexPath.row;
-    SCOrderInMat *inMat = unSelArray[indexPath.row];
+    PuOrderChild *inMat = unSelArray[indexPath.row];
     
     UITextField *countText = [alert textFieldAtIndex:0];
     [countText setKeyboardType:UIKeyboardTypeDecimalPad];
-    countText.text = [NSString stringWithFormat:@"%f",inMat.qty];
+    //尾数去0
+    countText.text = [StringUtil changeFloat:[NSString stringWithFormat:@"%f",inMat.curQty]];
     [alert show];
 }
 
@@ -187,13 +188,13 @@
         NSInteger tag = alertView.tag-2000;
         UITextField *countText = [alertView textFieldAtIndex:0];
         NSString *count = countText.text;
-        SCOrderInMat *inMat = unSelArray[tag];
+        PuOrderChild *inMat = unSelArray[tag];
         double qty = [count doubleValue];
-        if(qty+inMat.hasQty>inMat.limitQty){
+        if(qty+inMat.rkQty>inMat.limitQty){
             //数量过大
             [self.view makeToast:@"数量超过上限,请重新输入!" duration:3.0 position:CSToastPositionCenter];
         }else{
-            inMat.qty = qty;
+            inMat.curQty = qty;
         }
         [self.tableView reloadData];
     }

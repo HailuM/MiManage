@@ -31,21 +31,13 @@
 }
 
 -(void)showCell:(id)value{
-    if([value isKindOfClass:[SCOrderIn class]]){
-        SCOrderIn *order = (SCOrderIn *)value;
-        number = order.number;
-        time = order.date;
-        supplier = order.supplier;
-        materiaDesc = order.materialDesc;
-        addr = order.Addr;
-    }else if([value isKindOfClass:[SCOrderOut class]]){
-        SCOrderOut *order = (SCOrderOut *)value;
-        number = order.number;
-        time = order.date;
-        supplier = order.supplier;
-        materiaDesc = order.materialDesc;
-        addr = order.Addr;
-    }
+    
+    PuOrder *order = (PuOrder *)value;
+    number = order.number;
+    time = order.date;
+    supplier = order.supplier;
+    materiaDesc = order.materialDesc;
+    addr = order.Addr;
     
     self.numberLabel.text = number;
     self.timeLabel.text = time;

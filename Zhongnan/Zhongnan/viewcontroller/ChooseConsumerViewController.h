@@ -7,8 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "InConsumer.h"
-#import "OutConsumer.h"
+#import "Consumer.h"
 
 
 
@@ -20,7 +19,7 @@
 @interface ChooseConsumerViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
 
 @property (nonatomic, assign)  int flag;//0 出库   1 直入直出
-@property (nonatomic, copy) NSString *orderid;//订单di
+@property (nonatomic, copy) NSString *orderid;//订单id
 @property(assign,nonatomic)id<PassConsumerDelegate> delegate;
 
 

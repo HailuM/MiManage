@@ -7,11 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SCOrderIn.h"
-#import "SCOrderInMat.h"
+#import "PuOrder.h"
+#import "PuOrderChild.h"
 #import "OrderDetailTableViewCell.h"
 #import "ConfirmInViewController.h"
 #import "UIView+Toast.h"
+#import "StringUtil.h"
 
 @interface InDealDetailViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,UIAlertViewDelegate>{
     
@@ -23,7 +24,7 @@
     
 }
 
-@property (nonatomic, strong) SCOrderIn *order;
+@property (nonatomic, strong) PuOrder *order;
 @property (strong, nonatomic) IBOutlet UILabel *numberLabel;
 @property (strong, nonatomic) IBOutlet UILabel *supplierLabel;
 @property (strong, nonatomic) IBOutlet UILabel *addrLabel;

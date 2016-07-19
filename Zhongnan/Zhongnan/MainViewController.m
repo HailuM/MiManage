@@ -13,10 +13,15 @@
 #import "SCDBTool.h"
 #import "MJExtension.h"
 #import "UIBarButtonItem+Extension.h"
+#import <CoreGraphics/CoreGraphics.h>
+#import "MBProgressHUD.h"
 
 @interface MainViewController (){
     NSMutableArray *outPrintArray;//当前打印出库单
     NSMutableArray *dirPrintArray;//当前打印直入直出单
+    
+    MBProgressHUD *HUD;
+    UIAlertView *asyncRK;//同步入库,如果本地没有上传的单据,确认用户是否删除已下载的入库订单
 }
 
 @end
@@ -34,6 +39,10 @@
     NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
     NSDictionary *myDictionary  = [userDefaultes  objectForKey:@"getServerInfo"];
     serverUrl=[myDictionary valueForKey:@"ServerIP"];//
+    if(serverUrl==nil||serverUrl.length==0){
+        serverUrl = @"fdcwzm.zhongnangroup.cn:82";
+    }
+    
     //读取入库的token
     NSDictionary *tokenDic  = [userDefaultes  objectForKey:@"getToken"];
     inToken = [tokenDic valueForKey:@"rkToken"];//
@@ -117,34 +126,95 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark UIAlertView Delegate
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if([alertView isEqual:asyncRK]){
+        if(buttonIndex==1){
+            //删除数据库中的入库单及其关联表
+            [SCDBTool clearInData:inToken];
+            //直接下载入库订单
+            [self getOrderInTitle];
+        }
+    }
+}
 
 //同步入库
 - (IBAction)synStorage:(id)sender {
     //查询当前数据库中的入库单,并上传
+    NSInteger dirN = 0;//直入直出单条数
+    NSInteger inN = 0;//入库单条数
+    NSInteger outN = 0;//出库单条数
     
     if(inToken && inToken.length>0){
         //存在入库Token
         //查询入库单
-        NSArray *inArray = [SCIn findAll];
+        NSArray *inArray = [InBillChild findAll];
         //查询直入直出
-        NSArray *diroutArray = [SCDirout findAll];
-            for (SCIn *inOrder in inArray) {
-                //生成入库单jsonString
-                NSString *json = [SCDBTool stringWithData:inOrder.mj_keyValues];
-                [self uploadInWithRkToken:inToken withData:json];
-            }
+        NSArray *diroutArray = [DirBillChild findAll];
+        //查询出库单
+        NSArray *outArray = [OutBillChild findAll];
         
-        for (SCDirout *dirout in diroutArray) {
-            //生成直入直出单jsonString
-            NSString *json = [SCDBTool stringWithData:dirout.mj_keyValues];
-            [self uploadDiroutWithRkToken:inToken withData:json];
+        //上传直入直出
+        dirN = diroutArray.count;
+        //上传入库单
+        inN = inArray.count;
+        //如果没有ckToken,上传出库单
+        if(outToken==nil||outToken.length==0){
+            outN = outArray.count;
         }
-        //上传入库单结束
-        [self uploadInCompleteWithRkToken:inToken withDirout:diroutArray.count withInCount:inArray.count withOutCounr:@0];
-        //删除数据库中的入库单及其关联表
-        [SCDBTool clearInData:inToken];
-        //直接下载入库订单
-        [self getOrderInTitle];
+        
+        NSInteger sum = dirN+inN+outN;
+        if(sum>0){
+            HUD = [[MBProgressHUD alloc] initWithView:self.view];
+            [self.view addSubview:HUD];
+            HUD.mode = MBProgressHUDModeAnnularDeterminate;
+            HUD.label.text = @"上传中......";
+            [HUD showAnimated:YES whileExecutingBlock:^{
+                float f = 0.f;
+                while(f<1.f){
+                    //上传直入直出单
+                    for(DirBillChild *dir in diroutArray){
+                        NSString *json = [SCDBTool stringWithData:dir.mj_keyValues];
+                        [self uploadDiroutWithRkToken:inToken withData:json];
+                        f = f + (1/sum);
+                        HUD.progress = f;
+                    }
+                    for (InBillChild *inChild in inArray) {
+                        //生成入库单jsonString
+                        NSString *json = [SCDBTool stringWithData:inChild.mj_keyValues];
+                        [self uploadInWithRkToken:inToken withData:json];
+                        f = f + (1/sum);
+                        HUD.progress = f;
+                    }
+                    //需要上传出库单
+                    if(outN>0){
+                        for(OutBillChild *outChild in outArray){
+                            NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
+                            [self uploadOutWithCkToken:inToken withData:json withType:@"rkck"];
+                            f = f + (1/sum);
+                            HUD.progress = f;
+                        }
+                    }
+                }
+                //上传入库单结束
+                [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
+            } completionBlock:^{
+                [HUD removeFromSuperViewOnHide];
+                HUD = nil;
+                
+                [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单%ld条,出库单%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
+            }];
+            //删除数据库中的入库单及其关联表
+            [SCDBTool clearInData:inToken];
+            //直接下载入库订单
+            [self getOrderInTitle];
+        }else{
+            asyncRK = [[UIAlertView alloc] initWithTitle:@"重新下载" message:@"您想重新下载数据吗？若是则会清除已下载数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+            [asyncRK show];
+        }
+        
+        
+        
     }else{
         //删除数据库中的入库单及其关联表
         [SCDBTool clearInData:inToken];
@@ -159,10 +229,10 @@
     if(outToken && outToken.length>0){
         //存在出库Token
         //查询出库单
-        NSArray *outArray = [SCOut findAll];
-        for (SCOut *outOrder in outArray) {
-            NSString *json = [SCDBTool stringWithData:outOrder.mj_keyValues];
-            [self uploadOutWithCkToken:outToken withData:json withType:1];
+        NSArray *outArray = [OutBillChild findAll];
+        for (OutBillChild *outChild in outArray) {
+            NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
+            [self uploadOutWithCkToken:outToken withData:json withType:@"ck"];
         }
         
         //上传出库单结束
@@ -220,24 +290,25 @@
                 NSString *rkToken = [dict objectForKey:@"tokenStr"];
                 inToken = rkToken;
                 NSArray *details = [dict objectForKey:@"details"];
-                NSArray *orderInArray = [SCOrderIn mj_objectArrayWithKeyValuesArray:details];
+                NSArray *orderInArray = [PuOrder mj_objectArrayWithKeyValuesArray:details];
                 //保存rktoken
                 NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
                 NSDictionary *rkDic = [NSDictionary dictionaryWithObjectsAndKeys:rkToken,@"rkToken", nil];
                 [userDefaultes setObject:rkDic forKey:@"GetToken"];
                 //保存入库订单
                 
-                if(![SCOrderIn isExistInTable]){
-                    [SCOrderIn createTable];
+                if(![PuOrder isExistInTable]){
+                    [PuOrder createTable];
                 }
-                for(SCOrderIn *orderIn in orderInArray){
-                    [orderIn saveOrUpdate];
+                for(PuOrder *order in orderInArray){
+                    order.type = @"rk";
+                    [order saveOrUpdate];
                 }
-                //遍历下载订单对应的物料信息
+                //遍历下载订单对应的物料信息和领料商
                 
-                for(SCOrderIn *orderIn in orderInArray){
-                    [self getOrderInMatWithOrderId:orderIn.id withRkToken:rkToken];
-                    [self getConsumerForDiroutWithOrderId:orderIn.id withRkToken:rkToken];
+                for(PuOrder *order in orderInArray){
+                    [self getOrderInMatWithOrderId:order.id withRkToken:rkToken];
+                    [self getConsumerForDiroutWithOrderId:order.id withRkToken:rkToken];
                 }
             }
         }
@@ -272,9 +343,9 @@
         [da getTestConnet];
         NSArray *array = [SCDBTool arrayWithJSONString:da.tempStr];
         if(array){
-            NSArray *matArray = [SCOrderInMat mj_objectArrayWithKeyValuesArray:array];
+            NSArray *matArray = [PuOrderChild mj_objectArrayWithKeyValuesArray:array];
             //保存材料明细
-            for(SCOrderInMat *mat in matArray){
+            for(PuOrderChild *mat in matArray){
                 [mat saveOrUpdate];
             }
         }
@@ -307,9 +378,9 @@
         [da getTestConnet];
         NSArray *array = [SCDBTool arrayWithJSONString:da.tempStr];
         if(array){
-            NSArray *consumerArray = [InConsumer mj_objectArrayWithKeyValuesArray:array];
+            NSArray *consumerArray = [Consumer mj_objectArrayWithKeyValuesArray:array];
             //保存订单入库领料商
-            for(InConsumer *consumer in consumerArray){
+            for(Consumer *consumer in consumerArray){
                 [consumer saveOrUpdate];
             }
         }
@@ -412,22 +483,23 @@
                 NSString *ckToken = [dict objectForKey:@"tokenStr"];
                 outToken = ckToken;
                 NSArray *details = [dict objectForKey:@"details"];
-                NSArray *orderOutArray = [SCOrderOut mj_objectArrayWithKeyValuesArray:details];
+                NSArray *orderOutArray = [PuOrder mj_objectArrayWithKeyValuesArray:details];
                 //保存cktoken
                 NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
                 NSDictionary *rkDic = [NSDictionary dictionaryWithObjectsAndKeys:ckToken,@"ckToken", nil];
                 [userDefaultes setObject:rkDic forKey:@"GetToken"];
                 //保存出库订单
                 
-                if(![SCOrderOut isExistInTable]){
-                    [SCOrderOut createTable];
+                if(![PuOrder isExistInTable]){
+                    [PuOrder createTable];
                 }
-                for(SCOrderOut *orderOut in orderOutArray){
+                for(PuOrder *orderOut in orderOutArray){
+                    orderOut.type = @"ck";
                     [orderOut saveOrUpdate];
                 }
                 //遍历下载订单对应的材料信息和领料商信息
                 
-                for(SCOrderOut *orderout in orderOutArray){
+                for(PuOrder *orderout in orderOutArray){
                     [self getOrderOutMatWithOrderId:orderout.id withCkToken:ckToken];
                     [self getOrderOutConsumerWithOrderId:orderout.id withCkToken:ckToken];
                 }
@@ -482,9 +554,9 @@
         }else{
             NSArray *array = [SCDBTool arrayWithJSONString:da.tempStr];
             if(array){
-                NSArray *matArray = [SCOrderOutMat mj_objectArrayWithKeyValuesArray:array];
+                NSArray *matArray = [PuOrderChild mj_objectArrayWithKeyValuesArray:array];
                 //保存材料明细
-                for(SCOrderOutMat *mat in matArray){
+                for(PuOrderChild *mat in matArray){
                     [mat saveOrUpdate];
                 }
             }
@@ -534,9 +606,9 @@
             }else{
                 NSArray *array = [SCDBTool arrayWithJSONString:da.tempStr];
                 if(array){
-                    NSArray *matArray = [OutConsumer mj_objectArrayWithKeyValuesArray:array];
+                    NSArray *matArray = [Consumer mj_objectArrayWithKeyValuesArray:array];
                     //保存出库领料商
-                    for(OutConsumer *consumer in matArray){
+                    for(Consumer *consumer in matArray){
                         [consumer saveOrUpdate];
                     }
                 }
@@ -712,7 +784,7 @@
  *  @param ckToken  <#ckToken description#>
  *  @param jsonData <#jsonData description#>
  */
--(void)uploadOutWithCkToken:(NSString *)ckToken withData:(NSString *)jsonData withType:(int)type{
+-(void)uploadOutWithCkToken:(NSString *)ckToken withData:(NSString *)jsonData withType:(NSString *)type{
     if([serverUrl isEqualToString:@""] || serverUrl == nil){
         UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
         [alert show];
@@ -726,7 +798,7 @@
                           "<userOID>%@</userOID>"
                           "<cktokenStr>%@</cktokenStr>"
                           "<jsonData>%@</jsonData>"
-                          "<type>%d</type>"
+                          "<type>%@</type>"
                           "</Mobile_uploadckInfo>\n"
                           "</soap:Body>\n"
                           "</soap:Envelope>\n",self.user.UserOID,ckToken,jsonData,type];
@@ -801,329 +873,329 @@
 
 //补打
 - (IBAction)rePrint:(id)sender {
-    
+    //跳转到补打页面
     //查询出所有未打印的出库单和直入直出单
     
-    //查询出库单
-    NSArray *orderOutArray = [SCOrderMOut findByCriteria:@" WHERE isPrint = 0 "];//未打印的出库单
-//    NSArray *outArray = [SCOut findByCriteria:@" WHERE printcount = 0 "];//
-    for(SCOrderMOut *orderout in orderOutArray){
-        //待打印的材料数组
-        NSArray *outArray = [SCOut findByCriteria:[NSString stringWithFormat:@" WHERE  deliverid = '%@' ",orderout.gid]];
-        //准备打印出库单数据
-        if(outArray.count>0){
-            printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
-                          @"------------------------------",
-                          (orderout.printcount+1),
-                          @"\n出库单号:",orderout.deliverNo,
-                          @"\n项目:",orderout.ProjectName,
-                          @"\n领用商:",orderout.consumerName,
-                          @"\n地产公司:",orderout.Company,
-                          @"\n------------------------------"];
-            for (int i = 0; i<outArray.count; i++) {
-                SCOut *outM = outArray[i];
-                outM.isPrint = 1;
-                outM.printcount ++;
-                [outM saveOrUpdate];
-                SCOrderOutMat *outMat = [SCOrderOutMat findFirstByCriteria:[NSString stringWithFormat:@" WHERE wareentry = '%@'",outM.wareentry]];
-                NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%f%@%f%@%@\n ",
-                                       @"\n材料名称:",outMat.Name,
-                                       @"\n品牌:",outMat.brand,
-                                       @"\n规格型号:",outMat.model,
-                                       @"\n数量:",outM.qty,
-                                       @"\n单价:",outMat.price,
-                                       @"\n金额:",outM.qty*outMat.price,
-                                       @"\n备注:",outMat.note];
-                printContant = [printContant stringByAppendingString:matString];
-            }
-            printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
-                            @"\n收货人:__________________",
-                            @"\n                        ",
-                            @"\n证明人:__________________"];
-            //开始打印
-            //--------------
-            [uartLib scanStart];//scan
-            NSLog(@"connect Peripheral");
-            
-            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
-        }
-        orderout.isPrint = 1;
-        orderout.printcount ++;
-        [orderout saveOrUpdate];
-    }
-    
-    
-    
-    //查询直入直出单
-    NSArray *orderInArray = [SCOrderMDirout findByCriteria:@" WHERE isPrint = 0 "];//未打印的直入直出单
-//    NSArray *inArray = [SCDirout findByCriteria:@" WHERE printcount = 0 "];//直入直出单
-    for(SCOrderMDirout *orderDirout in orderInArray){
-        //待打印的材料数组
-        NSArray *diroutArray = [SCDirout findByCriteria:[NSString stringWithFormat:@" WHERE  zrzcid = '%@' ",orderDirout.gid]];
-        //准备打印出库单数据
-        if(diroutArray.count>0){
-            printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
-                          @"------------------------------",
-                          (orderDirout.printcount+1),
-                          @"\n出库单号:",orderDirout.deliverNo,
-                          @"\n项目:",orderDirout.ProjectName,
-                          @"\n领用商:",orderDirout.consumerName,
-                          @"\n地产公司:",orderDirout.Company,
-                          @"\n------------------------------"];
-            for (int i = 0; i<diroutArray.count; i++) {
-                SCDirout *dirout = diroutArray[i];
-                dirout.isPrint = 1;
-                dirout.printcount ++;
-                [dirout saveOrUpdate];
-                SCOrderInMat *inMat = [SCOrderInMat findFirstByCriteria:[NSString stringWithFormat:@" WHERE wareentry = '%@'",dirout.wareentry]];
-                NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%f%@%f%@%@\n ",
-                                       @"\n材料名称:",inMat.Name,
-                                       @"\n品牌:",inMat.brand,
-                                       @"\n规格型号:",inMat.model,
-                                       @"\n数量:",dirout.qty,
-                                       @"\n单价:",inMat.price,
-                                       @"\n金额:",dirout.qty*inMat.price,
-                                       @"\n备注:",inMat.note];
-                printContant = [printContant stringByAppendingString:matString];
-            }
-            printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
-                            @"\n收货人:____________________",
-                            @"\n                          ",
-                            @"\n证明人:____________________"];
-            //开始打印
-            //--------------
-            [uartLib scanStart];//scan
-            NSLog(@"connect Peripheral");
-            
-            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
-        }
-        orderDirout.isPrint = 1;
-        orderDirout.printcount ++;
-        [orderDirout saveOrUpdate];
-        
-    }
+//    //查询出库单
+//    NSArray *orderOutArray = [SCOrderMOut findByCriteria:@" WHERE isPrint = 0 "];//未打印的出库单
+////    NSArray *outArray = [SCOut findByCriteria:@" WHERE printcount = 0 "];//
+//    for(SCOrderMOut *orderout in orderOutArray){
+//        //待打印的材料数组
+//        NSArray *outArray = [SCOut findByCriteria:[NSString stringWithFormat:@" WHERE  deliverid = '%@' ",orderout.gid]];
+//        //准备打印出库单数据
+//        if(outArray.count>0){
+//            printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
+//                          @"------------------------------",
+//                          (orderout.printcount+1),
+//                          @"\n出库单号:",orderout.deliverNo,
+//                          @"\n项目:",orderout.ProjectName,
+//                          @"\n领用商:",orderout.consumerName,
+//                          @"\n地产公司:",orderout.Company,
+//                          @"\n------------------------------"];
+//            for (int i = 0; i<outArray.count; i++) {
+//                SCOut *outM = outArray[i];
+//                outM.isPrint = 1;
+//                outM.printcount ++;
+//                [outM saveOrUpdate];
+//                SCOrderOutMat *outMat = [SCOrderOutMat findFirstByCriteria:[NSString stringWithFormat:@" WHERE wareentry = '%@'",outM.wareentry]];
+//                NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%f%@%f%@%@\n ",
+//                                       @"\n材料名称:",outMat.Name,
+//                                       @"\n品牌:",outMat.brand,
+//                                       @"\n规格型号:",outMat.model,
+//                                       @"\n数量:",outM.qty,
+//                                       @"\n单价:",outMat.price,
+//                                       @"\n金额:",outM.qty*outMat.price,
+//                                       @"\n备注:",outMat.note];
+//                printContant = [printContant stringByAppendingString:matString];
+//            }
+//            printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
+//                            @"\n收货人:__________________",
+//                            @"\n                        ",
+//                            @"\n证明人:__________________"];
+//            //开始打印
+//            //--------------
+//            [uartLib scanStart];//scan
+//            NSLog(@"connect Peripheral");
+//            
+//            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+//        }
+//        orderout.isPrint = 1;
+//        orderout.printcount ++;
+//        [orderout saveOrUpdate];
+//    }
+//    
+//    
+//    
+//    //查询直入直出单
+//    NSArray *orderInArray = [SCOrderMDirout findByCriteria:@" WHERE isPrint = 0 "];//未打印的直入直出单
+////    NSArray *inArray = [SCDirout findByCriteria:@" WHERE printcount = 0 "];//直入直出单
+//    for(SCOrderMDirout *orderDirout in orderInArray){
+//        //待打印的材料数组
+//        NSArray *diroutArray = [SCDirout findByCriteria:[NSString stringWithFormat:@" WHERE  zrzcid = '%@' ",orderDirout.gid]];
+//        //准备打印出库单数据
+//        if(diroutArray.count>0){
+//            printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
+//                          @"------------------------------",
+//                          (orderDirout.printcount+1),
+//                          @"\n出库单号:",orderDirout.deliverNo,
+//                          @"\n项目:",orderDirout.ProjectName,
+//                          @"\n领用商:",orderDirout.consumerName,
+//                          @"\n地产公司:",orderDirout.Company,
+//                          @"\n------------------------------"];
+//            for (int i = 0; i<diroutArray.count; i++) {
+//                SCDirout *dirout = diroutArray[i];
+//                dirout.isPrint = 1;
+//                dirout.printcount ++;
+//                [dirout saveOrUpdate];
+//                SCOrderInMat *inMat = [SCOrderInMat findFirstByCriteria:[NSString stringWithFormat:@" WHERE wareentry = '%@'",dirout.wareentry]];
+//                NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%f%@%f%@%@\n ",
+//                                       @"\n材料名称:",inMat.Name,
+//                                       @"\n品牌:",inMat.brand,
+//                                       @"\n规格型号:",inMat.model,
+//                                       @"\n数量:",dirout.qty,
+//                                       @"\n单价:",inMat.price,
+//                                       @"\n金额:",dirout.qty*inMat.price,
+//                                       @"\n备注:",inMat.note];
+//                printContant = [printContant stringByAppendingString:matString];
+//            }
+//            printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
+//                            @"\n收货人:____________________",
+//                            @"\n                          ",
+//                            @"\n证明人:____________________"];
+//            //开始打印
+//            //--------------
+//            [uartLib scanStart];//scan
+//            NSLog(@"connect Peripheral");
+//            
+//            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+//        }
+//        orderDirout.isPrint = 1;
+//        orderDirout.printcount ++;
+//        [orderDirout saveOrUpdate];
+//        
+//    }
     
 }
 //-------
--(void)searchPrinter{
-    if(connectPeripheral ==nil){
-        [uartLib scanStart];//scan
-        [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
-    }else{
-        [uartLib scanStop];
-        [uartLib connectPeripheral:connectPeripheral];
-        [connectAlertView show];
-        [self performSelector:@selector(pirntData) withObject:nil afterDelay:3];
-    }
-    
-}
-//-----
--(void)pirntData{
-    NSString *curPrintContent;
-    
-    curPrintContent = printContant;
-    
-    if ([curPrintContent length]) {
-        NSString *printed = [curPrintContent stringByAppendingFormat:@"%c%c%c", '\n', '\n', '\n'];
-        
-        [self PrintWithFormat:printed];
-        //打印完成 记得该状态  todo
-        if(outPrintArray.count>0){
-            for(SCOut *scout in outPrintArray){
-                scout.isPrint = 1;
-                [scout saveOrUpdate];
-            }
-            outPrintArray = nil;
-        }
-        
-        if(dirPrintArray.count>0){
-            for (SCDirout *dirout in dirPrintArray) {
-                dirout.isPrint = 1;
-                [dirout saveOrUpdate];
-            }
-            dirPrintArray = nil;
-        }
-    }
-    [uartLib scanStop];
-    [uartLib disconnectPeripheral:connectPeripheral];
-    
-}
-
-//参数设置
-- (IBAction)toSetting:(id)sender {
-}
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-
-#pragma mark -
-#pragma mark UartDelegate
-/****************************************************************************/
-/*                       UartDelegate Methods                        */
-/****************************************************************************/
-- (void) didScanedPeripherals:(NSMutableArray  *)foundPeripherals;
-{
-    NSLog(@"didScanedPeripherals(%lu)", (unsigned long)[foundPeripherals count]);
-    
-    CBPeripheral	*peripheral;
-    
-    for (peripheral in foundPeripherals) {
-        NSLog(@"--Peripheral:%@", [peripheral name]);
-    }
-    
-    if ([foundPeripherals count] > 0) {
-        connectPeripheral = [foundPeripherals objectAtIndex:0];
-        if ([connectPeripheral name] == nil) {
-            // [[self peripheralName] setText:@"BTCOM"];
-        }else{
-            // [[self peripheralName] setText:[connectPeripheral name]];
-        }
-    }else{
-        //[[self peripheralName] setText:nil];
-        connectPeripheral = nil;
-    }
-}
-
-- (void) didConnectPeripheral:(CBPeripheral *)peripheral{
-    NSLog(@"did Connect Peripheral");
-    
-    //[[self sendButton] setEnabled:TRUE];
-    
-    [connectAlertView dismissWithClickedButtonIndex:0 animated:YES];
-    
-    //[self printerNotifyEnable];
-}
-
-- (void) didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error{
-    NSLog(@"did Disconnect Peripheral");
-    
-    // [[self sendButton] setEnabled:FALSE];
-    //[[self peripheralName] setText:@""];
-    [connectAlertView dismissWithClickedButtonIndex:0 animated:YES];
-    
-    //  [[[UIAlertView alloc] initWithTitle:@"Connect fail" message: @"Fail to connect,Please reconnect!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil,nil] show];
-    //--------------wynadd
-    [uartLib scanStart];//scan
-    NSLog(@"connect Peripheral");
-    [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
-    
-}
-
-- (void) didWriteData:(CBPeripheral *)peripheral error:(NSError *)error{
-    NSLog(@"didWriteData:%@", [peripheral name]);
-}
-
-
-- (void) didReceiveData:(CBPeripheral *)peripheral recvData:(NSData *)recvData
-{
-    NSLog(@"uart recv(%lu):%@", (unsigned long)[recvData length], recvData);
-    
-    if ([recvData length] == 4) {
-        Byte *recvByte = (Byte *)[recvData bytes];
-        
-        if (recvByte[2] == 0x0c) {
-            NSLog(@"缺纸");
-        }else{
-            NSLog(@"正常");
-        }
-    }
-    //[self promptDisplay:recvData];
-}
-
-- (void) didBluetoothPoweredOff{
-    
-}
-- (void) didBluetoothPoweredOn{
-    
-}
-
-- (void) didRetrievePeripheral:(NSArray *)peripherals{
-    
-}
-
-- (void) didRecvRSSI:(CBPeripheral *)peripheral RSSI:(NSNumber *)RSSI{
-    
-}
-- (void) didDiscoverPeripheral:(CBPeripheral *)peripheral RSSI:(NSNumber *)RSSI{
-    
-}
-
-- (void) didDiscoverPeripheralAndName:(CBPeripheral *)peripheral DevName:(NSString *)devName{
-    
-}
-
-- (void) didrecvCustom:(CBPeripheral *)peripheral CustomerRight:(bool) bRight{
-    
-}
-
-- (void) PrintWithFormat:(NSString *)printContent{
-#define MAX_CHARACTERISTIC_VALUE_SIZE 20
-    NSData  *data	= nil;
-    NSUInteger i;
-    NSUInteger strLength;
-    NSUInteger cellCount;
-    NSUInteger cellMin;
-    NSUInteger cellLen;
-    
-    Byte caPrintFmt[5];
-    
-    /*初始化命令：ESC @ 即0x1b,0x40*/
-    caPrintFmt[0] = 0x1b;
-    caPrintFmt[1] = 0x40;
-    
-    /*字符设置命令：ESC ! n即0x1b,0x21,n*/
-    caPrintFmt[2] = 0x1b;
-    caPrintFmt[3] = 0x21;
-    
-    caPrintFmt[4] = 0x00;
-    
-    NSData *cmdData =[[NSData alloc] initWithBytes:caPrintFmt length:5];
-    
-    [uartLib sendValue:connectPeripheral sendData:cmdData type:CBCharacteristicWriteWithResponse];
-    NSLog(@"format:%@", cmdData);
-    
-    NSStringEncoding enc = CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
-    //NSData *data = [curPrintContent dataUsingEncoding:enc];
-    //NSLog(@"dd:%@", data);
-    //NSString *retStr = [[NSString alloc] initWithData:data encoding:enc];
-    //NSLog(@"str:%@", retStr);
-    
-    strLength = [printContent length];
-    if (strLength < 1) {
-        return;
-    }
-    
-    cellCount = (strLength%MAX_CHARACTERISTIC_VALUE_SIZE)?(strLength/MAX_CHARACTERISTIC_VALUE_SIZE + 1):(strLength/MAX_CHARACTERISTIC_VALUE_SIZE);
-    for (i=0; i<cellCount; i++) {
-        cellMin = i*MAX_CHARACTERISTIC_VALUE_SIZE;
-        if (cellMin + MAX_CHARACTERISTIC_VALUE_SIZE > strLength) {
-            cellLen = strLength-cellMin;
-        }
-        else {
-            cellLen = MAX_CHARACTERISTIC_VALUE_SIZE;
-        }
-        
-        //NSLog(@"print:%d,%d,%d,%d", strLength,cellCount, cellMin, cellLen);
-        NSRange rang = NSMakeRange(cellMin, cellLen);
-        NSString *strRang = [printContent substringWithRange:rang];
-        NSLog(@"print:%@", strRang);
-        
-        data = [strRang dataUsingEncoding: enc];
-        //data = [strRang dataUsingEncoding: NSUTF8StringEncoding];
-        NSLog(@"print:%@", data);
-        //data = [strRang dataUsingEncoding: NSUTF8StringEncoding];
-        //NSLog(@"print:%@", data);
-        
-        [uartLib sendValue:connectPeripheral sendData:data type:CBCharacteristicWriteWithResponse];
-    }
-}
+//-(void)searchPrinter{
+//    if(connectPeripheral ==nil){
+//        [uartLib scanStart];//scan
+//        [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+//    }else{
+//        [uartLib scanStop];
+//        [uartLib connectPeripheral:connectPeripheral];
+//        [connectAlertView show];
+//        [self performSelector:@selector(pirntData) withObject:nil afterDelay:3];
+//    }
+//    
+//}
+////-----
+//-(void)pirntData{
+//    NSString *curPrintContent;
+//    
+//    curPrintContent = printContant;
+//    
+//    if ([curPrintContent length]) {
+//        NSString *printed = [curPrintContent stringByAppendingFormat:@"%c%c%c", '\n', '\n', '\n'];
+//        
+//        [self PrintWithFormat:printed];
+//        //打印完成 记得该状态  todo
+//        if(outPrintArray.count>0){
+//            for(SCOut *scout in outPrintArray){
+//                scout.isPrint = 1;
+//                [scout saveOrUpdate];
+//            }
+//            outPrintArray = nil;
+//        }
+//        
+//        if(dirPrintArray.count>0){
+//            for (SCDirout *dirout in dirPrintArray) {
+//                dirout.isPrint = 1;
+//                [dirout saveOrUpdate];
+//            }
+//            dirPrintArray = nil;
+//        }
+//    }
+//    [uartLib scanStop];
+//    [uartLib disconnectPeripheral:connectPeripheral];
+//    
+//}
+//
+////参数设置
+//- (IBAction)toSetting:(id)sender {
+//}
+//
+///*
+//#pragma mark - Navigation
+//
+//// In a storyboard-based application, you will often want to do a little preparation before navigation
+//- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+//    // Get the new view controller using [segue destinationViewController].
+//    // Pass the selected object to the new view controller.
+//}
+//*/
+//
+//#pragma mark -
+//#pragma mark UartDelegate
+///****************************************************************************/
+///*                       UartDelegate Methods                        */
+///****************************************************************************/
+//- (void) didScanedPeripherals:(NSMutableArray  *)foundPeripherals;
+//{
+//    NSLog(@"didScanedPeripherals(%lu)", (unsigned long)[foundPeripherals count]);
+//    
+//    CBPeripheral	*peripheral;
+//    
+//    for (peripheral in foundPeripherals) {
+//        NSLog(@"--Peripheral:%@", [peripheral name]);
+//    }
+//    
+//    if ([foundPeripherals count] > 0) {
+//        connectPeripheral = [foundPeripherals objectAtIndex:0];
+//        if ([connectPeripheral name] == nil) {
+//            // [[self peripheralName] setText:@"BTCOM"];
+//        }else{
+//            // [[self peripheralName] setText:[connectPeripheral name]];
+//        }
+//    }else{
+//        //[[self peripheralName] setText:nil];
+//        connectPeripheral = nil;
+//    }
+//}
+//
+//- (void) didConnectPeripheral:(CBPeripheral *)peripheral{
+//    NSLog(@"did Connect Peripheral");
+//    
+//    //[[self sendButton] setEnabled:TRUE];
+//    
+//    [connectAlertView dismissWithClickedButtonIndex:0 animated:YES];
+//    
+//    //[self printerNotifyEnable];
+//}
+//
+//- (void) didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error{
+//    NSLog(@"did Disconnect Peripheral");
+//    
+//    // [[self sendButton] setEnabled:FALSE];
+//    //[[self peripheralName] setText:@""];
+//    [connectAlertView dismissWithClickedButtonIndex:0 animated:YES];
+//    
+//    //  [[[UIAlertView alloc] initWithTitle:@"Connect fail" message: @"Fail to connect,Please reconnect!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil,nil] show];
+//    //--------------wynadd
+//    [uartLib scanStart];//scan
+//    NSLog(@"connect Peripheral");
+//    [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+//    
+//}
+//
+//- (void) didWriteData:(CBPeripheral *)peripheral error:(NSError *)error{
+//    NSLog(@"didWriteData:%@", [peripheral name]);
+//}
+//
+//
+//- (void) didReceiveData:(CBPeripheral *)peripheral recvData:(NSData *)recvData
+//{
+//    NSLog(@"uart recv(%lu):%@", (unsigned long)[recvData length], recvData);
+//    
+//    if ([recvData length] == 4) {
+//        Byte *recvByte = (Byte *)[recvData bytes];
+//        
+//        if (recvByte[2] == 0x0c) {
+//            NSLog(@"缺纸");
+//        }else{
+//            NSLog(@"正常");
+//        }
+//    }
+//    //[self promptDisplay:recvData];
+//}
+//
+//- (void) didBluetoothPoweredOff{
+//    
+//}
+//- (void) didBluetoothPoweredOn{
+//    
+//}
+//
+//- (void) didRetrievePeripheral:(NSArray *)peripherals{
+//    
+//}
+//
+//- (void) didRecvRSSI:(CBPeripheral *)peripheral RSSI:(NSNumber *)RSSI{
+//    
+//}
+//- (void) didDiscoverPeripheral:(CBPeripheral *)peripheral RSSI:(NSNumber *)RSSI{
+//    
+//}
+//
+//- (void) didDiscoverPeripheralAndName:(CBPeripheral *)peripheral DevName:(NSString *)devName{
+//    
+//}
+//
+//- (void) didrecvCustom:(CBPeripheral *)peripheral CustomerRight:(bool) bRight{
+//    
+//}
+//
+//- (void) PrintWithFormat:(NSString *)printContent{
+//#define MAX_CHARACTERISTIC_VALUE_SIZE 20
+//    NSData  *data	= nil;
+//    NSUInteger i;
+//    NSUInteger strLength;
+//    NSUInteger cellCount;
+//    NSUInteger cellMin;
+//    NSUInteger cellLen;
+//    
+//    Byte caPrintFmt[5];
+//    
+//    /*初始化命令：ESC @ 即0x1b,0x40*/
+//    caPrintFmt[0] = 0x1b;
+//    caPrintFmt[1] = 0x40;
+//    
+//    /*字符设置命令：ESC ! n即0x1b,0x21,n*/
+//    caPrintFmt[2] = 0x1b;
+//    caPrintFmt[3] = 0x21;
+//    
+//    caPrintFmt[4] = 0x00;
+//    
+//    NSData *cmdData =[[NSData alloc] initWithBytes:caPrintFmt length:5];
+//    
+//    [uartLib sendValue:connectPeripheral sendData:cmdData type:CBCharacteristicWriteWithResponse];
+//    NSLog(@"format:%@", cmdData);
+//    
+//    NSStringEncoding enc = CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
+//    //NSData *data = [curPrintContent dataUsingEncoding:enc];
+//    //NSLog(@"dd:%@", data);
+//    //NSString *retStr = [[NSString alloc] initWithData:data encoding:enc];
+//    //NSLog(@"str:%@", retStr);
+//    
+//    strLength = [printContent length];
+//    if (strLength < 1) {
+//        return;
+//    }
+//    
+//    cellCount = (strLength%MAX_CHARACTERISTIC_VALUE_SIZE)?(strLength/MAX_CHARACTERISTIC_VALUE_SIZE + 1):(strLength/MAX_CHARACTERISTIC_VALUE_SIZE);
+//    for (i=0; i<cellCount; i++) {
+//        cellMin = i*MAX_CHARACTERISTIC_VALUE_SIZE;
+//        if (cellMin + MAX_CHARACTERISTIC_VALUE_SIZE > strLength) {
+//            cellLen = strLength-cellMin;
+//        }
+//        else {
+//            cellLen = MAX_CHARACTERISTIC_VALUE_SIZE;
+//        }
+//        
+//        //NSLog(@"print:%d,%d,%d,%d", strLength,cellCount, cellMin, cellLen);
+//        NSRange rang = NSMakeRange(cellMin, cellLen);
+//        NSString *strRang = [printContent substringWithRange:rang];
+//        NSLog(@"print:%@", strRang);
+//        
+//        data = [strRang dataUsingEncoding: enc];
+//        //data = [strRang dataUsingEncoding: NSUTF8StringEncoding];
+//        NSLog(@"print:%@", data);
+//        //data = [strRang dataUsingEncoding: NSUTF8StringEncoding];
+//        //NSLog(@"print:%@", data);
+//        
+//        [uartLib sendValue:connectPeripheral sendData:data type:CBCharacteristicWriteWithResponse];
+//    }
+//}
 
 
 @end

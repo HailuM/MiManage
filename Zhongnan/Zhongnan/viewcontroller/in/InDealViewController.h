@@ -16,7 +16,7 @@
     NSString *orderid;//订单号
     NSString *supplier;//供应商
     
-    SCOrderIn *selOrder;
+    PuOrder *selOrder;
 }
 
 @property (nonatomic, strong) NSArray *inArray;

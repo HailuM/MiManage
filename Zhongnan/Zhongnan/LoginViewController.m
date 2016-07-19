@@ -100,6 +100,12 @@
     NSString *username=[myDictionary valueForKey:@"UserName"];//取出上次验证通过的用户名
     NSString *userpwd=[myDictionary valueForKey:@"UserPwd"];  //取出上次验证通过的密码
     
+    
+    NSInteger autologin = [userDefaultes integerForKey:@"autologin"];
+    if(autologin==1){
+        [self performSegueWithIdentifier:@"toMain" sender:self];
+    }
+    
     self.etUsername.text=username;//给文本赋值
     self.etPwd.text=userpwd;  //给文本赋值
     
@@ -136,6 +142,9 @@
                 NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
                 NSDictionary *remeberDictionary = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:username,userpwd,self.user.UserOID,nil] forKeys:[NSArray arrayWithObjects:@"UserName", @"UserPwd",@"UserOID",nil]];
                 [userDefaults setObject:remeberDictionary forKey:@"getRemeberInfo"];
+                [userDefaults setInteger:1 forKey:@"autologin"];//1,下次打开自动登录到首页
+                                                                //0,下次打开还必须跳转到登录页
+                
             }else{
                 NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
                 [userDefaultes removeObjectForKey:@"getRemeberInfo"];
@@ -160,9 +169,7 @@
         return false;
     }
     if([serverUrl isEqualToString:@""] || serverUrl==nil){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
-        return false;
+        serverUrl = @"fdcwzm.zhongnangroup.cn:82";
     }
     NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=ToLogin",serverUrl ];
     //连接webservice获取企业介绍的数据
@@ -187,8 +194,10 @@
     self.user = [[User alloc] init];
     if(stringArray[0]&&stringArray[0].length>0){
         //返回正确的用户信息
+        [User clearTable];
         self.user.UserOID = stringArray[0];
         self.user.UserName = stringArray[1];
+        [self.user saveOrUpdate];
     }else{
         //错误提示框的初始化
         UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
@@ -225,6 +234,8 @@
 //忘记密码事件
 -(void)toMissPassWord{
     //错误提示框的初始化
+    self.etUsername.text = @"";
+    self.etPwd.text = @"";
     UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
                                                   message:@"已重置密码，请重新登录！"
                                                  delegate:self

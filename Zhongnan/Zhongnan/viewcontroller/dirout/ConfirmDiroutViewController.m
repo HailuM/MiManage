@@ -236,7 +236,7 @@
             NSString *deliverNo = [NSString stringWithFormat:@"%@%@",[DateTool dateToString:now],[DateTool randomNumber]];
             int finish = 0;//判断单据是否结束:0,已结束  >0,未结束
             for (int i = 0; i<self.selArray.count; i++) {
-                SCOrderInMat *inMat = self.selArray[i];
+                PuOrderChild v *inMat = self.selArray[i];
                 if(inMat.qty+inMat.hasQty>=inMat.sourceQty && inMat.qty+inMat.hasQty<=inMat.limitQty){
                     finish = 0;
                 }else{

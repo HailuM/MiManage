@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface SysSettingViewController : UIViewController
+@interface SysSettingViewController : UIViewController<UIAlertViewDelegate>
 
 @end

@@ -7,22 +7,21 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SCIn.h"
-#import "SCOrderIn.h"
-#import "SCOrderInMat.h"
 #import "OrderDetailTableViewCell.h"
 #import "DateTool.h"
 #import "StringUtil.h"
 #import "UIView+Toast.h"
 #import "InDealViewController.h"
-#import "SCOrderMIn.h"
+#import "InBill.h"
+#import "InBillChild.h"
 #import "UUIDUtil.h"
 
 @interface ConfirmInViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>{
-    SCOrderMIn *mIn;
+    InBill *bill;
+    
 }
 
-@property (nonatomic, strong) SCOrderIn *order;
+@property (nonatomic, strong) PuOrder *order;
 @property (nonatomic, strong) NSMutableArray *selArray;//保存已选中材料的数组
 @property (nonatomic, strong) NSMutableArray *unSelArray;//保存未选择的材料的数组
 
