@@ -131,6 +131,8 @@
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     if([alertView isEqual:asyncRK]){
         if(buttonIndex==1){
+            [self uploadInCompleteWithRkToken:inToken withDirout:0 withInCount:0 withOutCounr:0];
+
             //删除数据库中的入库单及其关联表
             [SCDBTool clearInData:inToken];
             //直接下载入库订单
@@ -138,6 +140,7 @@
         }
     }else if([alertView isEqual:asyncCK]){
         if(buttonIndex==1){
+            [self uploadOutCompleteWithCkToken:outToken withOutCount:0];
             //删除数据库中的出库单及其关联表
             [SCDBTool clearOutData:outToken];
             
@@ -223,6 +226,7 @@
             [asyncRK show];
         }
     }else{
+        
         //删除数据库中的入库单及其关联表
         [SCDBTool clearInData:inToken];
         //直接下载入库订单
@@ -271,7 +275,6 @@
                     [self.view makeToast:[NSString stringWithFormat:@"本次上传出库单%ld条",outArray.count] duration:5.0 position:CSToastPositionCenter];
                 }];
             }else{
-                [self uploadOutCompleteWithCkToken:outToken withOutCount:outArray.count];
                 asyncCK = [[UIAlertView alloc] initWithTitle:@"重新下载" message:@"您想重新下载数据吗？若是则会清除已下载数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
                 [asyncCK show];
             }
