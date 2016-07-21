@@ -74,7 +74,7 @@
         for(PuOrderChild *outMat in self.selArray){
             sum = sum + outMat.curQty;
         }
-        self.checkedNumLabel.text = [NSString stringWithFormat:@"已选品种:%lu;总数量:%.2f",(unsigned long)self.selArray.count,sum];
+        self.checkedNumLabel.text = [NSString stringWithFormat:@"已选品种:%lu",(unsigned long)self.selArray.count];
         //        [self initData];
         
         
@@ -212,6 +212,7 @@
     [self.unSelArray addObject:self.selArray[position]];
     [self.selArray removeObjectAtIndex:position];
     [self.tableView reloadData];
+    self.checkedNumLabel.text = [NSString stringWithFormat:@"已选品种:%lu",(unsigned long)self.selArray.count];
 }
 
 /**

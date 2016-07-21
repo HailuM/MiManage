@@ -512,9 +512,9 @@
         if(da.tempStr.length>6){
         if([[da.tempStr substringToIndex:5] isEqualToString:@"false"]){
             //无数据
-            NSArray<NSString *> *stringArray = [da.tempStr componentsSeparatedByString:@":"];
+            NSString *string = [da.tempStr substringFromIndex:6];
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                          message:stringArray[1]
+                                                          message:string
                                                          delegate:self
                                                 cancelButtonTitle:@"确定"
                                                 otherButtonTitles:nil, nil];

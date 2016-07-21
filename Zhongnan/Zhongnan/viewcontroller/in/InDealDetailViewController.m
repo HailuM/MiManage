@@ -68,6 +68,12 @@
 -(void)initData {
     matArray = [PuOrderChild findByCriteria:[NSString stringWithFormat:@" WHERE orderid = '%@' and isFinish = 0 ",self.order.id]];
     unSelArray = [[NSMutableArray alloc] initWithArray:matArray];
+    for(PuOrderChild *inMat in unSelArray){
+        inMat.curQty = inMat.sourceQty-inMat.rkQty;//默认当前的入库数量为订单上的sourceQty-已入库数量;如果<0,则,为0
+        if(inMat.curQty<0){
+            inMat.curQty = 0;
+        }
+    }
     [self.tableView reloadData];
 }
 
@@ -131,10 +137,7 @@
     OrderDetailTableViewCell *cell = [OrderDetailTableViewCell cellWithTableView:tableView];
     cell.orderType = self.order.type;
     PuOrderChild *inMat = unSelArray[indexPath.row];
-    inMat.curQty = inMat.sourceQty-inMat.rkQty;//默认当前的入库数量为订单上的sourceQty-已入库数量;如果<0,则,为0
-    if(inMat.curQty<0){
-        inMat.curQty = 0;
-    }
+    
     [cell showCell:inMat];
     cell.addBtn.tag = 1000+indexPath.row;
     [cell.addBtn addTarget:self action:@selector(addToCheck:) forControlEvents:UIControlEventTouchUpInside];
