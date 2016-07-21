@@ -243,5 +243,6 @@
     [selArray addObject:unSelArray[position]];
     [unSelArray removeObjectAtIndex:position];
     [self.tableView reloadData];
+    self.checkedNumLabel.text = [NSString stringWithFormat:@"已选品种:%lu",(unsigned long)selArray.count];
 }
 @end
