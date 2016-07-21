@@ -231,7 +231,7 @@
         }else{
             for (int i = 0; i<self.selArray.count; i++) {
                 PuOrderChild *inMat = self.selArray[i];
-                if(inMat.isFinish==0){
+                if(inMat.isFinish==1){
                     finish++;
                 }
             }
@@ -243,7 +243,7 @@
         }else{
             self.order.isFinish = 1;
         }
-        
+        self.order.zcwc = 1;
         [self.order saveOrUpdate];
         
         

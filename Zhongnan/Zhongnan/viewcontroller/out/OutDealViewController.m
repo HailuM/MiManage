@@ -79,12 +79,16 @@
             }
             [self.tableView reloadData];
         }else{
-            [self.view makeToast:@"暂无数据,请返回主页同步出库订单" duration:3.0 position:CSToastPositionCenter];
+            [self.view makeToast:@"没有相关订单信息" duration:3.0 position:CSToastPositionCenter];
+            //搜索框置空
+            self.etOrder.text = @"";
         }
         
     }else{
         [PuOrder createTable];
-        [self.view makeToast:@"暂无数据,请返回主页同步出库订单" duration:3.0 position:CSToastPositionCenter];
+        [self.view makeToast:@"没有相关订单信息" duration:3.0 position:CSToastPositionCenter];
+        //搜索框置空
+        self.etOrder.text = @"";
     }
 }
 

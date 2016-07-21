@@ -337,8 +337,9 @@
                                        @"\n备注:",outMat.note];
                 printContant = [printContant stringByAppendingString:matString];
             }
-            printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
+            printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
                             @"\n收货人:________________________",
+                            @"\n  "
                             @"\n证明人:________________________"];
             
             //准备好的打印字符串

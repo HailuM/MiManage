@@ -335,8 +335,9 @@
                                            @"\n备注:",billChild.note];
                     printContant = [printContant stringByAppendingString:matString];
                 }
-                printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
+                printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
                                 @"\n收货人:_____________________",
+                                @"\n    ",
                                 @"\n证明人:_____________________"];
                 
                 //准备好的打印字符串

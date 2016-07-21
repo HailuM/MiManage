@@ -355,6 +355,7 @@
                         [self getOrderInMatWithOrderId:order.id withRkToken:rkToken];
                         [self getConsumerForDiroutWithOrderId:order.id withRkToken:rkToken];
                     }
+                    [self.view makeToast:[NSString stringWithFormat:@"本次下载订单%lu张!",(unsigned long)orderInArray.count] duration:3.0 position:CSToastPositionCenter];
                     [self orderCompletewithRkToken:inToken];
                 }
             }
@@ -465,6 +466,12 @@
                 [alert show];//提示框的显示 必须写 不然没有任何反映
                 
             }else{
+                UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                              message:@"同步入库下载成功!"
+                                                             delegate:self
+                                                    cancelButtonTitle:@"确定"
+                                                    otherButtonTitles:nil, nil];
+                [alert show];//提示框的显示 必须写 不然没有任何反映
             }
         }else{
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
@@ -547,7 +554,7 @@
                         [self getOrderOutConsumerWithOrderId:orderout.id withCkToken:ckToken];
                     }
                 //结束下载出库订单
-                
+                [self.view makeToast:[NSString stringWithFormat:@"本次下载订单%lu张!",(unsigned long)orderOutArray.count] duration:3.0 position:CSToastPositionCenter];
                     [self getOrderOutCompleteWithCkToken:outToken];
                 }
                 
@@ -697,6 +704,13 @@
             
         }else{
             //结束下载出库订单成功!
+            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                          message:@"同步出库成功!"
+                                                         delegate:self
+                                                cancelButtonTitle:@"确定"
+                                                otherButtonTitles:nil, nil];
+            [alert show];
+            
         }
     }
 }

@@ -56,7 +56,7 @@
     if([PuOrder isExistInTable]){
         NSString *criteria;
         NSArray *array;
-        criteria = [NSString stringWithFormat:@" WHERE type = 'rk' and isFinish = 0 and number like '%%%@%%' and supplier like '%%%@%%'",order,suppliername];
+        criteria = [NSString stringWithFormat:@" WHERE type = 'rk' and isFinish = 0 and zcwc = 0 and number like '%%%@%%' and supplier like '%%%@%%'",order,suppliername];
         array = [PuOrder findByCriteria:criteria];
         
         if(array.count>0){
@@ -64,12 +64,18 @@
             self.inArray = [NSArray arrayWithArray:array];
             [self.tableView reloadData];
         }else{
-            [self.view makeToast:@"暂无数据,请返回主页同步入库订单" duration:3.0 position:CSToastPositionCenter];
+            [self.view makeToast:@"没有相关订单信息" duration:3.0 position:CSToastPositionCenter];
+            //搜索框置空
+            self.etOrder.text = @"";
+            self.etSupplier.text = @"";
         }
         
     }else{
         [PuOrder createTable];
-        [self.view makeToast:@"暂无数据,请返回主页同步入库订单" duration:3.0 position:CSToastPositionCenter];
+        [self.view makeToast:@"没有相关订单信息" duration:3.0 position:CSToastPositionCenter];
+        //搜索框置空
+        self.etOrder.text = @"";
+        self.etSupplier.text = @"";
     }
 }
 
