@@ -109,6 +109,7 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     OrderDetailTableViewCell *cell = [OrderDetailTableViewCell cellWithTableView:tableView];
+    cell.orderType = self.order.type;
     PuOrderChild *inMat = self.selArray[indexPath.row];
     [cell showCell:inMat];
     cell.addBtn.tag = 1000+indexPath.row;
@@ -182,6 +183,7 @@
         if(buttonIndex==0){
             [uartLib scanStart];//scan
             NSLog(@"connect Peripheral");
+            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
         }
     }else{
         if(buttonIndex==alertView.firstOtherButtonIndex){
@@ -281,8 +283,7 @@
                     //更新已处理数量
                     inMat.ckQty = inMat.ckQty+inMat.curQty;//已出库数量
                     inMat.rkQty = inMat.rkQty+inMat.curQty;//已入库数量
-                    inMat.isFinish = 1;
-                    [inMat saveOrUpdate];
+                    
                     //生成入库单
                     DirBillChild *billChild = [[DirBillChild alloc] init];
                     billChild.orderid = bill.orderid;
@@ -303,6 +304,9 @@
                     
                     [billChild saveOrUpdate];
                     [self.array addObject:billChild];
+                    inMat.curQty = 0;
+                    inMat.isFinish = 1;
+                    [inMat saveOrUpdate];
                 }
                 
                 /**
@@ -323,26 +327,23 @@
                               @"\n-----------------------------"];
                 for (int i = 0; i<self.array.count; i++) {
                     DirBillChild *billChild = self.array[i];
-                    NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%@\n ",
+                    NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n ",
                                            @"\n材料名称:",billChild.Name,
                                            @"\n品牌:",billChild.brand,
                                            @"\n规格型号:",billChild.model,
-                                           @"\n数量:",billChild.qty,
+                                           @"\n数量:",[StringUtil changeFloat:[NSString stringWithFormat:@"%f",billChild.qty]],
                                            @"\n备注:",billChild.note];
                     printContant = [printContant stringByAppendingString:matString];
                 }
                 printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
-                                @"\n收货人:_________________________",
-                                @"\n证明人:_________________________"];
+                                @"\n收货人:_____________________",
+                                @"\n证明人:_____________________"];
                 
                 //准备好的打印字符串
                 //--------------
                 
                 printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"打印" otherButtonTitles: nil];
                 [printAlert show];
-                
-                [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
-                
                 
                 //返回首页
                 NSArray *controllers = self.navigationController.viewControllers;
@@ -454,9 +455,9 @@
     
     //  [[[UIAlertView alloc] initWithTitle:@"Connect fail" message: @"Fail to connect,Please reconnect!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil,nil] show];
     //--------------wynadd
-    [uartLib scanStart];//scan
-    NSLog(@"connect Peripheral");
-    [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+//    [uartLib scanStart];//scan
+//    NSLog(@"connect Peripheral");
+//    [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
     
 }
 

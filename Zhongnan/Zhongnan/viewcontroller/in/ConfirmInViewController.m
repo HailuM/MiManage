@@ -73,6 +73,7 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     OrderDetailTableViewCell *cell = [OrderDetailTableViewCell cellWithTableView:tableView];
+    cell.orderType = self.order.type;
     PuOrderChild *inMat = self.selArray[indexPath.row];
     [cell showCell:inMat];
     cell.addBtn.tag = 1000+indexPath.row;
@@ -204,7 +205,7 @@
             inMat.rkQty = inMat.curQty+inMat.rkQty;
             //如果已处理数量介于sourceQty和limitQty
             //则说明此次材料已处理结束
-            if(inMat.rkQty>inMat.sourceQty && inMat.rkQty<inMat.limitQty){
+            if(inMat.rkQty>=inMat.sourceQty && inMat.rkQty<=inMat.limitQty){
                 //此次处理完成
                 inMat.isFinish = 1;
             }

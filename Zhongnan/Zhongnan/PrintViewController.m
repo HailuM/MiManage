@@ -20,12 +20,14 @@
     
     NSMutableArray *array;
     
-    
+    //打印用
     UIAlertView *connectAlertView;
     UartLib *uartLib;
     CBPeripheral *connectPeripheral;
     NSString *printContant;
  
+    
+    
     NSInteger type;//0, 出库单   1,直入直出单
     
     OutBill *outBill;
@@ -99,6 +101,7 @@
         if(buttonIndex==0){
             [uartLib scanStart];//scan
             NSLog(@"connect Peripheral");
+            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
         }
     }
 }
@@ -141,18 +144,18 @@
                       @"\n------------------------------"];
         for (int i = 0; i<outChildArray.count; i++) {
             OutBillChild *outMat = outChildArray[i];
-            NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%@\n ",
+            NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n ",
                                    @"\n材料名称:",outMat.Name,
                                    @"\n品牌:",outMat.brand,
                                    @"\n规格型号:",outMat.model,
-                                   @"\n数量:",outMat.qty,
+                                   @"\n数量:",[StringUtil changeFloat:[NSString stringWithFormat:@"%f",outMat.qty]],
                                    @"\n备注:",outMat.note];
             printContant = [printContant stringByAppendingString:matString];
         }
         printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
-                        @"\n收货人:__________________________",
+                        @"\n收货人:________________________",
                         @"\n                                ",
-                        @"\n证明人:__________________________"];
+                        @"\n证明人:________________________"];
     }
     if([value isKindOfClass:[DirBill class]]){
         //直入直出单
@@ -164,7 +167,7 @@
         dirBill = value;
         //开始打印
         printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
-                      @"\n------------------------------",
+                      @"\n-----------------------------",
                       (dirBill.printcount+1),
                       @"\n出库单号:",dirBill.number,
                       @"\n项目:",dirBill.ProjectName,
@@ -173,17 +176,17 @@
                       @"\n-----------------------------"];
         for (int i = 0; i<dirChildArray.count; i++) {
             DirBillChild *billChild = dirChildArray[i];
-            NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%@\n ",
+            NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n ",
                                    @"\n材料名称:",billChild.Name,
                                    @"\n品牌:",billChild.brand,
                                    @"\n规格型号:",billChild.model,
-                                   @"\n数量:",billChild.qty,
+                                   @"\n数量:",[StringUtil changeFloat:[NSString stringWithFormat:@"%f",billChild.qty]],
                                    @"\n备注:",billChild.note];
             printContant = [printContant stringByAppendingString:matString];
         }
         printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
-                        @"\n收货人:_________________________",
-                        @"\n证明人:_________________________"];
+                        @"\n收货人:_____________________",
+                        @"\n证明人:_____________________"];
     }
     //准备好的打印字符串
     //--------------
@@ -296,9 +299,9 @@
     
     //  [[[UIAlertView alloc] initWithTitle:@"Connect fail" message: @"Fail to connect,Please reconnect!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil,nil] show];
     //--------------wynadd
-    [uartLib scanStart];//scan
-    NSLog(@"connect Peripheral");
-    [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+//    [uartLib scanStart];//scan
+//    NSLog(@"connect Peripheral");
+//    [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
     
 }
 
@@ -410,4 +413,5 @@
         [uartLib sendValue:connectPeripheral sendData:data type:CBCharacteristicWriteWithResponse];
     }
 }
+
 @end

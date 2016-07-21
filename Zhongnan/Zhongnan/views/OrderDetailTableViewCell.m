@@ -34,8 +34,23 @@
     PuOrderChild *inMat = (PuOrderChild *)value;
     name = inMat.Name;
     model = inMat.model;//规格型号
-    sourceQty = inMat.sourceQty-inMat.rkQty;//未处理入库数量
-    qty = inMat.curQty;//当前已处理数量
+    
+    if([_orderType isEqualToString:@"rk"]){
+        sourceQty = inMat.sourceQty-inMat.rkQty-inMat.curQty;//未处理入库数量
+        
+    }else if([_orderType isEqualToString:@"ck"]){
+        sourceQty = inMat.sourceQty-inMat.ckQty-inMat.curQty;//未处理出库数量
+        
+    }else if([_orderType isEqualToString:@"rkck"]){
+        sourceQty = inMat.sourceQty-inMat.ckQty-inMat.curQty;//未处理出库数量
+        
+    }else if ([_orderType isEqualToString:@"zrzc"]){
+        sourceQty = inMat.sourceQty-inMat.rkQty-inMat.curQty;//未处理入库数量
+    }
+    
+    
+    
+    qty = inMat.curQty;//当前已处理数量  默认为单据剩余的数量
     unit = inMat.unit;//单位
     brand = inMat.brand;//品牌
     note = inMat.note;//备注

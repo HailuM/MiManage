@@ -76,6 +76,11 @@
         }
         self.checkedNumLabel.text = [NSString stringWithFormat:@"已选品种:%lu;总数量:%.2f",(unsigned long)self.selArray.count,sum];
         //        [self initData];
+        
+        
+        if(self.consumer){
+            self.consumerLabel.text = self.consumer.Name;
+        }
     }
 }
 
@@ -111,6 +116,7 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     OrderDetailTableViewCell *cell = [OrderDetailTableViewCell cellWithTableView:tableView];
+    cell.orderType = self.order.type;
     PuOrderChild *outMat = self.selArray[indexPath.row];
     [cell showCell:outMat];
     cell.addBtn.tag = 1000+indexPath.row;
@@ -156,6 +162,7 @@
         if(buttonIndex==0){
             [uartLib scanStart];//scan
             NSLog(@"connect Peripheral");
+            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
         }
     }else{
         if(buttonIndex==alertView.firstOtherButtonIndex){
@@ -263,7 +270,7 @@
                 if(outMat.ckQty==outMat.sourceQty){
                     outMat.isFinish = 1;
                 }
-                [outMat saveOrUpdate];
+                
                 //生成出库单子表
                 OutBillChild *outChild = [[OutBillChild alloc] init];
                 outChild.outgid = outBill.gid;
@@ -288,6 +295,8 @@
                 
                 [outChild saveOrUpdate];
                 [self.array addObject:outChild];
+                outMat.curQty = 0;
+                [outMat saveOrUpdate];
             }
             int finish = 0;//判断单据是否结束:0,未结束  >0,已结束
             if(self.unSelArray.count>0){
@@ -296,7 +305,7 @@
             }else{
                 for (int i = 0; i<self.array.count; i++) {
                     PuOrderChild *outMat = self.selArray[i];
-                    if(outMat.isFinish==0){
+                    if(outMat.isFinish==1){
                         finish++;
                     }
                 }
@@ -319,18 +328,17 @@
                           @"\n------------------------------"];
             for (int i = 0; i<self.array.count; i++) {
                 OutBillChild *outMat = self.array[i];
-                NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%@\n",
+                NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n",
                                        @"\n材料名称:",outMat.Name,
                                        @"\n品牌:",outMat.brand,
                                        @"\n规格型号:",outMat.model,
-                                       @"\n数量:",outMat.qty,
+                                       @"\n数量:",[StringUtil changeFloat:[NSString stringWithFormat:@"%f",outMat.qty]],
                                        @"\n备注:",outMat.note];
                 printContant = [printContant stringByAppendingString:matString];
             }
-            printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
-                            @"\n收货人:__________________________",
-                            @"\n                                ",
-                            @"\n证明人:__________________________"];
+            printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
+                            @"\n收货人:________________________",
+                            @"\n证明人:________________________"];
             
             //准备好的打印字符串
             //--------------
@@ -338,15 +346,6 @@
             [printAlert show];
             
             
-            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
-            
-            //返回首页
-            NSArray *controllers = self.navigationController.viewControllers;
-            for(UIViewController *viewController in controllers){
-                if([viewController isKindOfClass:[OutDealViewController class]]){
-                    [self.navigationController popToViewController:viewController animated:YES];
-                }
-            }
         }
     } else {
         [self.view makeToast:@"请选择领料商!" duration:3.0 position:CSToastPositionCenter];
@@ -387,6 +386,13 @@
     }
     [uartLib scanStop];
     [uartLib disconnectPeripheral:connectPeripheral];
+    //返回首页
+    NSArray *controllers = self.navigationController.viewControllers;
+    for(UIViewController *viewController in controllers){
+        if([viewController isKindOfClass:[OutDealViewController class]]){
+            [self.navigationController popToViewController:viewController animated:YES];
+        }
+    }
     
 }
 
@@ -446,9 +452,9 @@
     
     //  [[[UIAlertView alloc] initWithTitle:@"Connect fail" message: @"Fail to connect,Please reconnect!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil,nil] show];
     //--------------wynadd
-        [uartLib scanStart];//scan
-        NSLog(@"connect Peripheral");
-        [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+//    [uartLib scanStart];//scan
+//    NSLog(@"connect Peripheral");
+//    [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
     
 }
 
@@ -560,7 +566,5 @@
         [uartLib sendValue:connectPeripheral sendData:data type:CBCharacteristicWriteWithResponse];
     }
 }
-
-
 
 @end

@@ -20,6 +20,8 @@
     NSString *note;//备注
 }
 
+@property (nonatomic,copy) NSString *orderType;//单据类型,判断是出库,入库,入库出库
+
 @property (strong, nonatomic) IBOutlet UIButton *addBtn;
 @property (strong, nonatomic) IBOutlet UILabel *matNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *modelLabel;
