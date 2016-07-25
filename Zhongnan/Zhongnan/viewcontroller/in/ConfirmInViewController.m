@@ -271,14 +271,15 @@
         }else{
             for (int i = 0; i<self.selArray.count; i++) {
                 PuOrderChild *inMat = self.selArray[i];
-                if(inMat.isFinish==1){
+                if(inMat.isFinish==0){
                     finish++;
                 }
             }
         }
         
         
-        if(finish==0){
+        if(finish>0){
+            //有材料未完成
             self.order.isFinish = 0;
         }else{
             self.order.isFinish = 1;

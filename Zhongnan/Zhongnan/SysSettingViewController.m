@@ -98,6 +98,12 @@
         [User createTable];
     }
     NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
+    
+    
+    //清除用户名及密码
+    NSDictionary *remeberDictionary = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"",@"",@"",nil] forKeys:[NSArray arrayWithObjects:@"UserName", @"UserPwd",@"UserOID",nil]];
+    [userDefaultes setObject:remeberDictionary forKey:@"getRemeberInfo"];
+    //清除自动登录
     [userDefaultes setInteger:0 forKey:@"autologin"];
 }
 

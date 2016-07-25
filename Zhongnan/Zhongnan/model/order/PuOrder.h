@@ -34,6 +34,10 @@
 @property(nonatomic,copy) NSString *Addr;
 @property(nonatomic,copy) NSString *type;  //"rkck":手机上的入库之后做的出库  "zrzc":直入直出  "rk":入库  "ck":出库
 @property(nonatomic,assign) int zcwc;//已经做了入库的就不能再做直入直出 0,表示可以做直入直出   1,表示不可以做直入直出
+
+@property(nonatomic,assign) int zrzcwc;//   直入直出是否完成
+
+
 @property(nonatomic,copy) NSString *name;
 @property(nonatomic,copy) NSString *ProjectName;
 @property(nonatomic,copy) NSString *Company;

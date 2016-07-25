@@ -12,6 +12,7 @@
 #import "DirBill.h"
 #import "DirBillChild.h"
 #import "OrderTableViewCell.h"
+#import "MainViewController.h"
 
 
 @interface PrintViewController (){
@@ -37,6 +38,10 @@
     NSArray *dirChildArray;
     
     UIAlertView *printAlert;
+    
+    
+    int timeCount;
+    UIAlertView *bleAlert;//提示未连接上蓝牙
 }
 
 @end
@@ -52,7 +57,7 @@
     [uartLib setUartDelegate:self];
     connectAlertView = [[UIAlertView alloc] initWithTitle:@"连接蓝牙打印机" message: @"连接中，请稍后!" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil,nil];
     
-    
+    bleAlert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"无法连接上蓝牙打印机，是否返回主界面？" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确认", nil];
     
     
     array = [[NSMutableArray alloc] init];
@@ -103,6 +108,21 @@
             NSLog(@"connect Peripheral");
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
         }
+    }else if([alertView isEqual:bleAlert]){
+        if(buttonIndex==1){
+            //返回首页
+            NSArray *controllers = self.navigationController.viewControllers;
+            for(UIViewController *viewController in controllers){
+                if([viewController isKindOfClass:[MainViewController class]]){
+                    [self.navigationController popToViewController:viewController animated:YES];
+                }
+            }
+        }else{
+            timeCount = 0;
+            [uartLib scanStart];//scan
+            NSLog(@"connect Peripheral");
+            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+        }
     }
 }
 
@@ -148,7 +168,7 @@
                                    @"\n材料名称:",outMat.Name,
                                    @"\n品牌:",outMat.brand,
                                    @"\n规格型号:",outMat.model,
-                                   @"\n数量:",[StringUtil changeFloat:[NSString stringWithFormat:@"%f",outMat.qty]],
+                                   @"\n数量:",[StringUtil changeFloat:outMat.qty],
                                    @"\n备注:",outMat.note];
             printContant = [printContant stringByAppendingString:matString];
         }
@@ -180,7 +200,7 @@
                                    @"\n材料名称:",billChild.Name,
                                    @"\n品牌:",billChild.brand,
                                    @"\n规格型号:",billChild.model,
-                                   @"\n数量:",[StringUtil changeFloat:[NSString stringWithFormat:@"%f",billChild.qty]],
+                                   @"\n数量:",[StringUtil changeFloat:billChild.qty],
                                    @"\n备注:",billChild.note];
             printContant = [printContant stringByAppendingString:matString];
         }
@@ -192,14 +212,29 @@
     //--------------
     
     printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"打印" otherButtonTitles: nil];
+    NSArray *subViewArray = printAlert.subviews;
+    for(int x=0;x<[subViewArray count];x++){
+        if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
+        {
+            UILabel *label = [subViewArray objectAtIndex:x];
+            label.textAlignment = UITextAlignmentLeft;
+        }
+        
+    }
     [printAlert show];
 }
 
 //-------
 -(void)searchPrinter{
     if(connectPeripheral ==nil){
-        [uartLib scanStart];//scan
-        [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+        if(timeCount>10){
+            //提示，未连接上蓝牙，是否返回主页面
+            [bleAlert show];
+        }else{
+            [uartLib scanStart];//scan
+            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+            timeCount = timeCount+3;
+        }
     }else{
         [uartLib scanStop];
         [uartLib connectPeripheral:connectPeripheral];

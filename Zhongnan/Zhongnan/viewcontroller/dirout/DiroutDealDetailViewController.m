@@ -59,7 +59,7 @@
  *  @param sender <#sender description#>
  */
 -(void)chooseConsumer:(id)sender{
-    [self performSegueWithIdentifier:@"diroutdetailtochoose" sender:self];
+    [self performSegueWithIdentifier:@"diroutconfirmtochoose" sender:self];
 }
 /**
  *  跳转到确认界面
@@ -133,7 +133,7 @@
         viewController.selArray = selArray;
         viewController.order = self.order;
         viewController.consumer = self.consumer;
-    }else if([segue.identifier isEqualToString:@"diroutdetailtochoose"]){
+    }else if([segue.identifier isEqualToString:@"diroutconfirmtochoose"]){
         ChooseConsumerViewController *viewController = segue.destinationViewController;
         viewController.flag = 1;
         viewController.orderid = self.order.id;

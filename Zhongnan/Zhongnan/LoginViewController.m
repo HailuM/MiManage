@@ -11,6 +11,7 @@
 #import "WebServiceConnect.h"
 #import "LoginInterface.h"
 #import "MainViewController.h"
+#import "UIBarButtonItem+Extension.h"
 
 
 @interface LoginViewController ()
@@ -25,7 +26,7 @@
     NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
     NSDictionary *myDictionary  = [userDefaultes  objectForKey:@"getServerInfo"];
     serverUrl=[myDictionary valueForKey:@"ServerIP"];//取出上次验证通过的用户名
-
+    self.navigationItem.leftBarButtonItem = [UIBarButtonItem itemWithImageName:@"" highImageName:@"" target:self action:@selector(back:)];
 }
 
 - (void)viewDidLoad {
@@ -237,7 +238,7 @@
     self.etUsername.text = @"";
     self.etPwd.text = @"";
     UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                  message:@"已重置密码，请重新登录！"
+                                                  message:@"手机端暂不支持此功能，请联系系统管理员"
                                                  delegate:self
                                         cancelButtonTitle:@"确定"
                                         otherButtonTitles:nil, nil];
@@ -248,6 +249,11 @@
 //跳转服务器配置页面
 -(void)toSystemControl{
     [self performSegueWithIdentifier:@"toServer" sender:self];
+}
+
+
+-(void)back:(id)sender {
+    
 }
 
 @end

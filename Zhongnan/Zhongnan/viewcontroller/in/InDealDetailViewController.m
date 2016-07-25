@@ -67,7 +67,14 @@
  */
 -(void)initData {
     matArray = [PuOrderChild findByCriteria:[NSString stringWithFormat:@" WHERE orderid = '%@' and isFinish = 0 ",self.order.id]];
-    unSelArray = [[NSMutableArray alloc] initWithArray:matArray];
+    unSelArray = [[NSMutableArray alloc] init];
+    for(PuOrderChild *inMat in matArray){
+        double source = [inMat.sourceQty doubleValue];
+        double rk = [inMat.rkQty doubleValue];
+        if(rk<source){
+            [unSelArray addObject:inMat];
+        }
+    }
     for(PuOrderChild *inMat in unSelArray){
         double cur = [inMat.curQty doubleValue];
         double source = [inMat.sourceQty doubleValue];
