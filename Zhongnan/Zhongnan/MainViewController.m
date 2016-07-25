@@ -223,7 +223,7 @@
                 [HUD removeFromSuperViewOnHide];
                 HUD = nil;
                 
-                [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单%ld条,出库单%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
+                [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
             }];
             
         }else{
@@ -280,7 +280,7 @@
                 } completionBlock:^{
                     [HUD removeFromSuperViewOnHide];
                     HUD = nil;
-                    [self.view makeToast:[NSString stringWithFormat:@"本次上传出库单%ld条",outArray.count] duration:5.0 position:CSToastPositionCenter];
+                    [self.view makeToast:[NSString stringWithFormat:@"本次上传出库单明细%ld条",outArray.count] duration:5.0 position:CSToastPositionCenter];
                 }];
             }else{
                 asyncCK = [[UIAlertView alloc] initWithTitle:@"重新下载" message:@"您想重新下载数据吗？若是则会清除已下载数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];

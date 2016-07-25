@@ -192,16 +192,18 @@
             NSString *count = countText.text;
             PuOrderChild *inMat = self.selArray[tag];
             double qty = [count doubleValue];
-            
-            if(qty>inMat.limitQty){
-                [self.view makeToast:@"数量超过上限,请重新输入!" duration:3.0 position:CSToastPositionCenter];
-            }else if(qty<inMat.sourceQty){
-                [self.view makeToast:@"数量未达到订单最低限制!" duration:3.0 position:CSToastPositionCenter];
+            if(qty==0){
+                //如果用户输入无效的字符串或者0
+                inMat.curQty = inMat.sourceQty-inMat.rkQty;
             }else{
-                inMat.curQty = qty;
+                if(qty>inMat.limitQty){
+                    [self.view makeToast:@"数量超过上限,请重新输入!" duration:3.0 position:CSToastPositionCenter];
+                }else if(qty<inMat.sourceQty){
+                    [self.view makeToast:@"数量未达到订单最低限制!" duration:3.0 position:CSToastPositionCenter];
+                }else{
+                    inMat.curQty = qty;
+                }
             }
-            
-            
             [self.tableView reloadData];
         }
     }
@@ -349,7 +351,7 @@
                 //返回首页
                 NSArray *controllers = self.navigationController.viewControllers;
                 for(UIViewController *viewController in controllers){
-                    if([viewController isKindOfClass:[DiroutDealViewController class]]){
+                    if([viewController isKindOfClass:[MainViewController class]]){
                         [self.navigationController popToViewController:viewController animated:YES];
                     }
                 }

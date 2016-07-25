@@ -198,12 +198,18 @@
         NSString *count = countText.text;
         PuOrderChild *inMat = unSelArray[tag];
         double qty = [count doubleValue];
-        if(qty+inMat.rkQty>inMat.limitQty){
-            //数量过大
-            [self.view makeToast:@"数量超过上限,请重新输入!" duration:3.0 position:CSToastPositionCenter];
+        if(qty==0){
+            //如果用户输入无效的字符串或者0
+            inMat.curQty = inMat.sourceQty-inMat.rkQty;
         }else{
-            inMat.curQty = qty;
+            if(qty+inMat.rkQty>inMat.limitQty){
+                //数量过大
+                [self.view makeToast:@"数量超过上限,请重新输入!" duration:3.0 position:CSToastPositionCenter];
+            }else{
+                inMat.curQty = qty;
+            }
         }
+        
         [self.tableView reloadData];
     }
 }
