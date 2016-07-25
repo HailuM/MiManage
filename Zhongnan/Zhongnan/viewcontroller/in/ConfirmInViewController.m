@@ -37,10 +37,10 @@
         if(!self.selArray){
             self.selArray = [[NSMutableArray alloc] init];
         }
-        double sum = 0;
-        for(PuOrderChild *inMat in self.selArray){
-            sum = sum + inMat.curQty;
-        }
+//        double sum = 0;
+//        for(PuOrderChild *inMat in self.selArray){
+//            sum = sum + inMat.curQty;
+//        }
         self.checkedNumLabel.text = [NSString stringWithFormat:@"已选品种:%lu",(unsigned long)self.selArray.count];
 //        [self initData];
     }
@@ -99,7 +99,7 @@
     UITextField *countText = [alert textFieldAtIndex:0];
     [countText setKeyboardType:UIKeyboardTypeDecimalPad];
     //尾数去0
-    countText.text = [StringUtil changeFloat:[NSString stringWithFormat:@"%f",inMat.curQty]];
+    countText.text = [StringUtil changeFloat:inMat.curQty];
     [alert show];
 }
 
@@ -107,10 +107,18 @@
     UILabel *label = sender;
     NSInteger tag = label.tag-2000;
     PuOrderChild *inMat = self.selArray[tag];
-    if(inMat.curQty-1<=0){
-        inMat.curQty = 0.0;
+    
+    double cur = [inMat.curQty doubleValue];
+    //    double source = [inMat.sourceQty doubleValue];
+    //    double rk = [inMat.rkQty doubleValue];
+    //    double limit = [inMat.limitQty doubleValue];
+    
+    
+    if(cur-1<=0){
+        inMat.curQty = @"0";
     }else{
-        inMat.curQty = inMat.curQty-1;
+        cur = cur - 1;
+        inMat.curQty = [NSString stringWithFormat:@"%f",cur];
     }
     [self.tableView reloadData];
 }
@@ -119,11 +127,25 @@
     UILabel *label = sender;
     NSInteger tag = label.tag-3000;
     PuOrderChild *inMat = self.selArray[tag];
-    if(inMat.curQty+1>inMat.limitQty-inMat.rkQty){
-        inMat.curQty = inMat.limitQty-inMat.rkQty;
-    }else{
-        inMat.curQty = inMat.curQty+1;
+    
+    double limit = 0;
+    //获取最终上限
+    if([inMat.limitQty doubleValue]<=0)
+    {
+        limit = [inMat.sourceQty doubleValue];
+    } else {
+        limit = [inMat.limitQty doubleValue];
     }
+    double cur = [inMat.curQty doubleValue];
+    //    double source = [inMat.sourceQty doubleValue];
+    double rk = [inMat.rkQty doubleValue];
+    
+    if(cur+1>limit-rk){
+        cur = limit-rk;
+    }else{
+        cur = cur+1;
+    }
+    inMat.curQty = [NSString stringWithFormat:@"%f",cur];
     [self.tableView reloadData];
 }
 
@@ -135,18 +157,34 @@
         NSString *count = countText.text;
         PuOrderChild *inMat = self.selArray[tag];
         double qty = [count doubleValue];
-        if(qty==0){
+        
+        double cur = [inMat.curQty doubleValue];
+        //        double source = [inMat.sourceQty doubleValue];
+        double rk = [inMat.rkQty doubleValue];
+        double limit = [inMat.limitQty doubleValue];
+        //获取最终上限
+        if(limit<=0)
+        {
+            limit = [inMat.sourceQty doubleValue];
+        } else {
+            limit = [inMat.limitQty doubleValue];;
+        }
+        
+        if(qty<=0){
             //如果用户输入无效的字符串或者0
-            inMat.curQty = inMat.sourceQty-inMat.rkQty;
+            cur = limit-rk;
         }else{
-            if(qty+inMat.rkQty>inMat.limitQty){
+            if(qty+rk>limit){
                 //数量过大
-                [self.view makeToast:@"数量超过上限,请重新输入!" duration:3.0 position:CSToastPositionCenter];
+                cur = limit-rk;
+                [self.view makeToast:@"数量超过上限!" duration:3.0 position:CSToastPositionCenter];
             }else{
-                inMat.curQty = qty;
+                cur = qty;
             }
         }
         
+        inMat.curQty = [NSString stringWithFormat:@"%f",cur];
+        [self.tableView reloadData];
         [self.tableView reloadData];
     }
 }
@@ -157,10 +195,6 @@
     [self.unSelArray addObject:self.selArray[position]];
     [self.selArray removeObjectAtIndex:position];
     [self.tableView reloadData];
-    double sum = 0;
-    for(PuOrderChild *inMat in self.selArray){
-        sum = sum + inMat.curQty;
-    }
     self.checkedNumLabel.text = [NSString stringWithFormat:@"已选品种:%lu",(unsigned long)self.selArray.count];
 }
 
@@ -172,7 +206,7 @@
 - (void)confirmDealIn:(id)sender {
     double sum = 0;
     for(PuOrderChild *inMat in self.selArray){
-        sum = sum + inMat.curQty;
+        sum = sum + [inMat.curQty doubleValue];
     }
     if(self.selArray.count==0 || sum==0){
         UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
@@ -208,10 +242,10 @@
         for (int i = 0; i<self.selArray.count; i++) {
             PuOrderChild *inMat = self.selArray[i];
             //之前处理的数量+这一次的处理数量
-            inMat.rkQty = inMat.curQty+inMat.rkQty;
+            inMat.rkQty = [NSString stringWithFormat:@"%f",[inMat.curQty doubleValue]+[inMat.rkQty doubleValue]];
             //如果已处理数量介于sourceQty和limitQty
             //则说明此次材料已处理结束
-            if(inMat.rkQty>=inMat.sourceQty && inMat.rkQty<=inMat.limitQty){
+            if([inMat.rkQty doubleValue]>=[inMat.sourceQty doubleValue] && [inMat.rkQty doubleValue]<=[inMat.limitQty doubleValue]){
                 //此次处理完成
                 inMat.isFinish = 1;
             }

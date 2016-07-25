@@ -91,7 +91,14 @@
 }
 */
 - (IBAction)signOut:(id)sender {
-    
+    //删除用户登录信息
+    if ([User isExistInTable]) {
+        [User clearTable];
+    }else{
+        [User createTable];
+    }
+    NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
+    [userDefaultes setInteger:0 forKey:@"autologin"];
 }
 
 @end

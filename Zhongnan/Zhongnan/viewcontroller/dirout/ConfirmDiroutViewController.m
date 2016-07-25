@@ -66,10 +66,6 @@
         if(!self.selArray){
             self.selArray = [[NSMutableArray alloc] init];
         }
-        double sum = 0;
-        for(PuOrderChild *inMat in self.selArray){
-            sum = sum + inMat.curQty;
-        }
         self.checkedNumLabel.text = [NSString stringWithFormat:@"已选品种:%lu",(unsigned long)self.selArray.count];
         //        [self initData];
         if(self.consumer){
@@ -136,7 +132,7 @@
     UITextField *countText = [alert textFieldAtIndex:0];
     [countText setKeyboardType:UIKeyboardTypeDecimalPad];
     //尾数去0
-    countText.text = [StringUtil changeFloat:[NSString stringWithFormat:@"%f",inMat.curQty]];
+    countText.text = [StringUtil changeFloat:inMat.curQty];
     [alert show];
 }
 /**
@@ -148,11 +144,26 @@
     UILabel *label = sender;
     NSInteger tag = label.tag-2000;
     PuOrderChild *inMat = self.selArray[tag];
-    if(inMat.curQty-1<=0){
-        inMat.curQty = 0;
-    }else{
-        inMat.curQty = inMat.curQty-1;
+    double limit = 0;
+    //获取最终上限
+    if([inMat.limitQty doubleValue]<=0)
+    {
+        limit = [inMat.sourceQty doubleValue];
+    } else {
+        limit = [inMat.limitQty doubleValue];
     }
+    double cur = [inMat.curQty doubleValue];
+    //    double source = [inMat.sourceQty doubleValue];
+    //    double ck = [outMat.ckQty doubleValue];
+    
+    
+    
+    if(cur-1<=0){
+        cur = 0.0;
+    }else{
+        cur = cur-1;
+    }
+    inMat.curQty = [NSString stringWithFormat:@"%f",cur];
     [self.tableView reloadData];
 }
 
@@ -160,11 +171,18 @@
     UILabel *label = sender;
     NSInteger tag = label.tag-3000;
     PuOrderChild *inMat = self.selArray[tag];
-    if(inMat.curQty+1>inMat.limitQty){
-        inMat.curQty = inMat.limitQty;
+    
+    double cur = [inMat.curQty doubleValue];
+    double source = [inMat.sourceQty doubleValue];
+    double rk = [inMat.rkQty doubleValue];
+    double limit = [inMat.limitQty doubleValue];
+    
+    if(cur+1>limit){
+        cur = limit;
     }else{
-        inMat.curQty = inMat.curQty+1;
+        cur = cur+1;
     }
+    inMat.curQty = [NSString stringWithFormat:@"%f",cur];
     [self.tableView reloadData];
 }
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
@@ -192,18 +210,25 @@
             NSString *count = countText.text;
             PuOrderChild *inMat = self.selArray[tag];
             double qty = [count doubleValue];
+            
+            
+            double cur = [inMat.curQty doubleValue];
+            double source = [inMat.sourceQty doubleValue];
+            double rk = [inMat.rkQty doubleValue];
+            double limit = [inMat.limitQty doubleValue];
+            
             if(qty==0){
                 //如果用户输入无效的字符串或者0
-                inMat.curQty = inMat.sourceQty-inMat.rkQty;
+                cur = source-rk;
             }else{
-                if(qty>inMat.limitQty){
-                    [self.view makeToast:@"数量超过上限,请重新输入!" duration:3.0 position:CSToastPositionCenter];
-                }else if(qty<inMat.sourceQty){
-                    [self.view makeToast:@"数量未达到订单最低限制!" duration:3.0 position:CSToastPositionCenter];
+                if(qty>limit){
+                    cur = limit;
+                    [self.view makeToast:@"数量超过上限!" duration:3.0 position:CSToastPositionCenter];
                 }else{
-                    inMat.curQty = qty;
+                    cur = qty;
                 }
             }
+            inMat.curQty = [NSString stringWithFormat:@"%f",cur];
             [self.tableView reloadData];
         }
     }
@@ -224,6 +249,19 @@
         self.consumerLabel.text = self.consumer.Name;
     }
 }
+
+
+-(BOOL) isFinish
+{
+    for (int i = 0; i<self.selArray.count; i++) {
+        PuOrderChild *inMat = self.selArray[i];
+        if(inMat.curQty<inMat.sourceQty || inMat.curQty>inMat.limitQty){
+            return NO;
+        }
+    }
+    return YES;
+}
+
 /**
  *  确认直入直出,保存至数据库
  *
@@ -234,7 +272,7 @@
  
         double sum = 0;
         for(PuOrderChild *inMat in self.selArray){
-            sum = sum + inMat.curQty;
+            sum = sum + [inMat.curQty doubleValue];
         }
         if(self.selArray.count==0 || sum==0){
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
@@ -244,17 +282,24 @@
                                                 otherButtonTitles:nil, nil];
             [alert show];//提示框的显示 必须写 不然没有任何反映
         }else if(self.unSelArray.count==0){
+            
+            
+            // TODO 判断直入直出有没有完成
+            
+            if ([self isFinish]) {
+                
+            }
+            
             //保存数据库
             // TODO 涉及到出入库的数量判断
             self.array = [[NSMutableArray alloc] init];
             NSDate *now = [NSDate date];
             
             //直入直出单号
-            NSString *deliverNo = [NSString stringWithFormat:@"%@%@",[DateTool dateToString:now],[DateTool randomNumber]];
             int finish = 0;//判断单据是否结束:0,已结束  >0,未结束
             for (int i = 0; i<self.selArray.count; i++) {
                 PuOrderChild *inMat = self.selArray[i];
-                if(inMat.curQty+inMat.rkQty>=inMat.sourceQty && inMat.curQty+inMat.rkQty<=inMat.limitQty){
+                if([inMat.curQty doubleValue]>=[inMat.sourceQty doubleValue] && [inMat.curQty doubleValue]<=[inMat.limitQty doubleValue]){
                     finish = finish;
                 }else{
                     finish ++;
@@ -283,8 +328,8 @@
                 for (int i = 0; i<self.selArray.count; i++) {
                     PuOrderChild *inMat = self.selArray[i];
                     //更新已处理数量
-                    inMat.ckQty = inMat.ckQty+inMat.curQty;//已出库数量
-                    inMat.rkQty = inMat.rkQty+inMat.curQty;//已入库数量
+                    inMat.ckQty = inMat.curQty;//已出库数量
+                    inMat.rkQty = inMat.curQty;//已入库数量
                     
                     //生成入库单
                     DirBillChild *billChild = [[DirBillChild alloc] init];

@@ -15,7 +15,7 @@
 /** 入库单行ID    UUID生成*/
 @property(nonatomic,copy)NSString *wareentryid;
 /** 入库单行的数量*/
-@property(nonatomic,assign)double qty;
+@property(nonatomic,copy)NSString *qty;
 /** 生成的入库单主表ID  我使用的是UUID*/
 @property(nonatomic,copy)NSString *receiveid;
 /** 来源订单表体ID*/

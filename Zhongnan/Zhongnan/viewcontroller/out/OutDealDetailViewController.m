@@ -73,10 +73,17 @@
     matArray = [PuOrderChild findByCriteria:[NSString stringWithFormat:@" WHERE orderid = '%@' and isFinish = 0",self.order.id]];
     unSelArray = [[NSMutableArray alloc] initWithArray:matArray];
     for(PuOrderChild *inMat in unSelArray){
-        inMat.curQty = inMat.sourceQty-inMat.rkQty;//默认当前的入库数量为订单上的sourceQty-已入库数量;如果<0,则,为0
-        if(inMat.curQty<0){
-            inMat.curQty = 0;
+        
+        double cur = [inMat.curQty doubleValue];
+        double source = [inMat.sourceQty doubleValue];
+        double rk = [inMat.rkQty doubleValue];
+        
+        
+        cur = source-rk;//默认当前的入库数量为订单上的sourceQty-已入库数量;如果<0,则,为0
+        if(cur<0){
+            cur = 0;
         }
+        inMat.curQty = [NSString stringWithFormat:@"%f",cur];
     }
     [self.tableView reloadData];
 }
@@ -173,7 +180,7 @@
     UITextField *countText = [alert textFieldAtIndex:0];
     [countText setKeyboardType:UIKeyboardTypeDecimalPad];
     //尾数去0
-    countText.text = [StringUtil changeFloat:[NSString stringWithFormat:@"%f",outMat.curQty]];
+    countText.text = [StringUtil changeFloat:outMat.curQty];
     [alert show];
 }
 
@@ -181,11 +188,28 @@
     UILabel *label = sender;
     NSInteger tag = label.tag-2000;
     PuOrderChild *outMat = unSelArray[tag];
-    if(outMat.curQty-1<=0){
-        outMat.curQty = 0.0;
-    }else{
-        outMat.curQty = outMat.curQty-1;
+    
+    
+    double limit = 0;
+    //获取最终上限
+    if([outMat.limitQty doubleValue]<=0)
+    {
+        limit = [outMat.sourceQty doubleValue];
+    } else {
+        limit = [outMat.limitQty doubleValue];
     }
+    double cur = [outMat.curQty doubleValue];
+    //    double source = [inMat.sourceQty doubleValue];
+//    double ck = [outMat.ckQty doubleValue];
+    
+    
+    
+    if(cur-1<=0){
+        cur = 0.0;
+    }else{
+        cur = cur-1;
+    }
+    outMat.curQty = [NSString stringWithFormat:@"%f",cur];
     [self.tableView reloadData];
 }
 
@@ -193,11 +217,27 @@
     UILabel *label = sender;
     NSInteger tag = label.tag-3000;
     PuOrderChild *outMat = unSelArray[tag];
-    if(outMat.curQty+1>outMat.sourceQty-outMat.ckQty){
-        outMat.curQty = outMat.sourceQty-outMat.ckQty;
-    }else{
-        outMat.curQty = outMat.curQty+1;
+    
+    double limit = 0;
+    //获取最终上限
+    if([outMat.limitQty doubleValue]<=0)
+    {
+        limit = [outMat.sourceQty doubleValue];
+    } else {
+        limit = [outMat.limitQty doubleValue];
     }
+    double cur = [outMat.curQty doubleValue];
+    double source = [outMat.sourceQty doubleValue];
+    double ck = [outMat.ckQty doubleValue];
+    
+    
+    
+    if(cur+1>source-ck){
+        cur = source-ck;
+    }else{
+        cur = cur+1;
+    }
+    outMat.curQty = [NSString stringWithFormat:@"%f",cur];
     [self.tableView reloadData];
 }
 
@@ -209,18 +249,33 @@
         NSString *count = countText.text;
         PuOrderChild *outMat = unSelArray[tag];
         double qty = [count doubleValue];
+        
+        double limit = 0;
+        //获取最终上限
+        if([outMat.limitQty doubleValue]<=0)
+        {
+            limit = [outMat.sourceQty doubleValue];
+        } else {
+            limit = [outMat.limitQty doubleValue];
+        }
+        double cur = [outMat.curQty doubleValue];
+        double source = [outMat.sourceQty doubleValue];
+        double ck = [outMat.ckQty doubleValue];
+        
         if(qty==0){
             //如果用户输入无效的字符串或者0
-            outMat.curQty = outMat.sourceQty-outMat.ckQty;
+            cur = 0;
         }else{
-            if(qty+outMat.ckQty>outMat.sourceQty){
+            if(qty+ck>source){
                 //数量过大
-                [self.view makeToast:@"数量超过上限,请重新输入!" duration:3.0 position:CSToastPositionCenter];
+                cur = source-ck;
+                [self.view makeToast:@"数量超过上限!" duration:3.0 position:CSToastPositionCenter];
             }else{
-                outMat.curQty = qty;
+                cur = qty;
             }
         }
         
+        outMat.curQty = [NSString stringWithFormat:@"%f",cur];
         [self.tableView reloadData];
     }
 }

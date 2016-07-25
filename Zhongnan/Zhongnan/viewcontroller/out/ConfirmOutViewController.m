@@ -70,10 +70,10 @@
         if(!self.selArray){
             self.selArray = [[NSMutableArray alloc] init];
         }
-        double sum = 0;
-        for(PuOrderChild *outMat in self.selArray){
-            sum = sum + outMat.curQty;
-        }
+//        double sum = 0;
+//        for(PuOrderChild *outMat in self.selArray){
+//            
+//        }
         self.checkedNumLabel.text = [NSString stringWithFormat:@"已选品种:%lu",(unsigned long)self.selArray.count];
         //        [self initData];
         
@@ -142,7 +142,7 @@
     UITextField *countText = [alert textFieldAtIndex:0];
     [countText setKeyboardType:UIKeyboardTypeDecimalPad];
     //尾数去0
-    countText.text = [StringUtil changeFloat:[NSString stringWithFormat:@"%f",inMat.curQty]];
+    countText.text = [StringUtil changeFloat:inMat.curQty];
     [alert show];
 }
 
@@ -171,17 +171,32 @@
             NSString *count = countText.text;
             PuOrderChild *inMat = self.selArray[tag];
             double qty = [count doubleValue];
+            double limit = 0;
+            //获取最终上限
+            if([inMat.limitQty doubleValue]<=0)
+            {
+                limit = [inMat.sourceQty doubleValue];
+            } else {
+                limit = [inMat.limitQty doubleValue];
+            }
+            double cur = [inMat.curQty doubleValue];
+            double source = [inMat.sourceQty doubleValue];
+            double ck = [inMat.ckQty doubleValue];
+            
             if(qty==0){
                 //如果用户输入无效的字符串或者0
-                inMat.curQty = inMat.sourceQty-inMat.ckQty;
+                cur = 0;
             }else{
-                if(qty+inMat.ckQty>inMat.sourceQty){
+                if(qty+ck>source){
                     //数量过大
-                    [self.view makeToast:@"数量超过上限,请重新输入!" duration:3.0 position:CSToastPositionCenter];
+                    cur = source-ck;
+                    [self.view makeToast:@"数量超过上限!" duration:3.0 position:CSToastPositionCenter];
                 }else{
-                    inMat.curQty = qty;
+                    cur = qty;
                 }
             }
+            
+            inMat.curQty = [NSString stringWithFormat:@"%f",cur];
             
             [self.tableView reloadData];
         }
@@ -192,24 +207,57 @@
 -(void)delQty:(id)sender{
     UILabel *label = sender;
     NSInteger tag = label.tag-2000;
-    PuOrderChild *inMat = self.selArray[tag];
-    if(inMat.curQty-1<=0){
-        inMat.curQty = 0.0;
-    }else{
-        inMat.curQty = inMat.curQty-1;
+    PuOrderChild *outMat = self.selArray[tag];
+    
+    
+    double limit = 0;
+    //获取最终上限
+    if([outMat.limitQty doubleValue]<=0)
+    {
+        limit = [outMat.sourceQty doubleValue];
+    } else {
+        limit = [outMat.limitQty doubleValue];
     }
+    double cur = [outMat.curQty doubleValue];
+    //    double source = [inMat.sourceQty doubleValue];
+    //    double ck = [outMat.ckQty doubleValue];
+    
+    
+    
+    if(cur-1<=0){
+        cur = 0.0;
+    }else{
+        cur = cur-1;
+    }
+    outMat.curQty = [NSString stringWithFormat:@"%f",cur];
     [self.tableView reloadData];
 }
 
 -(void)addQty:(id)sender {
     UILabel *label = sender;
     NSInteger tag = label.tag-3000;
-    PuOrderChild *inMat = self.selArray[tag];
-    if(inMat.curQty+1>inMat.sourceQty-inMat.ckQty){
-        inMat.curQty = inMat.sourceQty-inMat.ckQty;
-    }else{
-        inMat.curQty = inMat.curQty+1;
+    PuOrderChild *outMat = self.selArray[tag];
+    
+    double limit = 0;
+    //获取最终上限
+    if([outMat.limitQty doubleValue]<=0)
+    {
+        limit = [outMat.sourceQty doubleValue];
+    } else {
+        limit = [outMat.limitQty doubleValue];
     }
+    double cur = [outMat.curQty doubleValue];
+    double source = [outMat.sourceQty doubleValue];
+    double ck = [outMat.ckQty doubleValue];
+    
+    
+    
+    if(cur+1>source-ck){
+        cur = source-ck;
+    }else{
+        cur = cur+1;
+    }
+    outMat.curQty = [NSString stringWithFormat:@"%f",cur];
     [self.tableView reloadData];
 }
 
@@ -231,7 +279,7 @@
     if(self.consumer){
         double sum = 0;
         for(PuOrderChild *outMat in self.selArray){
-            sum = sum + outMat.curQty;
+            sum = sum + [outMat.curQty doubleValue];
         }
         if(self.selArray.count==0 || sum==0){
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
@@ -274,8 +322,8 @@
             self.array = [[NSMutableArray alloc] init];
             for (int i = 0; i<self.selArray.count; i++) {
                 PuOrderChild *outMat = self.selArray[i];
-                outMat.ckQty = outMat.ckQty+outMat.curQty;
-                if(outMat.ckQty==outMat.sourceQty){
+                outMat.ckQty = [NSString stringWithFormat:@"%f",[outMat.ckQty doubleValue]+[outMat.curQty doubleValue]];
+                if([outMat.ckQty doubleValue]==[outMat.sourceQty doubleValue]){
                     outMat.isFinish = 1;
                 }
                 
@@ -340,11 +388,11 @@
                                        @"\n材料名称:",outMat.Name,
                                        @"\n品牌:",outMat.brand,
                                        @"\n规格型号:",outMat.model,
-                                       @"\n数量:",[StringUtil changeFloat:[NSString stringWithFormat:@"%f",outMat.qty]],
+                                       @"\n数量:",[StringUtil changeFloat:outMat.qty],
                                        @"\n备注:",outMat.note];
                 printContant = [printContant stringByAppendingString:matString];
             }
-            printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
+            printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
                             @"\n收货人:________________________",
                             @"\n  "
                             @"\n证明人:________________________"];
@@ -354,7 +402,13 @@
             printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"打印" otherButtonTitles: nil];
             [printAlert show];
             
-            
+            //返回首页
+            NSArray *controllers = self.navigationController.viewControllers;
+            for(UIViewController *viewController in controllers){
+                if([viewController isKindOfClass:[MainViewController class]]){
+                    [self.navigationController popToViewController:viewController animated:YES];
+                }
+            }
         }
     } else {
         [self.view makeToast:@"请选择领料商!" duration:3.0 position:CSToastPositionCenter];
@@ -395,13 +449,6 @@
     }
     [uartLib scanStop];
     [uartLib disconnectPeripheral:connectPeripheral];
-    //返回首页
-    NSArray *controllers = self.navigationController.viewControllers;
-    for(UIViewController *viewController in controllers){
-        if([viewController isKindOfClass:[MainViewController class]]){
-            [self.navigationController popToViewController:viewController animated:YES];
-        }
-    }
     
 }
 

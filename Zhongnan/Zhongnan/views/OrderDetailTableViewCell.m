@@ -36,21 +36,21 @@
     model = inMat.model;//规格型号
     
     if([_orderType isEqualToString:@"rk"]){
-        sourceQty = inMat.sourceQty-inMat.rkQty-inMat.curQty;//未处理入库数量
+        sourceQty = [inMat.sourceQty doubleValue]-[inMat.rkQty doubleValue]-[inMat.curQty doubleValue];//未处理入库数量
         
     }else if([_orderType isEqualToString:@"ck"]){
-        sourceQty = inMat.sourceQty-inMat.ckQty-inMat.curQty;//未处理出库数量
+        sourceQty = [inMat.sourceQty doubleValue]-[inMat.ckQty doubleValue]-[inMat.curQty doubleValue];//未处理出库数量
         
     }else if([_orderType isEqualToString:@"rkck"]){
-        sourceQty = inMat.sourceQty-inMat.ckQty-inMat.curQty;//未处理出库数量
+        sourceQty = [inMat.sourceQty doubleValue]-[inMat.ckQty doubleValue]-[inMat.curQty doubleValue];//未处理出库数量
         
     }else if ([_orderType isEqualToString:@"zrzc"]){
-        sourceQty = inMat.sourceQty-inMat.rkQty-inMat.curQty;//未处理入库数量
+        sourceQty = [inMat.sourceQty doubleValue]-[inMat.rkQty doubleValue]-[inMat.curQty doubleValue];//未处理入库数量
     }
     
     
     
-    qty = inMat.curQty;//当前已处理数量  默认为单据剩余的数量
+    qty = [inMat.curQty doubleValue];//当前已处理数量  默认为单据剩余的数量
     unit = inMat.unit;//单位
     brand = inMat.brand;//品牌
     note = inMat.note;//备注

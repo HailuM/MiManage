@@ -23,13 +23,13 @@
 @property (nonatomic,copy) NSString * receiverOID;//领用商id ????
 @property (nonatomic,copy) NSString *wareentryid;//来源入库单的子表id
 /** 出库单行的数量*/
-@property(nonatomic,assign)double qty;
+@property(nonatomic,copy) NSString *qty;
 
 @property(nonatomic,copy) NSString *Name;//材料名称
 @property(nonatomic,copy) NSString *model;//规格
 @property(nonatomic,copy) NSString *unit;//单位
 @property(nonatomic,copy) NSString *brand;//品牌
 @property(nonatomic,copy) NSString *note;//备注
-@property(nonatomic,assign) double price;//单价
+@property(nonatomic,copy) NSString *price;//单价
 
 @end

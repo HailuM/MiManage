@@ -85,9 +85,9 @@
     matArray = [PuOrderChild findByCriteria:[NSString stringWithFormat:@" WHERE orderid = '%@' and isFinish = 0 ",self.order.id]];
     unSelArray = [[NSMutableArray alloc] initWithArray:matArray];
     for(PuOrderChild *inMat in unSelArray){
-        inMat.curQty = inMat.sourceQty-inMat.rkQty;//默认当前的入库数量为订单上的sourceQty-已入库数量;如果<0,则,为0
-        if(inMat.curQty<0){
-            inMat.curQty = 0;
+        inMat.curQty = [NSString stringWithFormat:@"%f",[inMat.sourceQty doubleValue]-[inMat.rkQty doubleValue]];//默认当前的入库数量为订单上的sourceQty-已入库数量;如果<0,则,为0
+        if([inMat.curQty doubleValue]<0){
+            inMat.curQty = @"0";
         }
     }
     [self.tableView reloadData];
@@ -189,11 +189,26 @@
     UILabel *label = sender;
     NSInteger tag = label.tag-2000;
     PuOrderChild *inMat = unSelArray[tag];
-    if(inMat.curQty-1<=0){
-        inMat.curQty = 0.0;
-    }else{
-        inMat.curQty = inMat.curQty-1;
+    double limit = 0;
+    //获取最终上限
+    if([inMat.limitQty doubleValue]<=0)
+    {
+        limit = [inMat.sourceQty doubleValue];
+    } else {
+        limit = [inMat.limitQty doubleValue];
     }
+    double cur = [inMat.curQty doubleValue];
+    //    double source = [inMat.sourceQty doubleValue];
+    //    double ck = [outMat.ckQty doubleValue];
+    
+    
+    
+    if(cur-1<=0){
+        cur = 0.0;
+    }else{
+        cur = cur-1;
+    }
+    inMat.curQty = [NSString stringWithFormat:@"%f",cur];
     [self.tableView reloadData];
 }
 
@@ -207,11 +222,18 @@
     UILabel *label = sender;
     NSInteger tag = label.tag-3000;
     PuOrderChild *inMat = unSelArray[tag];
-    if(inMat.curQty+1>inMat.limitQty){
-        inMat.curQty = inMat.limitQty;
+    
+    double cur = [inMat.curQty doubleValue];
+    double source = [inMat.sourceQty doubleValue];
+    double rk = [inMat.rkQty doubleValue];
+    double limit = [inMat.limitQty doubleValue];
+    
+    if(cur+1>limit){
+        cur = limit;
     }else{
-        inMat.curQty = inMat.curQty+1;
+        cur = cur+1;
     }
+    inMat.curQty = [NSString stringWithFormat:@"%f",cur];
     [self.tableView reloadData];
 }
 
@@ -221,18 +243,27 @@
         UITextField *countText = [alertView textFieldAtIndex:0];
         NSString *count = countText.text;
         PuOrderChild *inMat = unSelArray[tag];
+        
         double qty = [count doubleValue];
+        
+        
+        double cur = [inMat.curQty doubleValue];
+        double source = [inMat.sourceQty doubleValue];
+        double rk = [inMat.rkQty doubleValue];
+        double limit = [inMat.limitQty doubleValue];
+        
         if(qty==0){
             //如果用户输入无效的字符串或者0
-            inMat.curQty = inMat.sourceQty-inMat.rkQty;
+            cur = source-rk;
         }else{
-            if(qty>inMat.limitQty){
-                //数量过大
-                [self.view makeToast:@"已达上限!" duration:3.0 position:CSToastPositionCenter];
+            if(qty>limit){
+                cur = limit;
+                [self.view makeToast:@"数量超过上限!" duration:3.0 position:CSToastPositionCenter];
             }else{
-                inMat.curQty = qty;
+                cur = qty;
             }
         }
+        inMat.curQty = [NSString stringWithFormat:@"%f",cur];
         [self.tableView reloadData];
     }
 }
