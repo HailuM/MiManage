@@ -26,6 +26,6 @@
 @property (nonatomic,copy) NSString * receiverOID;//来源入库单的主表id
 
 
-//@property(nonatomic,assign) int temp;//0,临时的直入直出单  其他,直入直出单完成了,可以返回主界面
+@property(nonatomic,assign) int temp;//0,临时的直入直出单  其他,直入直出单完成了,可以返回主界面
 
 @end

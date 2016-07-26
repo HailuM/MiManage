@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "UartLib.h"
 #import "StringUtil.h"
+#import "UIView+Toast.h"
 
 @interface PrintViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,UartDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;

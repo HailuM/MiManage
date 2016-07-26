@@ -152,9 +152,24 @@
     }
     
     //TODO
-    //删除入库出库主表
+    //删除自制的入库出库主表
+    if([OutBill isExistInTable]){
+        [OutBill clearTable];
+    }else{
+        [OutBill createTable];
+    }
     
-    //删除入库出库子表
+    
+    //删除自制的入库出库子表
+    if([OutBillChild isExistInTable]){
+        [OutBillChild clearTable];
+    }else{
+        [OutBillChild createTable];
+    }
+    
+    NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
+    [userDefaultes setObject:@"" forKey:@"rkToken"];
+    
     return YES;
 }
 
@@ -216,6 +231,11 @@
     }else{
         [OutBillChild createTable];
     }
+    
+    
+    //出库token置空
+    NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
+    [userDefaultes setObject:@"" forKey:@"ckToken"];
     
     return YES;
 }

@@ -28,4 +28,9 @@
 @property(nonatomic,copy) NSString *brand;//品牌
 @property(nonatomic,copy) NSString *note;//备注
 @property(nonatomic,copy) NSString *price;//单价
+
+
+@property(nonatomic,assign) int temp;//0,临时
+
+
 @end

@@ -178,6 +178,12 @@
             outN = outArray.count;
         }
         
+        
+        //查看来源单据
+        NSArray *sourceArray = [PuOrder findAll];
+        
+        
+        
         NSInteger sum = dirN+inN+outN;
         if(sum>0){
             HUD = [[MBProgressHUD alloc] initWithView:self.view];
@@ -226,7 +232,7 @@
                 [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
             }];
             
-        }else{
+        }else {
             asyncRK = [[UIAlertView alloc] initWithTitle:@"重新下载" message:@"您想重新下载数据吗？若是则会清除已下载数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
             [asyncRK show];
         }
@@ -249,7 +255,7 @@
         NSArray *inArray = [InBillChild findAll];
         //如果存在未上传的入库单,则提示先同步入库
         if(inArray.count>0){
-            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先同步入库!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"存在未上传的入库单,请先同步入库!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
             [alert show];
         }else{
         
@@ -884,8 +890,8 @@
 /**
  *  上传出库单完成
  *
- *  @param ckToken  <#ckToken description#>
- *  @param outCount <#outCount description#>
+ *  @param ckToken
+ *  @param outCount 
  */
 -(void)uploadOutCompleteWithCkToken:(NSString *)ckToken withOutCount:(NSInteger)outCount {
     if([serverUrl isEqualToString:@""] || serverUrl == nil){

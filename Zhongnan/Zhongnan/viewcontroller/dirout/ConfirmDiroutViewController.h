@@ -15,21 +15,32 @@
 #import "ChooseConsumerViewController.h"
 #import "UartLib.h"
 
+@protocol DiroutDelegate <NSObject>
+
+-(void)pass:(NSArray *)array;
+
+@end
+
 @interface ConfirmDiroutViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,PassConsumerDelegate,UartDelegate>
 @property (nonatomic, strong) Consumer *consumer;//领料商
 @property (nonatomic, strong) PuOrder *order;
 @property (nonatomic, strong) NSMutableArray *selArray;//保存已选中材料的数组
-@property (nonatomic, strong) NSMutableArray *unSelArray;//保存未选择的材料的数组
+//@property (nonatomic, strong) NSMutableArray *unSelArray;//保存未选择的材料的数组
 @property (nonatomic, strong) NSMutableArray *array;//直入直出单
+
+@property (nonatomic,strong) NSMutableArray *finishArray;//存放已完成的材料
+
+
 
 @property (strong, nonatomic) IBOutlet UILabel *numberLabel;
 @property (strong, nonatomic) IBOutlet UILabel *supplierLabel;
 @property (strong, nonatomic) IBOutlet UILabel *addrLabel;
-@property (strong, nonatomic) IBOutlet UILabel *contactLabel;
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) IBOutlet UILabel *checkedNumLabel;
 @property (strong, nonatomic) IBOutlet UIButton *confirmBtn;
 @property (weak, nonatomic) IBOutlet UILabel *consumerLabel;
 
+
+@property (nonatomic, assign) id<DiroutDelegate> delegate;
 
 @end

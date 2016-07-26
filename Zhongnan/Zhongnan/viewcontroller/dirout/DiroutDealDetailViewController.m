@@ -59,7 +59,7 @@
  *  @param sender <#sender description#>
  */
 -(void)chooseConsumer:(id)sender{
-    [self performSegueWithIdentifier:@"diroutconfirmtochoose" sender:self];
+    [self performSegueWithIdentifier:@"diroutdetailtochoose" sender:self];
 }
 /**
  *  跳转到确认界面
@@ -129,11 +129,16 @@
     // Pass the selected object to the new view controller.
     if([segue.identifier isEqualToString:@"confirmdirout"]){
         ConfirmDiroutViewController *viewController = segue.destinationViewController;
-        viewController.unSelArray = unSelArray;
+//        viewController.unSelArray = unSelArray;
+        
+        //把所有物料都加入到已经选择的物料
+        
+        
         viewController.selArray = selArray;
+        [viewController.selArray addObjectsFromArray:unSelArray];
         viewController.order = self.order;
         viewController.consumer = self.consumer;
-    }else if([segue.identifier isEqualToString:@"diroutconfirmtochoose"]){
+    }else if([segue.identifier isEqualToString:@"diroutdetailtochoose"]){
         ChooseConsumerViewController *viewController = segue.destinationViewController;
         viewController.flag = 1;
         viewController.orderid = self.order.id;

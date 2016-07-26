@@ -9,6 +9,7 @@
 #import "ConfirmDiroutViewController.h"
 #import "UIView+Toast.h"
 #import "UUIDUtil.h"
+#import "UIBarButtonItem+Extension.h"
 
 
 @interface ConfirmDiroutViewController (){
@@ -24,7 +25,10 @@
     
     
     int timeCount;
-    UIAlertView *bleAlert;//提示未连接上蓝牙
+//    UIAlertView *bleAlert;//提示未连接上蓝牙
+    
+    
+    UIAlertView *finishAlert;//提示单子必须一次性做完
 }
 
 @end
@@ -35,6 +39,9 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.title = @"直入直出确认";
+    
+    
+    self.finishArray = [[NSMutableArray alloc] init];
     
     [self showOrder];
     
@@ -47,13 +54,37 @@
     [uartLib setUartDelegate:self];
     connectAlertView = [[UIAlertView alloc] initWithTitle:@"连接蓝牙打印机" message: @"连接中，请稍后!" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil,nil];
     
-    bleAlert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"无法连接上蓝牙打印机，是否返回主界面？" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确认", nil];
+//    bleAlert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"无法连接上蓝牙打印机" delegate:self cancelButtonTitle:@"确认" otherButtonTitles: nil];
+    
+    
+    finishAlert = [[UIAlertView alloc] initWithTitle:@"确认返回" message:@"已经保存并打印的出库单将失效!是否确认返回?" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确认", nil];
+    
+    self.navigationItem.leftBarButtonItem = [UIBarButtonItem itemWithImageName:@"left" highImageName:@"left" target:self action:@selector(back)];
+    
 }
+
+
+-(void)back {
+    //返回上一页
+    //把所有数据返回
+    if([self isFinish]){
+        NSArray *controllers = self.navigationController.viewControllers;
+        for(UIViewController *viewController in controllers){
+            if([viewController isKindOfClass:[MainViewController class]]){
+                [self.navigationController popToViewController:viewController animated:YES];
+            }
+        }
+    }else{
+        [finishAlert show];
+    }
+    
+}
+
 
 /**
  *  选择领料商
  *
- *  @param sender <#sender description#>
+ *  @param sender
  */
 -(void)chooseConsumer:(id)sender{
     [self performSegueWithIdentifier:@"diroutconfirmtochoose" sender:self];
@@ -90,7 +121,7 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
-    if([segue.identifier isEqualToString:@"diroutdetailtochoose"]){
+    if([segue.identifier isEqualToString:@"diroutconfirmtochoose"]){
         ChooseConsumerViewController *viewController = segue.destinationViewController;
         viewController.flag = 1;
         viewController.orderid = self.order.id;
@@ -182,8 +213,8 @@
     double rk = [inMat.rkQty doubleValue];
     double limit = [inMat.limitQty doubleValue];
     
-    if(cur+1>limit){
-        cur = limit;
+    if(cur+1>limit-rk){
+        cur = limit-rk;
     }else{
         cur = cur+1;
     }
@@ -208,22 +239,66 @@
             NSLog(@"connect Peripheral");
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
         }
-    }else if([alertView isEqual:bleAlert]){
+    }
+//    else if([alertView isEqual:bleAlert]){
+//        if(buttonIndex==0){
+//            //返回首页
+////            NSArray *controllers = self.navigationController.viewControllers;
+////            for(UIViewController *viewController in controllers){
+////                if([viewController isKindOfClass:[MainViewController class]]){
+////                    [self.navigationController popToViewController:viewController animated:YES];
+////                }
+////            }
+//        }else{
+//            timeCount = 0;
+//            [uartLib scanStart];//scan
+//            NSLog(@"connect Peripheral");
+//            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+//        }
+//    }
+    else if([alertView isEqual:finishAlert]){
         if(buttonIndex==1){
-            //返回首页
+            //清除缓存数据
+            
+            self.order.type = @"rk";//重置为待入库单
+            self.order.zcwc = 0;
+            self.order.zrzcwc = 0;
+            self.order.isFinish = 0;
+            [self.order saveOrUpdate];
+            
+            //重置未完成入库材料明细
+            for(PuOrderChild *inMat in self.selArray){
+                inMat.ckQty = @"0";
+                inMat.rkQty = @"0";
+                inMat.curQty = @"0";
+                inMat.isFinish = 0;
+                [inMat saveOrUpdate];
+            }
+            //重置已完成入库材料明细
+            for(PuOrderChild *inMat in self.finishArray){
+                inMat.ckQty = @"0";
+                inMat.rkQty = @"0";
+                inMat.curQty = @"0";
+                inMat.isFinish = 0;
+                [inMat saveOrUpdate];
+            }
+            
+            //删除临时数据
+            //临时主表
+            [DirBill deleteObjectsByCriteria:@" where temp = 0 "];
+            
+            //临时子表
+            [DirBillChild deleteObjectsByCriteria:@" where temp = 0 "];
+            
             NSArray *controllers = self.navigationController.viewControllers;
             for(UIViewController *viewController in controllers){
                 if([viewController isKindOfClass:[MainViewController class]]){
                     [self.navigationController popToViewController:viewController animated:YES];
                 }
             }
-        }else{
-            timeCount = 0;
-            [uartLib scanStart];//scan
-            NSLog(@"connect Peripheral");
-            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
         }
-    }else{
+    }
+    else {
         if(buttonIndex==alertView.firstOtherButtonIndex){
             NSInteger tag = alertView.tag-4000;
             UITextField *countText = [alertView textFieldAtIndex:0];
@@ -256,11 +331,11 @@
 
 
 -(void)delToCheck:(id)sender {
-    UIButton *btn = sender;
-    NSInteger position = btn.tag - 1000;
-    [self.unSelArray addObject:self.selArray[position]];
-    [self.selArray removeObjectAtIndex:position];
-    [self.tableView reloadData];
+//    UIButton *btn = sender;
+//    NSInteger position = btn.tag - 1000;
+//    [self.unSelArray addObject:self.selArray[position]];
+//    [self.selArray removeObjectAtIndex:position];
+//    [self.tableView reloadData];
 }
 
 -(void)pass:(id)value {
@@ -275,8 +350,13 @@
 {
     for (int i = 0; i<self.selArray.count; i++) {
         PuOrderChild *inMat = self.selArray[i];
-        if(inMat.curQty<inMat.sourceQty || inMat.curQty>inMat.limitQty){
-            return NO;
+        double cur = [inMat.curQty doubleValue];
+        double source = [inMat.sourceQty doubleValue];
+        double rk = [inMat.rkQty doubleValue];
+        double limit = [inMat.limitQty doubleValue];
+        
+        if(rk<source||rk>limit){
+            return NO;//未达到收货单的数量,未完成
         }
     }
     return YES;
@@ -301,7 +381,7 @@
                                                 cancelButtonTitle:@"确定"
                                                 otherButtonTitles:nil, nil];
             [alert show];//提示框的显示 必须写 不然没有任何反映
-        }else if(self.unSelArray.count==0){
+        }else{
             
             
             // TODO 判断直入直出有没有完成
@@ -310,46 +390,36 @@
                 
             }
             
-            //保存数据库
+            //保存当前数据到数据库
             // TODO 涉及到出入库的数量判断
             self.array = [[NSMutableArray alloc] init];
             NSDate *now = [NSDate date];
             
-            //直入直出单号
-            int finish = 0;//判断单据是否结束:0,已结束  >0,未结束
+            //直入直出可以多次做
+            //生成直入直出单主表
+            bill = [[DirBill alloc] init];
+            bill.zrzcid = [UUIDUtil getUUID];
+            bill.orderid = self.order.id;
+            bill.number = [StringUtil generateNo:@"SCZRZC"];
+            bill.date = self.order.date;
+            bill.supplier = self.order.supplier;
+            bill.materialDesc = self.order.materialDesc;
+            bill.Addr = self.order.Addr;
+            bill.ProjectName= self.order.ProjectName;
+            bill.Company = self.order.Company;
+            bill.preparertime = [DateTool datetimeToString:now];
+            bill.consumerid = self.consumer.consumerid;
+            bill.consumername = self.consumer.Name;
+            bill.printcount = 0;
+            
+            [bill saveOrUpdate];//保存直入直出单主表
+            
             for (int i = 0; i<self.selArray.count; i++) {
                 PuOrderChild *inMat = self.selArray[i];
-                if([inMat.curQty doubleValue]>=[inMat.sourceQty doubleValue] && [inMat.curQty doubleValue]<=[inMat.limitQty doubleValue]){
-                    finish = finish;
-                }else{
-                    finish ++;
-                }
-            }
-            //订单已结束
-            if(finish==0){
-                //生成直入直出单主表
-                bill = [[DirBill alloc] init];
-                bill.zrzcid = [UUIDUtil getUUID];
-                bill.orderid = self.order.id;
-                bill.number = [StringUtil generateNo:@"SCZRZC"];
-                bill.date = self.order.date;
-                bill.supplier = self.order.supplier;
-                bill.materialDesc = self.order.materialDesc;
-                bill.Addr = self.order.Addr;
-                bill.ProjectName= self.order.ProjectName;
-                bill.Company = self.order.Company;
-                bill.preparertime = [DateTool datetimeToString:now];
-                bill.consumerid = self.consumer.consumerid;
-                bill.consumername = self.consumer.Name;
-                bill.printcount = 0;
-                
-                [bill saveOrUpdate];//保存直入直出单主表
-                
-                for (int i = 0; i<self.selArray.count; i++) {
-                    PuOrderChild *inMat = self.selArray[i];
+                if([inMat.curQty doubleValue]>0){
                     //更新已处理数量
-                    inMat.ckQty = inMat.curQty;//已出库数量
-                    inMat.rkQty = inMat.curQty;//已入库数量
+                    inMat.ckQty = [NSString stringWithFormat:@"%f",[inMat.curQty doubleValue] + [inMat.ckQty doubleValue]];//已出库数量
+                    inMat.rkQty = [NSString stringWithFormat:@"%f",[inMat.curQty doubleValue] + [inMat.rkQty doubleValue]];//已入库数量
                     
                     //生成入库单
                     DirBillChild *billChild = [[DirBillChild alloc] init];
@@ -370,57 +440,108 @@
                     billChild.price = inMat.price;
                     
                     [billChild saveOrUpdate];
+                    
                     [self.array addObject:billChild];
-                    inMat.curQty = 0;
+                    
+                    inMat.curQty = @"0";
                     inMat.isFinish = 1;
                     [inMat saveOrUpdate];
                 }
+            }
+            
+            /**
+             *  设置订单只能直入直出
+             */
+            self.order.type = @"zrzc";
+            if([self isFinish]){
+            self.order.isFinish = 1;
+            }
+            [self.order saveOrUpdate];
+            
+            
+            //还有就是剩下的物料 curQty=0;
+            
+            //开始打印
+            printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
+                          @"\n------------------------------",
+                          (bill.printcount+1),
+                          @"\n出库单号:",bill.number,
+                          @"\n项目:",bill.ProjectName,
+                          @"\n领用商:",bill.consumername,
+                          @"\n地产公司:",bill.Company,
+                          @"\n-----------------------------"];
+            for (int i = 0; i<self.array.count; i++) {
+                DirBillChild *billChild = self.array[i];
+                NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n ",
+                                       @"\n材料名称:",billChild.Name,
+                                       @"\n品牌:",billChild.brand,
+                                       @"\n规格型号:",billChild.model,
+                                       @"\n数量:",[StringUtil changeFloat:billChild.qty],
+                                       @"\n备注:",billChild.note];
+                printContant = [printContant stringByAppendingString:matString];
+            }
+            printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
+                            @"\n收货人:_____________________",
+                            @"\n    ",
+                            @"\n证明人:_____________________"];
+            
+            
+            
+//            重新刷新数据,将已经完成的材料remove
+            
+            NSMutableArray *tempArray = [[NSMutableArray alloc] init];
+            for (int i = 0; i<self.selArray.count; i++) {
+                PuOrderChild *inMat = self.selArray[i];
+                if([inMat.rkQty doubleValue]<[inMat.sourceQty doubleValue] || [inMat.rkQty doubleValue]>[inMat.limitQty doubleValue]){
+                    [tempArray addObject:inMat];
+                }else{
+                    [self.finishArray addObject:inMat];
+                }
+            }
+            
+            self.selArray = [NSMutableArray arrayWithArray:tempArray];
+            [self.tableView reloadData];
+            
+            
+            //准备好的打印字符串
+            //--------------
+            
+            printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"打印" otherButtonTitles: nil];
+            NSArray *subViewArray = printAlert.subviews;
+//            for(int x=0;x<[subViewArray count];x++){
+//                if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
+//                {
+//                    UILabel *label = [subViewArray objectAtIndex:x];
+//                    label.textAlignment = NSTextAlignmentLeft;
+//                }
+//                
+//            }
+            [printAlert show];
+        
+            //判断直入直出是否结束
+            //整个收货通知单`结束
+            if([self isFinish]){
                 
-                /**
-                 *  设置订单只能直入直出
-                 */
+                //保存所有的直入直出单为正式单据,同时将来源单据保存为已完成状态
                 self.order.type = @"zrzc";
                 self.order.isFinish = 1;
+                self.order.zrzcwc = 1;
                 [self.order saveOrUpdate];
                 
-                //开始打印
-                printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
-                              @"\n------------------------------",
-                              (bill.printcount+1),
-                              @"\n出库单号:",bill.number,
-                              @"\n项目:",bill.ProjectName,
-                              @"\n领用商:",bill.consumername,
-                              @"\n地产公司:",bill.Company,
-                              @"\n-----------------------------"];
-                for (int i = 0; i<self.array.count; i++) {
-                    DirBillChild *billChild = self.array[i];
-                    NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n ",
-                                           @"\n材料名称:",billChild.Name,
-                                           @"\n品牌:",billChild.brand,
-                                           @"\n规格型号:",billChild.model,
-                                           @"\n数量:",[StringUtil changeFloat:billChild.qty],
-                                           @"\n备注:",billChild.note];
-                    printContant = [printContant stringByAppendingString:matString];
-                }
-                printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
-                                @"\n收货人:_____________________",
-                                @"\n    ",
-                                @"\n证明人:_____________________"];
                 
-                //准备好的打印字符串
-                //--------------
-                
-                printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"打印" otherButtonTitles: nil];
-                NSArray *subViewArray = printAlert.subviews;
-                for(int x=0;x<[subViewArray count];x++){
-                    if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
-                    {
-                        UILabel *label = [subViewArray objectAtIndex:x];
-                        label.textAlignment = UITextAlignmentLeft;
-                    }
-                    
+                //查找所有临时主表
+                NSArray *dirArray = [DirBill findByCriteria:@" where temp = 0 "];
+                for(DirBill *tempBill in dirArray) {
+                    tempBill.temp = 1;
+                    [tempBill update];
                 }
-                [printAlert show];
+                
+                NSArray *childArray = [DirBillChild findByCriteria:@" where temp = 0 "];
+                for(DirBillChild *tempChild in childArray){
+                    tempChild.temp = 1;
+                    [tempChild saveOrUpdate];
+                }
+                
                 
                 //返回首页
                 NSArray *controllers = self.navigationController.viewControllers;
@@ -430,11 +551,10 @@
                     }
                 }
 
-            }else{
-                [self.view makeToast:@"直入直出必须一次性处理完材料!" duration:3.0 position:CSToastPositionCenter];
             }
-        }else{
-            [self.view makeToast:@"直入直出必须一次性处理完材料!" duration:3.0 position:CSToastPositionCenter];
+//            else{
+//                [self.view makeToast:@"直入直出必须一次性处理完材料!" duration:3.0 position:CSToastPositionCenter];
+//            }
         }
         
     }else{
@@ -443,16 +563,50 @@
     
 }
 
+- (void)willPresentAlertView:(UIAlertView *)alertView{
+    if([alertView isEqual:printAlert]){
+        NSLog(@"%@",printAlert.subviews);
+        for( UIView * view in alertView.subviews )
+        {
+            if( [view isKindOfClass:[UILabel class]] )
+            {
+                UILabel* label = (UILabel*) view;
+                label.textAlignment = NSTextAlignmentLeft;
+            }
+        }  
+    }
+}
+
+
+
 //-------
 -(void)searchPrinter{
     if(connectPeripheral ==nil){
         if(timeCount>10){
             //提示，未连接上蓝牙，是否返回主页面
-            [bleAlert show];
+//            [bleAlert show];
+            
+            [self.view makeToast:@"无法连接上蓝牙"];
+            //停止扫描
+            [uartLib scanStop];
+            if(![self isFinish]){
+                //未完成 提示是否保存数据
+                [finishAlert show];
+            }else{
+                NSArray *controllers = self.navigationController.viewControllers;
+                for(UIViewController *viewController in controllers){
+                    if([viewController isKindOfClass:[MainViewController class]]){
+                        [self.navigationController popToViewController:viewController animated:YES];
+                    }
+                }
+            }
+            
+            
         }else{
             [uartLib scanStart];//scan
-            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
             timeCount = timeCount+3;
+            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+            
         }
     }else{
         [uartLib scanStop];

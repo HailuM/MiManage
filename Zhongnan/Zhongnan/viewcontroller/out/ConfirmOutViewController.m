@@ -26,7 +26,7 @@
     
     
     int timeCount;
-    UIAlertView *bleAlert;//提示未连接上蓝牙
+//    UIAlertView *bleAlert;//提示未连接上蓝牙
 }
 
 @end
@@ -49,7 +49,7 @@
     [uartLib setUartDelegate:self];
     connectAlertView = [[UIAlertView alloc] initWithTitle:@"连接蓝牙打印机" message: @"连接中，请稍后!" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil,nil];
     
-    bleAlert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"无法连接上蓝牙打印机，是否返回主界面？" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确认", nil];
+//    bleAlert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"无法连接上蓝牙打印机，是否返回主界面？" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确认", nil];
     
     
     
@@ -173,22 +173,24 @@
             NSLog(@"connect Peripheral");
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
         }
-    }else if([alertView isEqual:bleAlert]){
-        if(buttonIndex==1){
-            //返回首页
-            NSArray *controllers = self.navigationController.viewControllers;
-            for(UIViewController *viewController in controllers){
-                if([viewController isKindOfClass:[MainViewController class]]){
-                    [self.navigationController popToViewController:viewController animated:YES];
-                }
-            }
-        }else{
-            timeCount = 0;
-            [uartLib scanStart];//scan
-            NSLog(@"connect Peripheral");
-            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
-        }
-    }else{
+    }
+//    else if([alertView isEqual:bleAlert]){
+//        if(buttonIndex==1){
+//            //返回首页
+//            NSArray *controllers = self.navigationController.viewControllers;
+//            for(UIViewController *viewController in controllers){
+//                if([viewController isKindOfClass:[MainViewController class]]){
+//                    [self.navigationController popToViewController:viewController animated:YES];
+//                }
+//            }
+//        }else{
+//            timeCount = 0;
+//            [uartLib scanStart];//scan
+//            NSLog(@"connect Peripheral");
+//            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+//        }
+//    }
+    else{
         if(buttonIndex==alertView.firstOtherButtonIndex){
             NSInteger tag = alertView.tag-4000;
             UITextField *countText = [alertView textFieldAtIndex:0];
@@ -455,11 +457,21 @@
         
         if(timeCount>10){
             //提示，未连接上蓝牙，是否返回主页面
-            [bleAlert show];
+//            [bleAlert show];
+            [self.view makeToast:@"无法连接上蓝牙"];
+            //停止扫描
+            [uartLib scanStop];
+            //返回首页
+            NSArray *controllers = self.navigationController.viewControllers;
+            for(UIViewController *viewController in controllers){
+                if([viewController isKindOfClass:[MainViewController class]]){
+                    [self.navigationController popToViewController:viewController animated:YES];
+                }
+            }
         }else{
             [uartLib scanStart];//scan
-            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
             timeCount = timeCount+3;
+            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
         }
         
     }else{
