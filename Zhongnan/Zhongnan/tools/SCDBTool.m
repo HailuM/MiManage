@@ -154,7 +154,8 @@
     //TODO
     //删除自制的入库出库主表
     if([OutBill isExistInTable]){
-        [OutBill clearTable];
+        NSArray *array = [OutBill findByCriteria:@" where type = 'rkck'"];
+        [OutBill deleteObjects:array];
     }else{
         [OutBill createTable];
     }
@@ -162,7 +163,8 @@
     
     //删除自制的入库出库子表
     if([OutBillChild isExistInTable]){
-        [OutBillChild clearTable];
+        NSArray *array = [OutBillChild findByCriteria:@" where type = 'rkck'"];
+        [OutBillChild deleteObjects:array];
     }else{
         [OutBillChild createTable];
     }
@@ -220,14 +222,16 @@
     
     //删除出库主表
     if([OutBill isExistInTable]){
-        [OutBill clearTable];
+        NSArray *array = [OutBill findByCriteria:@" where type = 'ck'"];
+        [OutBill deleteObjects:array];
     }else{
         [OutBill createTable];
     }
     
     //删除出库子表
     if([OutBillChild isExistInTable]){
-        [OutBillChild clearTable];
+        NSArray *array = [OutBillChild findByCriteria:@" where type = 'ck'"];
+        [OutBillChild deleteObjects:array];
     }else{
         [OutBillChild createTable];
     }

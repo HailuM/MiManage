@@ -22,8 +22,6 @@
     self.xmlTopInfo=[NSString stringWithFormat: @"%@",topMessage];
     self.methodName=[NSString stringWithFormat: @"%@",method];
     self.type=[NSString stringWithFormat: @"%@",typeName];
-    
-    // [self getTestConnet];
     return self;
 }
 

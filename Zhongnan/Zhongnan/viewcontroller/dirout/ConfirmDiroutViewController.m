@@ -234,10 +234,45 @@
                 break;
         }
     }else if(alertView==printAlert){
-        if(buttonIndex==0){
+        if(buttonIndex==1){
             [uartLib scanStart];//scan
             NSLog(@"connect Peripheral");
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+        }else{
+            //判断直入直出是否结束
+            //整个收货通知单`结束
+            if([self isFinish]){
+                
+                //保存所有的直入直出单为正式单据,同时将来源单据保存为已完成状态
+                self.order.type = @"zrzc";
+                self.order.isFinish = 1;
+                self.order.zrzcwc = 1;
+                [self.order saveOrUpdate];
+                
+                
+                //查找所有临时主表
+                NSArray *dirArray = [DirBill findByCriteria:@" where temp = 0 "];
+                for(DirBill *tempBill in dirArray) {
+                    tempBill.temp = 1;
+                    [tempBill update];
+                }
+                
+                NSArray *childArray = [DirBillChild findByCriteria:@" where temp = 0 "];
+                for(DirBillChild *tempChild in childArray){
+                    tempChild.temp = 1;
+                    [tempChild saveOrUpdate];
+                }
+                
+                
+                //返回首页
+                NSArray *controllers = self.navigationController.viewControllers;
+                for(UIViewController *viewController in controllers){
+                    if([viewController isKindOfClass:[MainViewController class]]){
+                        [self.navigationController popToViewController:viewController animated:YES];
+                    }
+                }
+                
+            }
         }
     }
 //    else if([alertView isEqual:bleAlert]){
@@ -507,7 +542,7 @@
             //准备好的打印字符串
             //--------------
             
-            printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"打印" otherButtonTitles: nil];
+            printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"打印", nil];
             NSArray *subViewArray = printAlert.subviews;
 //            for(int x=0;x<[subViewArray count];x++){
 //                if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
@@ -519,40 +554,7 @@
 //            }
             [printAlert show];
         
-            //判断直入直出是否结束
-            //整个收货通知单`结束
-            if([self isFinish]){
-                
-                //保存所有的直入直出单为正式单据,同时将来源单据保存为已完成状态
-                self.order.type = @"zrzc";
-                self.order.isFinish = 1;
-                self.order.zrzcwc = 1;
-                [self.order saveOrUpdate];
-                
-                
-                //查找所有临时主表
-                NSArray *dirArray = [DirBill findByCriteria:@" where temp = 0 "];
-                for(DirBill *tempBill in dirArray) {
-                    tempBill.temp = 1;
-                    [tempBill update];
-                }
-                
-                NSArray *childArray = [DirBillChild findByCriteria:@" where temp = 0 "];
-                for(DirBillChild *tempChild in childArray){
-                    tempChild.temp = 1;
-                    [tempChild saveOrUpdate];
-                }
-                
-                
-                //返回首页
-                NSArray *controllers = self.navigationController.viewControllers;
-                for(UIViewController *viewController in controllers){
-                    if([viewController isKindOfClass:[MainViewController class]]){
-                        [self.navigationController popToViewController:viewController animated:YES];
-                    }
-                }
-
-            }
+            
 //            else{
 //                [self.view makeToast:@"直入直出必须一次性处理完材料!" duration:3.0 position:CSToastPositionCenter];
 //            }
@@ -583,6 +585,8 @@
 //-------
 -(void)searchPrinter{
     if(connectPeripheral ==nil){
+        [self.view makeToast:@"正在连接蓝牙打印机......" duration:3.0 position:CSToastPositionCenter];
+        
         if(timeCount>10){
             //提示，未连接上蓝牙，是否返回主页面
 //            [bleAlert show];

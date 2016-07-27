@@ -32,4 +32,6 @@
 @property(nonatomic,copy) NSString *note;//备注
 @property(nonatomic,copy) NSString *price;//单价
 
+@property (nonatomic,copy) NSString *type;//@"ck"  @"rkck"
+
 @end

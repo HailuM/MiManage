@@ -172,16 +172,16 @@
         //查询直入直出
         NSArray *diroutArray = [DirBillChild findAll];
         //查询出库单
-        NSArray *outArray = [OutBillChild findAll];
+        NSArray *outArray = [OutBillChild findByCriteria:@" where type = 'rkck'"];
         
         //上传直入直出
         dirN = diroutArray.count;
         //上传入库单
         inN = inArray.count;
         //如果没有ckToken,上传出库单
-        if(outToken==nil||outToken.length==0){
+//        if(outToken==nil||outToken.length==0){
             outN = outArray.count;
-        }
+//        }
         
         
         //查看来源单据
@@ -193,42 +193,55 @@
         if(sum>0){
             HUD = [[MBProgressHUD alloc] initWithView:self.view];
             [self.view addSubview:HUD];
-            HUD.mode = MBProgressHUDModeAnnularDeterminate;
+            HUD.mode = MBProgressHUDModeDeterminateHorizontalBar;
             HUD.label.text = @"上传中......";
             
             [HUD showAnimated:YES whileExecutingBlock:^{
-                float f = 0.f;
-                while(f<1.f){
+                float f = 0.0f;
+//                while(f<1.0f){
                     //上传直入直出单
                     for(DirBillChild *dir in diroutArray){
+                        f = f + (float)(1.0f/(sum+1));
+                        [HUD setProgress:f];
                         NSString *json = [SCDBTool stringWithData:dir.mj_keyValues];
                         [self uploadDiroutWithRkToken:inToken withData:json];
-                        f = f + (float)(1.0/sum);
-                        HUD.progress = f;
+                        
+//                        [self performSelector:@selector(myTask) withObject:nil afterDelay:0.001];
+                        
                     }
+                
                     for (InBillChild *inChild in inArray) {
+                        f = f + (float)(1.0f/(sum+1));
+                        [HUD setProgress:f];
                         //生成入库单jsonString
                         NSString *json = [SCDBTool stringWithData:inChild.mj_keyValues];
                         [self uploadInWithRkToken:inToken withData:json];
-                        f = f + (float)(1.0/sum);
-                        HUD.progress = f;
+//                        [self performSelector:@selector(myTask) withObject:nil afterDelay:0.001];
+                        
+                        
                     }
+                
                     //需要上传出库单
                     if(outN>0){
                         for(OutBillChild *outChild in outArray){
+                            f = f + (float)(1.0f/(sum+1));
+                            [HUD setProgress:f];
                             NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
                             [self uploadOutWithCkToken:inToken withData:json withType:@"rkck"];
+//                            [self performSelector:@selector(myTask) withObject:nil afterDelay:0.001];
                             [outChild deleteObject];
-                            f = f + (float)(1.0/sum);
-                            HUD.progress = f;
+                            
                         }
+                        
                     }
-                }
+//                }
                 //上传入库单结束
                 [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
                 NSDate *middle = [NSDate date];
                 NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
-                
+                [self performSelector:@selector(myTask) withObject:nil afterDelay:0.001];
+                f = f + (float)(1.0f/(sum+1));
+                HUD.progress = f;
             } completionBlock:^{
                 [HUD removeFromSuperViewOnHide];
                 HUD = nil;
@@ -260,6 +273,10 @@
     NSLog(@"结束时间:%@",[DateTool datetimeToString:end]);
 }
 
+-(void)myTask {
+    NSLog(@"耗时操作");
+}
+
 //同步出库
 - (IBAction)syncOut:(id)sender {
     //查询当前数据库中的出库单,并上传
@@ -276,12 +293,12 @@
         
             //存在出库Token
             //查询出库单
-            NSArray *outArray = [OutBillChild findAll];
+            NSArray *outArray = [OutBillChild findByCriteria:@" where type = 'ck'"];
             
             if(outArray.count>0){
                 HUD = [[MBProgressHUD alloc] initWithView:self.view];
                 [self.view addSubview:HUD];
-                HUD.mode = MBProgressHUDModeAnnularDeterminate;
+                HUD.mode = MBProgressHUDModeDeterminateHorizontalBar;
                 HUD.label.text = @"上传中......";
                 [HUD showAnimated:YES whileExecutingBlock:^{
                     float f = 0.f;
@@ -310,11 +327,20 @@
             }
         }
     }else{
-        //删除数据库中的出库单及其关联表
-        [SCDBTool clearOutData:outToken];
+        //查询入库单
+        NSArray *inArray = [InBillChild findAll];
+        //如果存在未上传的入库单,则提示先同步入库
+        if(inArray.count>0){
+            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"存在未上传的入库单,请先同步入库!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+            [alert show];
+        }else{
         
-        //下载当前出库订单表头
-        [self getOrderOutTitle];
+            //删除数据库中的出库单及其关联表
+            [SCDBTool clearOutData:outToken];
+            
+            //下载当前出库订单表头
+            [self getOrderOutTitle];
+        }
     }
     
     
@@ -779,6 +805,7 @@
             //直入直出上传成功!
         }
     }
+//    sleep(1);
 }
 
 /**
@@ -819,6 +846,7 @@
         }
         
     }
+//    sleep(1);
 }
 /**
  *  上传入库相关结束
@@ -860,6 +888,7 @@
             [self.view makeToast:@"同步上传入库成功!" duration:3.0 position:CSToastPositionCenter];
         }
     }
+//    sleep(1);
 }
 
 /**
@@ -905,6 +934,8 @@
         }
         //        [self.view makeToast:da.tempStr duration:3.0 position:CSToastPositionCenter];
     }
+    
+//    sleep(1);
 }
 
 /**

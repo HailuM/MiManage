@@ -104,28 +104,14 @@
                 break;
         }
     }else if(alertView==printAlert){
-        if(buttonIndex==0){
+        if(buttonIndex==1){
             [uartLib scanStart];//scan
             NSLog(@"connect Peripheral");
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+        }else{
+            
         }
     }
-//    else if([alertView isEqual:bleAlert]){
-//        if(buttonIndex==1){
-//            //返回首页
-//            NSArray *controllers = self.navigationController.viewControllers;
-//            for(UIViewController *viewController in controllers){
-//                if([viewController isKindOfClass:[MainViewController class]]){
-//                    [self.navigationController popToViewController:viewController animated:YES];
-//                }
-//            }
-//        }else{
-//            timeCount = 0;
-//            [uartLib scanStart];//scan
-//            NSLog(@"connect Peripheral");
-//            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
-//        }
-//    }
 }
 
 #pragma mark - TableView
@@ -214,7 +200,7 @@
     //准备好的打印字符串
     //--------------
     
-    printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"打印" otherButtonTitles: nil];
+    printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"打印", nil];
     NSArray *subViewArray = printAlert.subviews;
     for(int x=0;x<[subViewArray count];x++){
         if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
@@ -230,6 +216,8 @@
 //-------
 -(void)searchPrinter{
     if(connectPeripheral ==nil){
+        [self.view makeToast:@"正在连接蓝牙打印机......" duration:3.0 position:CSToastPositionCenter];
+        
         if(timeCount>10){
             //提示，未连接上蓝牙，是否返回主页面
             [self.view makeToast:@"无连接上蓝牙打印机!"];

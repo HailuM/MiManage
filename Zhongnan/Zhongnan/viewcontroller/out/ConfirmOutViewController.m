@@ -168,10 +168,17 @@
                 break;
         }
     }else if(alertView == printAlert){
-        if(buttonIndex==0){
+        if(buttonIndex==1){
             [uartLib scanStart];//scan
             NSLog(@"connect Peripheral");
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+        }else{
+            NSArray *controllers = self.navigationController.viewControllers;
+            for(UIViewController *viewController in controllers){
+                if([viewController isKindOfClass:[MainViewController class]]){
+                    [self.navigationController popToViewController:viewController animated:YES];
+                }
+            }
         }
     }
 //    else if([alertView isEqual:bleAlert]){
@@ -341,6 +348,7 @@
             outBill.Addr = self.order.Addr;
             outBill.ProjectName= self.order.ProjectName;
             outBill.Company = self.order.Company;
+            outBill.type = self.order.type;
             
             [outBill saveOrUpdate];//保存出库单主表
             
@@ -367,7 +375,7 @@
                 // TODO
 //                outChild.receiveid = outBill.receiveid;//确认来源
                 outChild.receiveid = outMat.sourcecid;
-                
+                outChild.type = self.order.type;
                 outChild.orderid = self.order.sourceid;
                 outChild.receiverOID = self.consumer.receiverOID;
                 outChild.wareentryid = outMat.wareentryid;
@@ -428,7 +436,7 @@
             
             //准备好的打印字符串
             //--------------
-            printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"打印" otherButtonTitles: nil];
+            printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"打印", nil];
             NSArray *subViewArray = printAlert.subviews;
             for(int x=0;x<[subViewArray count];x++){
                 if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
@@ -458,6 +466,7 @@
 -(void)searchPrinter{
     if(connectPeripheral ==nil){
         
+        [self.view makeToast:@"蓝牙搜索中......"];
         if(timeCount>10){
             //提示，未连接上蓝牙，是否返回主页面
 //            [bleAlert show];

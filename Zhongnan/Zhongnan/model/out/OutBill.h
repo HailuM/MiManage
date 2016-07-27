@@ -25,4 +25,6 @@
 @property (nonatomic,copy) NSString *ProjectName;
 @property (nonatomic,copy) NSString *Company;
 
+@property (nonatomic,copy) NSString *type;//@"ck"  @"rkck"
+
 @end
