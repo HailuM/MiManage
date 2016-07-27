@@ -10,6 +10,7 @@
 #import "User.h"
 #import "SCDBTool.h"
 #import "UartLib.h"
+#import "DateTool.h"
 
 @interface MainViewController : UIViewController<UIAlertViewDelegate>{
     

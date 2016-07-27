@@ -109,13 +109,13 @@
     PuOrderChild *inMat = self.selArray[tag];
     
     double cur = [inMat.curQty doubleValue];
-    //    double source = [inMat.sourceQty doubleValue];
-    //    double rk = [inMat.rkQty doubleValue];
+    double source = [inMat.sourceQty doubleValue];
+    double rk = [inMat.rkQty doubleValue];
     //    double limit = [inMat.limitQty doubleValue];
     
     
     if(cur-1<=0){
-        inMat.curQty = @"0";
+        inMat.curQty = [NSString stringWithFormat:@"%f",source-rk];
     }else{
         cur = cur - 1;
         inMat.curQty = [NSString stringWithFormat:@"%f",cur];
@@ -137,7 +137,7 @@
         limit = [inMat.limitQty doubleValue];
     }
     double cur = [inMat.curQty doubleValue];
-    //    double source = [inMat.sourceQty doubleValue];
+    double source = [inMat.sourceQty doubleValue];
     double rk = [inMat.rkQty doubleValue];
     
     if(cur+1>limit-rk){
@@ -159,7 +159,7 @@
         double qty = [count doubleValue];
         
         double cur = [inMat.curQty doubleValue];
-        //        double source = [inMat.sourceQty doubleValue];
+        double source = [inMat.sourceQty doubleValue];
         double rk = [inMat.rkQty doubleValue];
         double limit = [inMat.limitQty doubleValue];
         //获取最终上限
@@ -172,7 +172,7 @@
         
         if(qty<=0){
             //如果用户输入无效的字符串或者0
-            cur = limit-rk;
+            cur = source-rk;
         }else{
             if(qty+rk>limit){
                 //数量过大
@@ -237,7 +237,23 @@
         
         
         [bill saveOrUpdate];//保存入库单
+        //手机根据刚刚做的入库单生成新的出库来源订单主表
+        PuOrder *rkOrder = [[PuOrder alloc] init];
+        rkOrder.id = [UUIDUtil getUUID];//手机生成的入库单id
+        rkOrder.sourceid = self.order.id;
+        rkOrder.number = [StringUtil generateNo:@"SCRK"];
+        rkOrder.supplier = self.order.supplier;
+        rkOrder.materialDesc = self.order.materialDesc;
+        rkOrder.Addr = self.order.Addr;
+        rkOrder.type = @"rkck";
+        rkOrder.zcwc = NO;
+        rkOrder.name = self.order.name;
+        rkOrder.ProjectName = self.order.ProjectName;
+        rkOrder.Company = self.order.Company;
+        rkOrder.date = [DateTool dateWithString:now];
+        rkOrder.isFinish = 0;
         
+        [rkOrder saveOrUpdate];
         
         for (int i = 0; i<self.selArray.count; i++) {
             PuOrderChild *inMat = self.selArray[i];
@@ -263,7 +279,34 @@
                 [InBillChild createTable];
             }
             [billC saveOrUpdate];
+            
+            
+            //child
+            PuOrderChild *rkChild = [[PuOrderChild alloc] init];
+            //rkChild 生成入库单的子表
+//            rkChild.orderentryid = [UUIDUtil getUUID];
+            rkChild.orderentryid = inMat.orderentryid;
+            
+            rkChild.orderid = rkOrder.id;
+            
+            
+            rkChild.sourceid = inMat.orderid;
+            rkChild.sourcecid = bill.receiveid;
+            rkChild.isFinish = 0;
+            rkChild.note = inMat.note;
+            rkChild.brand = inMat.brand;
+            rkChild.model = inMat.model;
+            rkChild.Name = inMat.Name;
+            rkChild.price = inMat.price;
+            rkChild.ckQty = 0;
+            rkChild.sourceQty = inMat.curQty;
+            rkChild.wareentryid = billC.wareentryid;
+            /////如果是手机生成入库单,那么材料明细的wareentryid是手机生成的,带到出库单明细的wareentryid
+            [rkChild saveOrUpdate];
+            
         }
+        
+        
         int finish = 0;//判断单据是否结束:0,未结束  >0,已结束
         if(self.unSelArray.count>0){
             //未结束
@@ -288,40 +331,11 @@
         [self.order saveOrUpdate];
         
         
-        //手机根据刚刚做的入库单生成新的出库来源订单主表
-        PuOrder *rkOrder = [[PuOrder alloc] init];
-        rkOrder.id = [UUIDUtil getUUID];//手机生成的入库单id
-        rkOrder.sourceid = self.order.id;
-        rkOrder.number = [StringUtil generateNo:@"SCRK"];
-        rkOrder.supplier = self.order.supplier;
-        rkOrder.materialDesc = self.order.materialDesc;
-        rkOrder.Addr = self.order.Addr;
-        rkOrder.type = @"rkck";
-        rkOrder.zcwc = NO;
-        rkOrder.name = self.order.name;
-        rkOrder.ProjectName = self.order.ProjectName;
-        rkOrder.Company = self.order.Company;
-        rkOrder.date = [DateTool dateWithString:now];
-        rkOrder.isFinish = 0;
         
-        [rkOrder saveOrUpdate];
-        //手机根据刚刚做的入库单生成新的出库来源订单子表
-        for(PuOrderChild *child in self.selArray){
-            PuOrderChild *rkChild = [[PuOrderChild alloc] init];
-            rkChild.orderentryid = [UUIDUtil getUUID];
-            rkChild.orderid = rkOrder.id;
-            rkChild.sourceid = child.orderid;
-            rkChild.sourcecid = child.orderentryid;
-            rkChild.isFinish = 0;
-            rkChild.note = child.note;
-            rkChild.brand = child.brand;
-            rkChild.model = child.model;
-            rkChild.Name = child.Name;
-            rkChild.price = child.price;
-            rkChild.ckQty = 0;
-            rkChild.sourceQty = child.curQty;
-            [rkChild saveOrUpdate];
-        }
+//        //手机根据刚刚做的入库单生成新的出库来源订单子表
+//        for(PuOrderChild *child in self.selArray){
+//            
+//        }
         
         //返回首页
         NSArray *controllers = self.navigationController.viewControllers;

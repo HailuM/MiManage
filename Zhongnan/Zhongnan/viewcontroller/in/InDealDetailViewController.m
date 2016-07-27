@@ -169,13 +169,13 @@
     PuOrderChild *inMat = unSelArray[tag];
     
     double cur = [inMat.curQty doubleValue];
-//    double source = [inMat.sourceQty doubleValue];
-//    double rk = [inMat.rkQty doubleValue];
-//    double limit = [inMat.limitQty doubleValue];
+    double source = [inMat.sourceQty doubleValue];
+    double rk = [inMat.rkQty doubleValue];
+    double limit = [inMat.limitQty doubleValue];
     
     
     if(cur-1<=0){
-        inMat.curQty = @"0";
+        inMat.curQty = [NSString stringWithFormat:@"%f",source-rk];
     }else{
         cur = cur - 1;
         inMat.curQty = [NSString stringWithFormat:@"%f",cur];
@@ -235,7 +235,7 @@
         
         
         double cur = [inMat.curQty doubleValue];
-//        double source = [inMat.sourceQty doubleValue];
+        double source = [inMat.sourceQty doubleValue];
         double rk = [inMat.rkQty doubleValue];
         double limit = [inMat.limitQty doubleValue];
         //获取最终上限
@@ -248,7 +248,7 @@
         
         if(qty<=0){
             //如果用户输入无效的字符串或者0
-            cur = limit-rk;
+            cur = source-rk;
         }else{
             if(qty+rk>limit){
                 //数量过大

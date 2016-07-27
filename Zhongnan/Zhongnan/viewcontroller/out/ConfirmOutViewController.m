@@ -356,7 +356,7 @@
                 //生成出库单子表
                 OutBillChild *outChild = [[OutBillChild alloc] init];
                 outChild.outgid = outBill.gid;
-                outChild.orderid = outBill.orderid;
+                
                 outChild.preparertime = outBill.preparertime;
                 outChild.deliverNo = outBill.deliverNo;
                 outChild.deliverid = [UUIDUtil getUUID];
@@ -365,7 +365,10 @@
                 outChild.printcount = 0;
                 outChild.qty = outMat.curQty;
                 // TODO
-                outChild.receiveid = outBill.receiveid;
+//                outChild.receiveid = outBill.receiveid;//确认来源
+                outChild.receiveid = outMat.sourcecid;
+                
+                outChild.orderid = self.order.sourceid;
                 outChild.receiverOID = self.consumer.receiverOID;
                 outChild.wareentryid = outMat.wareentryid;
                 outChild.Name = outMat.Name;
@@ -461,6 +464,10 @@
             [self.view makeToast:@"无法连接上蓝牙"];
             //停止扫描
             [uartLib scanStop];
+            //主线程延迟5秒
+            [self performSelector:@selector(delayMethod) withObject:nil afterDelay:5.0f];
+            
+            
             //返回首页
             NSArray *controllers = self.navigationController.viewControllers;
             for(UIViewController *viewController in controllers){
@@ -470,8 +477,9 @@
             }
         }else{
             [uartLib scanStart];//scan
-            timeCount = timeCount+3;
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+            timeCount = timeCount+3;
+
         }
         
     }else{
@@ -482,6 +490,8 @@
     }
     
 }
+- (void)delayMethod { NSLog(@"execute"); }
+
 //-----
 -(void)pirntData{
     NSString *curPrintContent;

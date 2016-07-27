@@ -85,10 +85,10 @@
         
         double cur = [inMat.curQty doubleValue];
         double source = [inMat.sourceQty doubleValue];
-        double rk = [inMat.rkQty doubleValue];
+        double ck = [inMat.ckQty doubleValue];
         
         
-        cur = source-rk;//默认当前的入库数量为订单上的sourceQty-已入库数量;如果<0,则,为0
+        cur = source-ck;//默认当前的入库数量为订单上的sourceQty-已入库数量;如果<0,则,为0
         if(cur<0){
             cur = 0;
         }
@@ -199,22 +199,22 @@
     PuOrderChild *outMat = unSelArray[tag];
     
     
-    double limit = 0;
+//    double limit = 0;
     //获取最终上限
-    if([outMat.limitQty doubleValue]<=0)
-    {
-        limit = [outMat.sourceQty doubleValue];
-    } else {
-        limit = [outMat.limitQty doubleValue];
-    }
+//    if([outMat.limitQty doubleValue]<=0)
+//    {
+//        limit = [outMat.sourceQty doubleValue];
+//    } else {
+//        limit = [outMat.limitQty doubleValue];
+//    }
     double cur = [outMat.curQty doubleValue];
-    //    double source = [inMat.sourceQty doubleValue];
-//    double ck = [outMat.ckQty doubleValue];
-    
+    double source = [outMat.sourceQty doubleValue];
+    double ck = [outMat.ckQty doubleValue];
+
     
     
     if(cur-1<=0){
-        cur = 0.0;
+        cur = source-ck;
     }else{
         cur = cur-1;
     }
@@ -227,22 +227,14 @@
     NSInteger tag = label.tag-3000;
     PuOrderChild *outMat = unSelArray[tag];
     
-    double limit = 0;
-    //获取最终上限
-    if([outMat.limitQty doubleValue]<=0)
-    {
-        limit = [outMat.sourceQty doubleValue];
-    } else {
-        limit = [outMat.limitQty doubleValue];
-    }
+    
     double cur = [outMat.curQty doubleValue];
     double source = [outMat.sourceQty doubleValue];
     double ck = [outMat.ckQty doubleValue];
     
-    
-    
     if(cur+1>source-ck){
         cur = source-ck;
+        [self.view makeToast:@"数量超过上限!" duration:3.0 position:CSToastPositionCenter];
     }else{
         cur = cur+1;
     }
@@ -259,21 +251,13 @@
         PuOrderChild *outMat = unSelArray[tag];
         double qty = [count doubleValue];
         
-        double limit = 0;
-        //获取最终上限
-        if([outMat.limitQty doubleValue]<=0)
-        {
-            limit = [outMat.sourceQty doubleValue];
-        } else {
-            limit = [outMat.limitQty doubleValue];
-        }
         double cur = [outMat.curQty doubleValue];
         double source = [outMat.sourceQty doubleValue];
         double ck = [outMat.ckQty doubleValue];
         
         if(qty==0){
             //如果用户输入无效的字符串或者0
-            cur = 0;
+            cur = source-ck;
         }else{
             if(qty+ck>source){
                 //数量过大

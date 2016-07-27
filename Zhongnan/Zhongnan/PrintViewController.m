@@ -50,6 +50,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    timeCount = 0;
     // Do any additional setup after loading the view.
     
     self.title = @"打印";
@@ -205,8 +206,9 @@
                                    @"\n备注:",billChild.note];
             printContant = [printContant stringByAppendingString:matString];
         }
-        printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
+        printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
                         @"\n收货人:_____________________",
+                        @"\n",
                         @"\n证明人:_____________________"];
     }
     //准备好的打印字符串
@@ -234,6 +236,8 @@
             //返回首页
             [uartLib scanStop];
             //主线程延迟5秒
+            [self performSelector:@selector(delayMethod) withObject:nil afterDelay:5.0f];
+            
             NSArray *controllers = self.navigationController.viewControllers;
             for(UIViewController *viewController in controllers){
                 if([viewController isKindOfClass:[MainViewController class]]){
@@ -253,6 +257,8 @@
     }
     
 }
+- (void)delayMethod { NSLog(@"execute"); }
+
 //-----
 -(void)pirntData{
     NSString *curPrintContent;

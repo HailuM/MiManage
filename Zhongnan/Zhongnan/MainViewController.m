@@ -155,6 +155,11 @@
 
 //同步入库
 - (IBAction)synStorage:(id)sender {
+    
+    NSDate *first = [NSDate date];
+    NSLog(@"开始时间:%@",[DateTool datetimeToString:first]);
+    
+    
     //查询当前数据库中的入库单,并上传
     NSInteger dirN = 0;//直入直出单条数
     NSInteger inN = 0;//入库单条数
@@ -221,15 +226,22 @@
                 }
                 //上传入库单结束
                 [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
-                //删除数据库中的入库单及其关联表
-                [SCDBTool clearInData:inToken];
-                //直接下载入库订单
-                [self getOrderInTitle];
+                NSDate *middle = [NSDate date];
+                NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
+                
             } completionBlock:^{
                 [HUD removeFromSuperViewOnHide];
                 HUD = nil;
                 
                 [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
+                //删除数据库中的入库单及其关联表
+                [SCDBTool clearInData:inToken];
+                NSDate *middle1 = [NSDate date];
+                NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
+                //直接下载入库订单
+                [self getOrderInTitle];
+                NSDate *middle2 = [NSDate date];
+                NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
             }];
             
         }else {
@@ -243,6 +255,9 @@
         //直接下载入库订单
         [self getOrderInTitle];
     }
+    
+    NSDate *end = [NSDate date];
+    NSLog(@"结束时间:%@",[DateTool datetimeToString:end]);
 }
 
 //同步出库
@@ -279,14 +294,15 @@
                     //上传出库单结束
                     [self uploadOutCompleteWithCkToken:outToken withOutCount:outArray.count];
                     //删除数据库中的出库单及其关联表
-                    [SCDBTool clearOutData:outToken];
                     
-                    //下载当前出库订单表头
-                    [self getOrderOutTitle];
                 } completionBlock:^{
                     [HUD removeFromSuperViewOnHide];
                     HUD = nil;
                     [self.view makeToast:[NSString stringWithFormat:@"本次上传出库单明细%ld条",outArray.count] duration:5.0 position:CSToastPositionCenter];
+                    [SCDBTool clearOutData:outToken];
+                    
+                    //下载当前出库订单表头
+                    [self getOrderOutTitle];
                 }];
             }else{
                 asyncCK = [[UIAlertView alloc] initWithTitle:@"重新下载" message:@"您想重新下载数据吗？若是则会清除已下载数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
@@ -401,6 +417,8 @@
             }
         }
         //        [self.view makeToast:da.tempStr duration:3.0 position:CSToastPositionCenter];
+        NSDate *middle = [NSDate date];
+        NSLog(@"下载表头结束时间:%@",[DateTool datetimeToString:middle]);
     }
 }
 
@@ -436,6 +454,8 @@
             }
         }
         //        [self.view makeToast:da.tempStr duration:3.0 position:CSToastPositionCenter];
+        NSDate *middle = [NSDate date];
+        NSLog(@"下载领料商时间:%@",[DateTool datetimeToString:middle]);
     }
 }
 /**

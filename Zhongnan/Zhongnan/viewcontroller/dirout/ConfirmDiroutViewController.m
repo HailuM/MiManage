@@ -180,22 +180,22 @@
     UILabel *label = sender;
     NSInteger tag = label.tag-2000;
     PuOrderChild *inMat = self.selArray[tag];
-    double limit = 0;
-    //获取最终上限
-    if([inMat.limitQty doubleValue]<=0)
-    {
-        limit = [inMat.sourceQty doubleValue];
-    } else {
-        limit = [inMat.limitQty doubleValue];
-    }
+//    double limit = 0;
+//    //获取最终上限
+//    if([inMat.limitQty doubleValue]<=0)
+//    {
+//        limit = [inMat.sourceQty doubleValue];
+//    } else {
+//        limit = [inMat.limitQty doubleValue];
+//    }
     double cur = [inMat.curQty doubleValue];
-    //    double source = [inMat.sourceQty doubleValue];
-    //    double ck = [outMat.ckQty doubleValue];
+    double source = [inMat.sourceQty doubleValue];
+    double rk = [inMat.rkQty doubleValue];
     
     
     
     if(cur-1<=0){
-        cur = 0.0;
+        cur = source-rk;
     }else{
         cur = cur-1;
     }
@@ -493,6 +493,7 @@
             for (int i = 0; i<self.selArray.count; i++) {
                 PuOrderChild *inMat = self.selArray[i];
                 if([inMat.rkQty doubleValue]<[inMat.sourceQty doubleValue] || [inMat.rkQty doubleValue]>[inMat.limitQty doubleValue]){
+                    inMat.curQty = [NSString stringWithFormat:@"%f",[inMat.sourceQty doubleValue]-[inMat.rkQty doubleValue]];
                     [tempArray addObject:inMat];
                 }else{
                     [self.finishArray addObject:inMat];
@@ -586,9 +587,18 @@
             //提示，未连接上蓝牙，是否返回主页面
 //            [bleAlert show];
             
-            [self.view makeToast:@"无法连接上蓝牙"];
+            [self.view makeToast:@"无法连接上蓝牙" duration:3.0 position:CSToastPositionCenter];
+            
+           
+            
             //停止扫描
             [uartLib scanStop];
+            
+            
+             //主线程延迟5秒
+            [self performSelector:@selector(delayMethod) withObject:nil afterDelay:5.0f];
+            
+            
             if(![self isFinish]){
                 //未完成 提示是否保存数据
                 [finishAlert show];
@@ -604,9 +614,8 @@
             
         }else{
             [uartLib scanStart];//scan
-            timeCount = timeCount+3;
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
-            
+            timeCount = timeCount+3;
         }
     }else{
         [uartLib scanStop];
@@ -616,6 +625,10 @@
     }
     
 }
+
+
+- (void)delayMethod { NSLog(@"execute"); }
+
 //-----
 -(void)pirntData{
     NSString *curPrintContent;

@@ -182,7 +182,7 @@
     UITextField *countText = [alert textFieldAtIndex:0];
     [countText setKeyboardType:UIKeyboardTypeDecimalPad];
     //尾数去0
-    countText.text = [StringUtil changeFloat:[NSString stringWithFormat:@"%f",inMat.curQty]];
+    countText.text = [StringUtil changeFloat:[NSString stringWithFormat:@"%f",[inMat.sourceQty doubleValue] - [inMat.rkQty doubleValue]]];
     [alert show];
 }
 /**
@@ -196,20 +196,14 @@
     PuOrderChild *inMat = unSelArray[tag];
     double limit = 0;
     //获取最终上限
-    if([inMat.limitQty doubleValue]<=0)
-    {
-        limit = [inMat.sourceQty doubleValue];
-    } else {
-        limit = [inMat.limitQty doubleValue];
-    }
     double cur = [inMat.curQty doubleValue];
-    //    double source = [inMat.sourceQty doubleValue];
-    //    double ck = [outMat.ckQty doubleValue];
+    double source = [inMat.sourceQty doubleValue];
+    double rk = [inMat.rkQty doubleValue];
     
     
     
     if(cur-1<=0){
-        cur = 0.0;
+        cur = source-rk;
     }else{
         cur = cur-1;
     }
