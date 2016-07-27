@@ -440,13 +440,13 @@
             }
             [printAlert show];
             
-            //返回首页
-            NSArray *controllers = self.navigationController.viewControllers;
-            for(UIViewController *viewController in controllers){
-                if([viewController isKindOfClass:[MainViewController class]]){
-                    [self.navigationController popToViewController:viewController animated:YES];
-                }
-            }
+//            //返回首页
+//            NSArray *controllers = self.navigationController.viewControllers;
+//            for(UIViewController *viewController in controllers){
+//                if([viewController isKindOfClass:[MainViewController class]]){
+//                    [self.navigationController popToViewController:viewController animated:YES];
+//                }
+//            }
         }
     } else {
         [self.view makeToast:@"请选择领料商!" duration:3.0 position:CSToastPositionCenter];
