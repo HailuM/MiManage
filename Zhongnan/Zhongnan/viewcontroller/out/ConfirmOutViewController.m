@@ -316,7 +316,7 @@
         }
         if(self.selArray.count==0 || sum==0){
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                          message:@"尚未选择材料入库,请执行入库后再提交!"
+                                                          message:@"请先选择物料信息!"
                                                          delegate:self
                                                 cancelButtonTitle:@"确定"
                                                 otherButtonTitles:nil, nil];
@@ -472,7 +472,14 @@
 //            [bleAlert show];
             [self.view makeToast:@"无法连接上蓝牙"];
             //停止扫描
-            [uartLib scanStop];
+            @try{
+                [uartLib scanStop];
+                [uartLib disconnectPeripheral:connectPeripheral];
+            } @catch (NSException *exception) {
+                NSLog(@"蓝牙停止扫描,出现%@",exception);
+            } @finally {
+                
+            }
             //主线程延迟5秒
             [self performSelector:@selector(delayMethod) withObject:nil afterDelay:5.0f];
             
@@ -517,6 +524,13 @@
         for(OutBillChild *childPrint in self.array){
             childPrint.printcount ++;
             [childPrint saveOrUpdate];
+        }
+        //返回首页
+        NSArray *controllers = self.navigationController.viewControllers;
+        for(UIViewController *viewController in controllers){
+            if([viewController isKindOfClass:[MainViewController class]]){
+                [self.navigationController popToViewController:viewController animated:YES];
+            }
         }
     }
     [uartLib scanStop];

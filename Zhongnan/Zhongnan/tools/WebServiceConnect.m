@@ -46,7 +46,7 @@
     [theRequest setHTTPBody: [soapMessage dataUsingEncoding:NSUTF8StringEncoding]];
     
     //同步接受
-    NSData  * responseData = [NSURLConnection sendSynchronousRequest:theRequest returningResponse:nil error:nil];
+    NSData  *responseData = [NSURLConnection sendSynchronousRequest:theRequest returningResponse:nil error:nil];
     NSMutableString *result = [[NSMutableString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
     
 //    NSLog(@"dd%@",result);

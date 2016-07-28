@@ -96,8 +96,16 @@
         switch (buttonIndex) {
             case 0:
                 NSLog(@"Cancel Button Pressed");
-                [uartLib scanStop];
-                [uartLib disconnectPeripheral:connectPeripheral];
+                
+                @try{
+                    [uartLib scanStop];
+                    [uartLib disconnectPeripheral:connectPeripheral];
+                } @catch (NSException *exception) {
+                    NSLog(@"蓝牙停止扫描,出现%@",exception);
+                } @finally {
+                    
+                }
+                
                 break;
                 
             default:
@@ -222,7 +230,14 @@
             //提示，未连接上蓝牙，是否返回主页面
             [self.view makeToast:@"无连接上蓝牙打印机!"];
             //返回首页
-            [uartLib scanStop];
+            @try{
+                [uartLib scanStop];
+                [uartLib disconnectPeripheral:connectPeripheral];
+            } @catch (NSException *exception) {
+                NSLog(@"蓝牙停止扫描,出现%@",exception);
+            } @finally {
+                
+            }
             //主线程延迟5秒
             [self performSelector:@selector(delayMethod) withObject:nil afterDelay:5.0f];
             
@@ -273,6 +288,13 @@
             for(DirBillChild *childPrint in outChildArray){
                 childPrint.printcount ++;
                 [childPrint saveOrUpdate];
+            }
+        }
+        
+        NSArray *controllers = self.navigationController.viewControllers;
+        for(UIViewController *viewController in controllers){
+            if([viewController isKindOfClass:[MainViewController class]]){
+                [self.navigationController popToViewController:viewController animated:YES];
             }
         }
     }

@@ -69,7 +69,7 @@
 -(void)confirm:(id)sender {
     if(selArray.count==0){
         UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                      message:@"尚未选择材料入库,请执行入库后再提交!"
+                                                      message:@"请先选择物料信息!"
                                                      delegate:self
                                             cancelButtonTitle:@"确定"
                                             otherButtonTitles:nil, nil];
