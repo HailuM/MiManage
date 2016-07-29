@@ -23,6 +23,12 @@
     MBProgressHUD *HUD;
     UIAlertView *asyncRK;//同步入库,如果本地没有上传的单据,确认用户是否删除已下载的入库订单
     UIAlertView *asyncCK;//同步出库,如果本地没有上传的单据,确认用户是否删除已下载的出库订单
+    
+    
+    
+    int hasIn;//已上传的入库明细数量
+    int hasDir;//已上传的直入直出明细数量
+    int hasOut;//已上传的出库明细数量
 }
 
 @end
@@ -173,6 +179,10 @@
         NSInteger inN = 0;//入库单条数
         NSInteger outN = 0;//出库单条数
         
+        hasIn = 0;
+        hasDir = 0;
+        hasOut = 0;
+        
         if(inToken && inToken.length>0){
             //存在入库Token
             //查询入库单
@@ -237,32 +247,43 @@
                                 NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
                                 [self uploadOutWithCkToken:inToken withData:json withType:@"rkck"];
     //                            [self performSelector:@selector(myTask) withObject:nil afterDelay:0.001];
-                                [outChild deleteObject];
+//                                [outChild deleteObject];
                                 
                             }
                             
                         }
     //                }
                     //上传入库单结束
-                    [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
-                    NSDate *middle = [NSDate date];
-                    NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
-                    [self performSelector:@selector(myTask) withObject:nil afterDelay:0.001];
-                    f = f + (float)(1.0f/(sum+1));
-                    HUD.progress = f;
+                    if(hasIn==inN && hasOut == outN && hasDir == dirN){
+                    
+                        [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
+                        NSDate *middle = [NSDate date];
+                        NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
+                        [self performSelector:@selector(myTask) withObject:nil afterDelay:0.001];
+                        f = f + (float)(1.0f/(sum+1));
+                        HUD.progress = f;
+                        
+                        [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
+                        //删除数据库中的入库单及其关联表
+                        [SCDBTool clearInData:inToken];
+                        NSDate *middle1 = [NSDate date];
+                        NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
+                        //直接下载入库订单
+                        [self getOrderInTitle];
+                        NSDate *middle2 = [NSDate date];
+                        NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
+                    }else{
+                        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                                      message:@"上传中断!"
+                                                                     delegate:self
+                                                            cancelButtonTitle:@"确定"
+                                                            otherButtonTitles:nil, nil];
+                        [alert show];
+                    }
+                    
                 } completionBlock:^{
                     [HUD removeFromSuperViewOnHide];
                     HUD = nil;
-                    
-                    [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
-                    //删除数据库中的入库单及其关联表
-                    [SCDBTool clearInData:inToken];
-                    NSDate *middle1 = [NSDate date];
-                    NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
-                    //直接下载入库订单
-                    [self getOrderInTitle];
-                    NSDate *middle2 = [NSDate date];
-                    NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
                 }];
                 
             }else {
@@ -297,6 +318,18 @@
                                             otherButtonTitles:nil, nil];
         [alert show];//提示框的显示 必须写 不然没有任何反映
     }else{
+        
+        
+        
+        hasOut = 0;
+        
+        
+        
+        
+        
+        
+        
+        
         //查询当前数据库中的出库单,并上传
         if(outToken && outToken.length>0){
             
@@ -326,18 +359,29 @@
                             f = f + (float)(1.0/outArray.count);
                             HUD.progress = f;
                         }
+                        
+                        
+                        if(hasOut==outArray.count){
                         //上传出库单结束
                         [self uploadOutCompleteWithCkToken:outToken withOutCount:outArray.count];
+                        [self.view makeToast:[NSString stringWithFormat:@"本次上传出库单明细%ld条",outArray.count] duration:5.0 position:CSToastPositionCenter];
                         //删除数据库中的出库单及其关联表
+                            [SCDBTool clearOutData:outToken];
+                            //下载当前出库订单表头
+                            [self getOrderOutTitle];
+                        }else{
+                            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                                          message:@"上传中断!"
+                                                                         delegate:self
+                                                                cancelButtonTitle:@"确定"
+                                                                otherButtonTitles:nil, nil];
+                            [alert show];
+                        }
+                        
                         
                     } completionBlock:^{
                         [HUD removeFromSuperViewOnHide];
                         HUD = nil;
-                        [self.view makeToast:[NSString stringWithFormat:@"本次上传出库单明细%ld条",outArray.count] duration:5.0 position:CSToastPositionCenter];
-                        [SCDBTool clearOutData:outToken];
-                        
-                        //下载当前出库订单表头
-                        [self getOrderOutTitle];
                     }];
                 }else{
                     asyncCK = [[UIAlertView alloc] initWithTitle:@"重新下载" message:@"您想重新下载数据吗？若是则会清除已下载数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
@@ -821,6 +865,7 @@
             
         }else{
             //直入直出上传成功!
+            hasDir ++;
         }
     }
 //    sleep(1);
@@ -861,6 +906,7 @@
             
         }else{
             //入库上传成功!
+            hasIn ++;
         }
         
     }
@@ -948,6 +994,9 @@
             
         }else{
             //出库上传成功!
+            
+            
+            hasOut ++;
 //            [self.view makeToast:@"上传成功!" duration:3.0 position:CSToastPositionCenter];
         }
         //        [self.view makeToast:da.tempStr duration:3.0 position:CSToastPositionCenter];
