@@ -354,10 +354,11 @@
                     [HUD showAnimated:YES whileExecutingBlock:^{
                         float f = 0.f;
                         for (OutBillChild *outChild in outArray) {
-                            NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
-                            [self uploadOutWithCkToken:outToken withData:json withType:@"ck"];
                             f = f + (float)(1.0/outArray.count);
                             HUD.progress = f;
+                            NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
+                            [self uploadOutWithCkToken:outToken withData:json withType:@"ck"];
+                            
                         }
                         
                         
