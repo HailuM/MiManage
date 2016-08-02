@@ -317,7 +317,7 @@
                     NSDate *middle1 = [NSDate date];
                     NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
                     //直接下载入库订单
-                    [self getOrderInTitle];
+                    [self performSelector:@selector(getOrderInTitle) withObject:nil afterDelay:3.0];
                     NSDate *middle2 = [NSDate date];
                     NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
                 }else{
@@ -421,7 +421,7 @@
                             //删除数据库中的出库单及其关联表
                             [SCDBTool clearOutData:outToken];
                             //下载当前出库订单表头
-                            [self getOrderOutTitle];
+                            [self performSelector:@selector(getOrderOutTitle) withObject:nil afterDelay:3.0];
                         }else{
                             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
                                                                           message:@"上传中断!"
@@ -484,12 +484,7 @@
         if([[da.tempStr substringToIndex:5] isEqualToString:@"false"]){
             //无数据
             NSArray<NSString *> *stringArray = [da.tempStr componentsSeparatedByString:@":"];
-            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                          message:stringArray[1]
-                                                         delegate:self
-                                                cancelButtonTitle:@"确定"
-                                                otherButtonTitles:nil, nil];
-            [alert show];//提示框的显示 必须写 不然没有任何反映
+            [self.view makeToast:stringArray[1] duration:3.0 position:CSToastPositionCenter];
 
         }else{
             //解析JSON字符串数据
