@@ -80,7 +80,6 @@
 		C83E25851D3B8B1000128C7C /* InBill.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25841D3B8B1000128C7C /* InBill.m */; };
 		C83E25881D3B8DE200128C7C /* InBillSer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25871D3B8DE200128C7C /* InBillSer.m */; };
 		C83E258B1D3B8E0800128C7C /* InBillChild.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E258A1D3B8E0800128C7C /* InBillChild.m */; };
-		C83E258F1D3BB6CC00128C7C /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E258D1D3BB6CC00128C7C /* MBProgressHUD.m */; };
 		C83E25921D3BBE7F00128C7C /* DirBill.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25911D3BBE7F00128C7C /* DirBill.m */; };
 		C83E25951D3BBE9400128C7C /* DirBillSer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25941D3BBE9400128C7C /* DirBillSer.m */; };
 		C83E25981D3BBEAB00128C7C /* DirBillChild.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25971D3BBEAB00128C7C /* DirBillChild.m */; };
@@ -88,6 +87,12 @@
 		C83E25A11D3BBF0600128C7C /* OutBillSer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25A01D3BBF0600128C7C /* OutBillSer.m */; };
 		C83E25A41D3BBF1B00128C7C /* OutBillChild.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25A31D3BBF1B00128C7C /* OutBillChild.m */; };
 		C83E25A71D3E09C600128C7C /* PrintViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25A61D3E09C600128C7C /* PrintViewController.m */; };
+		C8B07EC31D50421C0002FE2C /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8B07EC21D50421C0002FE2C /* QuartzCore.framework */; };
+		C8B07ECF1D50471F0002FE2C /* SVIndefiniteAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B07EC61D50471F0002FE2C /* SVIndefiniteAnimatedView.m */; };
+		C8B07ED01D50471F0002FE2C /* SVProgressAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B07EC81D50471F0002FE2C /* SVProgressAnimatedView.m */; };
+		C8B07ED21D50471F0002FE2C /* SVProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B07ECC1D50471F0002FE2C /* SVProgressHUD.m */; };
+		C8B07ED31D50471F0002FE2C /* SVRadialGradientLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B07ECE1D50471F0002FE2C /* SVRadialGradientLayer.m */; };
+		C8B07ED41D5047940002FE2C /* SVProgressHUD.bundle in Resources */ = {isa = PBXBuildFile; fileRef = C8B07ECA1D50471F0002FE2C /* SVProgressHUD.bundle */; };
 		C8C378D01D26DA12008D184B /* MJExtensionConst.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378BD1D26DA12008D184B /* MJExtensionConst.m */; };
 		C8C378D11D26DA12008D184B /* MJFoundation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378BF1D26DA12008D184B /* MJFoundation.m */; };
 		C8C378D21D26DA12008D184B /* MJProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C378C11D26DA12008D184B /* MJProperty.m */; };
@@ -223,8 +228,6 @@
 		C83E25871D3B8DE200128C7C /* InBillSer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InBillSer.m; path = model/in/InBillSer.m; sourceTree = "<group>"; };
 		C83E25891D3B8E0800128C7C /* InBillChild.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InBillChild.h; path = model/in/InBillChild.h; sourceTree = "<group>"; };
 		C83E258A1D3B8E0800128C7C /* InBillChild.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InBillChild.m; path = model/in/InBillChild.m; sourceTree = "<group>"; };
-		C83E258D1D3BB6CC00128C7C /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBProgressHUD.m; path = hud/MBProgressHUD.m; sourceTree = "<group>"; };
-		C83E258E1D3BB6CC00128C7C /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBProgressHUD.h; path = hud/MBProgressHUD.h; sourceTree = "<group>"; };
 		C83E25901D3BBE7F00128C7C /* DirBill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DirBill.h; path = model/dir/DirBill.h; sourceTree = "<group>"; };
 		C83E25911D3BBE7F00128C7C /* DirBill.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DirBill.m; path = model/dir/DirBill.m; sourceTree = "<group>"; };
 		C83E25931D3BBE9400128C7C /* DirBillSer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DirBillSer.h; path = model/dir/DirBillSer.h; sourceTree = "<group>"; };
@@ -239,6 +242,17 @@
 		C83E25A31D3BBF1B00128C7C /* OutBillChild.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OutBillChild.m; path = model/out/OutBillChild.m; sourceTree = "<group>"; };
 		C83E25A51D3E09C600128C7C /* PrintViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrintViewController.h; sourceTree = "<group>"; };
 		C83E25A61D3E09C600128C7C /* PrintViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrintViewController.m; sourceTree = "<group>"; };
+		C8B07EC21D50421C0002FE2C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		C8B07EC51D50471F0002FE2C /* SVIndefiniteAnimatedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVIndefiniteAnimatedView.h; sourceTree = "<group>"; };
+		C8B07EC61D50471F0002FE2C /* SVIndefiniteAnimatedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVIndefiniteAnimatedView.m; sourceTree = "<group>"; };
+		C8B07EC71D50471F0002FE2C /* SVProgressAnimatedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVProgressAnimatedView.h; sourceTree = "<group>"; };
+		C8B07EC81D50471F0002FE2C /* SVProgressAnimatedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVProgressAnimatedView.m; sourceTree = "<group>"; };
+		C8B07EC91D50471F0002FE2C /* SVProgressHUD-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SVProgressHUD-Prefix.pch"; sourceTree = "<group>"; };
+		C8B07ECA1D50471F0002FE2C /* SVProgressHUD.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = SVProgressHUD.bundle; sourceTree = "<group>"; };
+		C8B07ECB1D50471F0002FE2C /* SVProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVProgressHUD.h; sourceTree = "<group>"; };
+		C8B07ECC1D50471F0002FE2C /* SVProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVProgressHUD.m; sourceTree = "<group>"; };
+		C8B07ECD1D50471F0002FE2C /* SVRadialGradientLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVRadialGradientLayer.h; sourceTree = "<group>"; };
+		C8B07ECE1D50471F0002FE2C /* SVRadialGradientLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVRadialGradientLayer.m; sourceTree = "<group>"; };
 		C8C378BB1D26DA12008D184B /* MJExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MJExtension.h; path = mjextension/MJExtension.h; sourceTree = "<group>"; };
 		C8C378BC1D26DA12008D184B /* MJExtensionConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MJExtensionConst.h; path = mjextension/MJExtensionConst.h; sourceTree = "<group>"; };
 		C8C378BD1D26DA12008D184B /* MJExtensionConst.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MJExtensionConst.m; path = mjextension/MJExtensionConst.m; sourceTree = "<group>"; };
@@ -301,6 +315,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8B07EC31D50421C0002FE2C /* QuartzCore.framework in Frameworks */,
 				C8C378EE1D26DE5B008D184B /* libsqlite3.tbd in Frameworks */,
 				A52CB3CB1D22571500402E3F /* libUartLib.a in Frameworks */,
 			);
@@ -312,6 +327,7 @@
 		A52CB34D1D22416500402E3F = {
 			isa = PBXGroup;
 			children = (
+				C8B07EC21D50421C0002FE2C /* QuartzCore.framework */,
 				C8C378ED1D26DE5B008D184B /* libsqlite3.tbd */,
 				A52CB3581D22416500402E3F /* Zhongnan */,
 				A52CB3571D22416500402E3F /* Products */,
@@ -329,7 +345,7 @@
 		A52CB3581D22416500402E3F /* Zhongnan */ = {
 			isa = PBXGroup;
 			children = (
-				C83E258C1D3BB68F00128C7C /* hud */,
+				C8B07EC41D50471F0002FE2C /* SVProgressHUD */,
 				C8C378BA1D26D9FF008D184B /* mjextension */,
 				C8C378B91D26D8A8008D184B /* toast */,
 				C8C378B81D26D89F008D184B /* fmdb */,
@@ -552,13 +568,21 @@
 			name = dirout;
 			sourceTree = "<group>";
 		};
-		C83E258C1D3BB68F00128C7C /* hud */ = {
+		C8B07EC41D50471F0002FE2C /* SVProgressHUD */ = {
 			isa = PBXGroup;
 			children = (
-				C83E258D1D3BB6CC00128C7C /* MBProgressHUD.m */,
-				C83E258E1D3BB6CC00128C7C /* MBProgressHUD.h */,
+				C8B07EC51D50471F0002FE2C /* SVIndefiniteAnimatedView.h */,
+				C8B07EC61D50471F0002FE2C /* SVIndefiniteAnimatedView.m */,
+				C8B07EC71D50471F0002FE2C /* SVProgressAnimatedView.h */,
+				C8B07EC81D50471F0002FE2C /* SVProgressAnimatedView.m */,
+				C8B07EC91D50471F0002FE2C /* SVProgressHUD-Prefix.pch */,
+				C8B07ECA1D50471F0002FE2C /* SVProgressHUD.bundle */,
+				C8B07ECB1D50471F0002FE2C /* SVProgressHUD.h */,
+				C8B07ECC1D50471F0002FE2C /* SVProgressHUD.m */,
+				C8B07ECD1D50471F0002FE2C /* SVRadialGradientLayer.h */,
+				C8B07ECE1D50471F0002FE2C /* SVRadialGradientLayer.m */,
 			);
-			name = hud;
+			path = SVProgressHUD;
 			sourceTree = "<group>";
 		};
 		C8C378B81D26D89F008D184B /* fmdb */ = {
@@ -725,6 +749,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8B07ED41D5047940002FE2C /* SVProgressHUD.bundle in Resources */,
 				A52CB3B81D22437D00402E3F /* zx.png in Resources */,
 				A52CB39B1D22437D00402E3F /* 87.png in Resources */,
 				A52CB39C1D22437D00402E3F /* 120.png in Resources */,
@@ -784,7 +809,6 @@
 				C8C378D81D26DA12008D184B /* NSObject+MJProperty.m in Sources */,
 				C8C378F11D26E540008D184B /* OutDealViewController.m in Sources */,
 				C83E258B1D3B8E0800128C7C /* InBillChild.m in Sources */,
-				C83E258F1D3BB6CC00128C7C /* MBProgressHUD.m in Sources */,
 				C83E257B1D3B81C500128C7C /* PuOrderChild.m in Sources */,
 				C8C378EA1D26DA2F008D184B /* FMDatabasePool.m in Sources */,
 				A52CB3DA1D227E8000402E3F /* MainViewController.m in Sources */,
@@ -794,6 +818,7 @@
 				C8C378D91D26DA12008D184B /* NSString+MJExtension.m in Sources */,
 				A52CB3D71D227AD600402E3F /* User.m in Sources */,
 				C8C378D51D26DA12008D184B /* NSObject+MJClass.m in Sources */,
+				C8B07ED21D50471F0002FE2C /* SVProgressHUD.m in Sources */,
 				A52CB3D31D225D1200402E3F /* LoginInterface.m in Sources */,
 				C83E257F1D3B87A200128C7C /* Consumer.m in Sources */,
 				C83E25781D3B81A000128C7C /* PuOrderSer.m in Sources */,
@@ -812,11 +837,13 @@
 				C8C378D71D26DA12008D184B /* NSObject+MJKeyValue.m in Sources */,
 				C8FD75B01D2412CE00E52D7A /* InDealViewController.m in Sources */,
 				C8C378D61D26DA12008D184B /* NSObject+MJCoding.m in Sources */,
+				C8B07ED01D50471F0002FE2C /* SVProgressAnimatedView.m in Sources */,
 				C83E25981D3BBEAB00128C7C /* DirBillChild.m in Sources */,
 				A58FC3621D26353E00CA3A81 /* OrderDetailTableViewCell.m in Sources */,
 				A52CB3C61D224A7700402E3F /* UIColor+Hex.m in Sources */,
 				A52CB35E1D22416500402E3F /* AppDelegate.m in Sources */,
 				C8C378EC1D26DA2F008D184B /* FMDatabase.m in Sources */,
+				C8B07ECF1D50471F0002FE2C /* SVIndefiniteAnimatedView.m in Sources */,
 				C83E25921D3BBE7F00128C7C /* DirBill.m in Sources */,
 				C8C378FD1D26EC63008D184B /* DiroutDealDetailViewController.m in Sources */,
 				C83E25A11D3BBF0600128C7C /* OutBillSer.m in Sources */,
@@ -837,6 +864,7 @@
 				A565621E1D250815003D6E2B /* OrderTableViewCell.m in Sources */,
 				C83E25A41D3BBF1B00128C7C /* OutBillChild.m in Sources */,
 				C8C379001D26EC7A008D184B /* ConfirmDiroutViewController.m in Sources */,
+				C8B07ED31D50471F0002FE2C /* SVRadialGradientLayer.m in Sources */,
 				C83E25A71D3E09C600128C7C /* PrintViewController.m in Sources */,
 				C8C378D01D26DA12008D184B /* MJExtensionConst.m in Sources */,
 				C8FD75A91D22C65E00E52D7A /* ServerConfigViewController.m in Sources */,

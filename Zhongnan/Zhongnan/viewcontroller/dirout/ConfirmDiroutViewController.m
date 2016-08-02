@@ -536,6 +536,8 @@
             }
             
             self.selArray = [NSMutableArray arrayWithArray:tempArray];
+            [self.selArray addObjectsFromArray:self.unSelArray];
+            [self.unSelArray removeAllObjects];
             [self.tableView reloadData];
             
             
@@ -605,21 +607,6 @@
             
              //主线程延迟5秒
             [self performSelector:@selector(delayMethod) withObject:nil afterDelay:5.0f];
-            
-            
-            if(![self isFinish]){
-                //未完成 提示是否保存数据
-                [finishAlert show];
-            }else{
-                NSArray *controllers = self.navigationController.viewControllers;
-                for(UIViewController *viewController in controllers){
-                    if([viewController isKindOfClass:[MainViewController class]]){
-                        [self.navigationController popToViewController:viewController animated:YES];
-                    }
-                }
-            }
-            
-            
         }else{
             [uartLib scanStart];//scan
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
@@ -635,7 +622,20 @@
 }
 
 
-- (void)delayMethod { NSLog(@"execute"); }
+- (void)delayMethod {
+    NSLog(@"execute");
+    if(![self isFinish]){
+        //未完成 提示是否保存数据
+        [finishAlert show];
+    }else{
+        NSArray *controllers = self.navigationController.viewControllers;
+        for(UIViewController *viewController in controllers){
+            if([viewController isKindOfClass:[MainViewController class]]){
+                [self.navigationController popToViewController:viewController animated:YES];
+            }
+        }
+    }
+}
 
 //-----
 -(void)pirntData{

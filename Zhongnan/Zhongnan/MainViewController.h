@@ -11,6 +11,7 @@
 #import "SCDBTool.h"
 #import "UartLib.h"
 #import "DateTool.h"
+#import "SVProgressHUD/SVProgressHUD.h"
 
 @interface MainViewController : UIViewController<UIAlertViewDelegate>{
     

@@ -236,17 +236,17 @@
             } @catch (NSException *exception) {
                 NSLog(@"蓝牙停止扫描,出现%@",exception);
             } @finally {
-                
+                //主线程延迟5秒
+                [self performSelector:@selector(delayMethod) withObject:nil afterDelay:5.0f];
             }
-            //主线程延迟5秒
-            [self performSelector:@selector(delayMethod) withObject:nil afterDelay:5.0f];
             
-            NSArray *controllers = self.navigationController.viewControllers;
-            for(UIViewController *viewController in controllers){
-                if([viewController isKindOfClass:[MainViewController class]]){
-                    [self.navigationController popToViewController:viewController animated:YES];
-                }
-            }
+            
+//            NSArray *controllers = self.navigationController.viewControllers;
+//            for(UIViewController *viewController in controllers){
+//                if([viewController isKindOfClass:[MainViewController class]]){
+//                    [self.navigationController popToViewController:viewController animated:YES];
+//                }
+//            }
         }else{
             [uartLib scanStart];//scan
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
@@ -260,7 +260,15 @@
     }
     
 }
-- (void)delayMethod { NSLog(@"execute"); }
+- (void)delayMethod {
+    NSLog(@"execute");
+    //返回首页
+    NSArray *controllers = self.navigationController.viewControllers;
+    for(UIViewController *viewController in controllers){
+        if([viewController isKindOfClass:[MainViewController class]]){
+            [self.navigationController popToViewController:viewController animated:YES];
+        }
+    }}
 
 //-----
 -(void)pirntData{

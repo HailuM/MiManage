@@ -14,17 +14,18 @@
 #import "MJExtension.h"
 #import "UIBarButtonItem+Extension.h"
 #import <CoreGraphics/CoreGraphics.h>
-#import "MBProgressHUD.h"
+//#import "MBProgressHUD.h"
 
 @interface MainViewController (){
     NSMutableArray *outPrintArray;//当前打印出库单
     NSMutableArray *dirPrintArray;//当前打印直入直出单
     
-    MBProgressHUD *HUD;
+//    MBProgressHUD *HUD;
     UIAlertView *asyncRK;//同步入库,如果本地没有上传的单据,确认用户是否删除已下载的入库订单
     UIAlertView *asyncCK;//同步出库,如果本地没有上传的单据,确认用户是否删除已下载的出库订单
     
-    
+    NSInteger sum;
+    float progress;
     
     int hasIn;//已上传的入库明细数量
     int hasDir;//已上传的直入直出明细数量
@@ -43,7 +44,7 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
+    progress = 0.0f;
     
     
     self.user = [User findFirstByCriteria:@""];
@@ -108,6 +109,8 @@
 //    uartLib = [[UartLib alloc] init];
 //    [uartLib setUartDelegate:self];
 //    connectAlertView = [[UIAlertView alloc] initWithTitle:@"连接蓝牙打印机" message: @"连接中，请稍后!" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil,nil];
+    
+
 }
 
 //验证网络是否通畅
@@ -158,7 +161,6 @@
         }
     }
 }
-
 //同步入库
 - (IBAction)synStorage:(id)sender {
     if (![self isConnectionAvailable:@"http:\\www.baidu.com"]) {
@@ -207,84 +209,129 @@
             
             
             
-            NSInteger sum = dirN+inN+outN;
+            sum = dirN+inN+outN;
             if(sum>0){
-                HUD = [[MBProgressHUD alloc] initWithView:self.view];
-                [self.view addSubview:HUD];
-                HUD.mode = MBProgressHUDModeDeterminateHorizontalBar;
-                HUD.label.text = @"上传中......";
+//                HUD = [[MBProgressHUD alloc] initWithView:self.view];
+//                [self.view addSubview:HUD];
+//                HUD.mode = MBProgressHUDModeDeterminateHorizontalBar;
+//                HUD.label.text = @"上传中......";
+//                [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+//                dispatch_after(DISPATCH_TIME_NOW, dispatch_get_main_queue(), ^{
+//                    float f = 0.0f;
+//                    //                while(f<1.0f){
+//                    //上传直入直出单
+//                    for(DirBillChild *dir in diroutArray){
+////                        f = f + (float)(1.0f/(sum+1));
+////                        [HUD setProgress:f];
+//                        NSString *json = [SCDBTool stringWithData:dir.mj_keyValues];
+//                        [self uploadDiroutWithRkToken:inToken withData:json];
+//                    }
+//                    
+//                    for (InBillChild *inChild in inArray) {
+////                        f = f + (float)(1.0f/(sum+1));
+////                        [HUD setProgress:f];
+//                        //生成入库单jsonString
+//                        NSString *json = [SCDBTool stringWithData:inChild.mj_keyValues];
+//                        [self uploadInWithRkToken:inToken withData:json];
+//                    }
+//                    
+//                    //需要上传出库单
+//                    if(outN>0){
+//                        for(OutBillChild *outChild in outArray){
+//                            f = f + (float)(1.0f/(sum+1));
+//                            [HUD setProgress:f];
+//                            NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
+//                            [self uploadOutWithCkToken:inToken withData:json withType:@"rkck"];
+//                        }
+//                        
+//                    }
+//                    //上传入库单结束
+//                    if(hasIn==inN && hasOut == outN && hasDir == dirN){
+//                        
+//                        [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
+//                        NSDate *middle = [NSDate date];
+//                        NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
+//                        
+////                        f = f + (float)(1.0f/(sum+1));
+////                        HUD.progress = f;
+//                        
+//                        [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
+//                        //删除数据库中的入库单及其关联表
+//                        [SCDBTool clearInData:inToken];
+//                        NSDate *middle1 = [NSDate date];
+//                        NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
+//                        //直接下载入库订单
+//                        [self getOrderInTitle];
+//                        NSDate *middle2 = [NSDate date];
+//                        NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
+//                    }else{
+//                        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+//                                                                      message:@"上传中断!"
+//                                                                     delegate:self
+//                                                            cancelButtonTitle:@"确定"
+//                                                            otherButtonTitles:nil, nil];
+//                        [alert show];
+//                    }
+//                    
+//                    [MBProgressHUD hideHUDForView:self.view animated:YES];
+////                    [HUD removeFromSuperViewOnHide];
+////                    HUD = nil;
+//
+//                });
                 
-                [HUD showAnimated:YES whileExecutingBlock:^{
-                    float f = 0.0f;
-    //                while(f<1.0f){
-                        //上传直入直出单
-                        for(DirBillChild *dir in diroutArray){
-                            f = f + (float)(1.0f/(sum+1));
-                            [HUD setProgress:f];
-                            NSString *json = [SCDBTool stringWithData:dir.mj_keyValues];
-                            [self uploadDiroutWithRkToken:inToken withData:json];
-                            
-    //                        [self performSelector:@selector(myTask) withObject:nil afterDelay:0.001];
-                            
-                        }
+                progress = 0.0f;
+                //SVProgressHUD
+                [SVProgressHUD showProgress:0.0 status:@"上传中..."];
+                
+                //上传直入直出单
+                for(DirBillChild *dir in diroutArray){
                     
-                        for (InBillChild *inChild in inArray) {
-                            f = f + (float)(1.0f/(sum+1));
-                            [HUD setProgress:f];
-                            //生成入库单jsonString
-                            NSString *json = [SCDBTool stringWithData:inChild.mj_keyValues];
-                            [self uploadInWithRkToken:inToken withData:json];
-    //                        [self performSelector:@selector(myTask) withObject:nil afterDelay:0.001];
-                            
-                            
-                        }
-                    
-                        //需要上传出库单
-                        if(outN>0){
-                            for(OutBillChild *outChild in outArray){
-                                f = f + (float)(1.0f/(sum+1));
-                                [HUD setProgress:f];
-                                NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
-                                [self uploadOutWithCkToken:inToken withData:json withType:@"rkck"];
-    //                            [self performSelector:@selector(myTask) withObject:nil afterDelay:0.001];
-//                                [outChild deleteObject];
-                                
-                            }
-                            
-                        }
-    //                }
-                    //上传入库单结束
-                    if(hasIn==inN && hasOut == outN && hasDir == dirN){
-                    
-                        [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
-                        NSDate *middle = [NSDate date];
-                        NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
-                        [self performSelector:@selector(myTask) withObject:nil afterDelay:0.001];
-                        f = f + (float)(1.0f/(sum+1));
-                        HUD.progress = f;
-                        
-                        [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
-                        //删除数据库中的入库单及其关联表
-                        [SCDBTool clearInData:inToken];
-                        NSDate *middle1 = [NSDate date];
-                        NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
-                        //直接下载入库订单
-                        [self getOrderInTitle];
-                        NSDate *middle2 = [NSDate date];
-                        NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
-                    }else{
-                        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                                      message:@"上传中断!"
-                                                                     delegate:self
-                                                            cancelButtonTitle:@"确定"
-                                                            otherButtonTitles:nil, nil];
-                        [alert show];
+                    NSString *json = [SCDBTool stringWithData:dir.mj_keyValues];
+                    [self uploadDiroutWithRkToken:inToken withData:json];
+                }
+
+                for (InBillChild *inChild in inArray) {
+                    //生成入库单jsonString
+                    NSString *json = [SCDBTool stringWithData:inChild.mj_keyValues];
+                    [self uploadInWithRkToken:inToken withData:json];
+                }
+
+                //需要上传出库单
+                if(outN>0){
+                    for(OutBillChild *outChild in outArray){
+                        NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
+                        [self uploadOutWithCkToken:inToken withData:json withType:@"rkck"];
                     }
                     
-                } completionBlock:^{
-                    [HUD removeFromSuperViewOnHide];
-                    HUD = nil;
-                }];
+                }
+                //上传入库单结束
+                if(hasIn==inN && hasOut == outN && hasDir == dirN){
+                    [SVProgressHUD dismissWithDelay:1.0];
+                    [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
+                    NSDate *middle = [NSDate date];
+                    NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
+
+                    [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
+                    //删除数据库中的入库单及其关联表
+                    [SCDBTool clearInData:inToken];
+                    NSDate *middle1 = [NSDate date];
+                    NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
+                    //直接下载入库订单
+                    [self getOrderInTitle];
+                    NSDate *middle2 = [NSDate date];
+                    NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
+                }else{
+                    UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                                  message:@"上传中断!"
+                                                                 delegate:self
+                                                        cancelButtonTitle:@"确定"
+                                                        otherButtonTitles:nil, nil];
+                    [alert show];
+                }
+                
+                
+                
+                
                 
             }else {
                 asyncRK = [[UIAlertView alloc] initWithTitle:@"重新下载" message:@"您想重新下载数据吗？若是则会清除已下载数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
@@ -342,31 +389,36 @@
                 [alert show];
             }else{
             
+                progress = 0.0f;
+                //SVProgressHUD
+                
                 //存在出库Token
                 //查询出库单
                 NSArray *outArray = [OutBillChild findByCriteria:@" where type = 'ck'"];
                 
                 if(outArray.count>0){
-                    HUD = [[MBProgressHUD alloc] initWithView:self.view];
-                    [self.view addSubview:HUD];
-                    HUD.mode = MBProgressHUDModeDeterminateHorizontalBar;
-                    HUD.label.text = @"上传中......";
-                    [HUD showAnimated:YES whileExecutingBlock:^{
-                        float f = 0.f;
+                    sum = outArray.count;
+//                    HUD = [[MBProgressHUD alloc] initWithView:self.view];
+//                    [self.view addSubview:HUD];
+//                    HUD.mode = MBProgressHUDModeDeterminateHorizontalBar;
+//                    HUD.label.text = @"上传中......";
+//                    [HUD showAnimated:YES whileExecutingBlock:^{
+//                        float f = 0.f;
+                    [SVProgressHUD showProgress:0.0 status:@"上传中..."];
                         for (OutBillChild *outChild in outArray) {
-                            f = f + (float)(1.0/outArray.count);
-                            HUD.progress = f;
+//                            f = f + (float)(1.0/outArray.count);
+//                            HUD.progress = f;
                             NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
                             [self uploadOutWithCkToken:outToken withData:json withType:@"ck"];
                             
                         }
-                        
-                        
                         if(hasOut==outArray.count){
-                        //上传出库单结束
-                        [self uploadOutCompleteWithCkToken:outToken withOutCount:outArray.count];
-                        [self.view makeToast:[NSString stringWithFormat:@"本次上传出库单明细%ld条",outArray.count] duration:5.0 position:CSToastPositionCenter];
-                        //删除数据库中的出库单及其关联表
+                            
+                            [SVProgressHUD dismissWithDelay:1.0];
+                            //上传出库单结束
+                            [self uploadOutCompleteWithCkToken:outToken withOutCount:outArray.count];
+                            [self.view makeToast:[NSString stringWithFormat:@"本次上传出库单明细%ld条",outArray.count] duration:5.0 position:CSToastPositionCenter];
+                            //删除数据库中的出库单及其关联表
                             [SCDBTool clearOutData:outToken];
                             //下载当前出库订单表头
                             [self getOrderOutTitle];
@@ -380,10 +432,10 @@
                         }
                         
                         
-                    } completionBlock:^{
-                        [HUD removeFromSuperViewOnHide];
-                        HUD = nil;
-                    }];
+//                    } completionBlock:^{
+//                        [HUD removeFromSuperViewOnHide];
+//                        HUD = nil;
+//                    }];
                 }else{
                     asyncCK = [[UIAlertView alloc] initWithTitle:@"重新下载" message:@"您想重新下载数据吗？若是则会清除已下载数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
                     [asyncCK show];
@@ -581,12 +633,7 @@
                 [alert show];//提示框的显示 必须写 不然没有任何反映
                 
             }else{
-                UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                              message:@"同步入库下载成功!"
-                                                             delegate:self
-                                                    cancelButtonTitle:@"确定"
-                                                    otherButtonTitles:nil, nil];
-                [alert show];//提示框的显示 必须写 不然没有任何反映
+                [self.view makeToast:@"同步入库下载成功!" duration:3.0 position:CSToastPositionCenter];
             }
         }else{
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
@@ -635,13 +682,8 @@
         if([[da.tempStr substringToIndex:5] isEqualToString:@"false"]){
             //无数据
             NSString *string = [da.tempStr substringFromIndex:6];
-            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                          message:string
-                                                         delegate:self
-                                                cancelButtonTitle:@"确定"
-                                                otherButtonTitles:nil, nil];
-            [alert show];//提示框的显示 必须写 不然没有任何反映
             
+            [self.view makeToast:string duration:3.0 position:CSToastPositionCenter];
         }else{
             //解析JSON字符串数据
             NSDictionary *dict = [SCDBTool dictionaryWithJSONString:da.tempStr];
@@ -867,6 +909,12 @@
         }else{
             //直入直出上传成功!
             hasDir ++;
+            progress = progress + (float)(1.0f/sum);
+            if(progress<1){
+                [SVProgressHUD showProgress:progress status:@"上传中..."];
+            }else{
+                [SVProgressHUD dismissWithDelay:1.0];
+            }
         }
     }
 //    sleep(1);
@@ -908,6 +956,12 @@
         }else{
             //入库上传成功!
             hasIn ++;
+            progress = progress + (float)(1.0f/sum);
+            if(progress<1){
+                [SVProgressHUD showProgress:progress status:@"上传中..."];
+            }else{
+                [SVProgressHUD dismissWithDelay:1.0];
+            }
         }
         
     }
@@ -998,9 +1052,13 @@
             
             
             hasOut ++;
-//            [self.view makeToast:@"上传成功!" duration:3.0 position:CSToastPositionCenter];
+            progress = progress + (float)(1.0f/sum);
+            if(progress<1){
+                [SVProgressHUD showProgress:progress status:@"上传中..."];
+            }else{
+                [SVProgressHUD dismissWithDelay:1.0];
+            }
         }
-        //        [self.view makeToast:da.tempStr duration:3.0 position:CSToastPositionCenter];
     }
     
 //    sleep(1);

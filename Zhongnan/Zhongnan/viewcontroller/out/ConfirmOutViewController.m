@@ -484,13 +484,7 @@
             [self performSelector:@selector(delayMethod) withObject:nil afterDelay:5.0f];
             
             
-            //返回首页
-            NSArray *controllers = self.navigationController.viewControllers;
-            for(UIViewController *viewController in controllers){
-                if([viewController isKindOfClass:[MainViewController class]]){
-                    [self.navigationController popToViewController:viewController animated:YES];
-                }
-            }
+            
         }else{
             [uartLib scanStart];//scan
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];

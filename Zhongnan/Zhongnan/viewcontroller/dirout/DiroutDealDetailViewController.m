@@ -129,13 +129,9 @@
     // Pass the selected object to the new view controller.
     if([segue.identifier isEqualToString:@"confirmdirout"]){
         ConfirmDiroutViewController *viewController = segue.destinationViewController;
-//        viewController.unSelArray = unSelArray;
         
-        //把所有物料都加入到已经选择的物料
-        
-        
+        viewController.unSelArray = unSelArray;
         viewController.selArray = selArray;
-        [viewController.selArray addObjectsFromArray:unSelArray];
         viewController.order = self.order;
         viewController.consumer = self.consumer;
     }else if([segue.identifier isEqualToString:@"diroutdetailtochoose"]){

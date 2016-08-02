@@ -25,7 +25,7 @@
 @property (nonatomic, strong) Consumer *consumer;//领料商
 @property (nonatomic, strong) PuOrder *order;
 @property (nonatomic, strong) NSMutableArray *selArray;//保存已选中材料的数组
-//@property (nonatomic, strong) NSMutableArray *unSelArray;//保存未选择的材料的数组
+@property (nonatomic, strong) NSMutableArray *unSelArray;//保存未选择的材料的数组
 @property (nonatomic, strong) NSMutableArray *array;//直入直出单
 
 @property (nonatomic,strong) NSMutableArray *finishArray;//存放已完成的材料

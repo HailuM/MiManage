@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Zhongnan/MainViewController.m"
-            timestampString = "491452743.536816"
+            timestampString = "491809312.150998"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "574"
-            endingLineNumber = "574"
+            startingLineNumber = "627"
+            endingLineNumber = "627"
             landmarkName = "-orderCompletewithRkToken:"
             landmarkType = "5">
          </BreakpointContent>
@@ -106,59 +106,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Zhongnan/MainViewController.m"
-            timestampString = "491708042.504911"
+            timestampString = "491806285.805786"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "217"
-            endingLineNumber = "217"
-            landmarkName = "-synStorage:"
-            landmarkType = "5">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[MainViewController synStorage:]"
-                  moduleName = "Zhongnan"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/wongsuechang/Documents/iOSProject/MiManage/Zhongnan/Zhongnan/MainViewController.m"
-                  timestampString = "491708732.360289"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "217"
-                  endingLineNumber = "217"
-                  offsetFromSymbolStart = "1268">
-               </Location>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "__33-[MainViewController synStorage:]_block_invoke"
-                  moduleName = "Zhongnan"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/wongsuechang/Documents/iOSProject/MiManage/Zhongnan/Zhongnan/MainViewController.m"
-                  timestampString = "491708732.360593"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "217"
-                  endingLineNumber = "217"
-                  offsetFromSymbolStart = "52">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Zhongnan/MainViewController.m"
-            timestampString = "491708046.532342"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "274"
-            endingLineNumber = "274"
+            startingLineNumber = "307"
+            endingLineNumber = "307"
             landmarkName = "-synStorage:"
             landmarkType = "5">
          </BreakpointContent>
@@ -170,12 +122,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Zhongnan/MainViewController.m"
-            timestampString = "491708051.853749"
+            timestampString = "491806285.805786"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "285"
-            endingLineNumber = "285"
+            startingLineNumber = "284"
+            endingLineNumber = "284"
             landmarkName = "-synStorage:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Zhongnan/MainViewController.m"
+            timestampString = "491809707.350233"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "918"
+            endingLineNumber = "918"
+            landmarkName = "-uploadDiroutWithRkToken:withData:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

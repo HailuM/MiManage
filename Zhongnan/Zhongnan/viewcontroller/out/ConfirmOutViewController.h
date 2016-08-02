@@ -10,7 +10,7 @@
 #import "OutDealViewController.h"
 #import "ChooseConsumerViewController.h"
 #import "UartLib.h"
-#import "MBProgressHUD.h"
+//#import "MBProgressHUD.h"
 
 @interface ConfirmOutViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,PassConsumerDelegate,UartDelegate,UIAlertViewDelegate>
 
