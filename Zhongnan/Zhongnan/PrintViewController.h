@@ -11,7 +11,11 @@
 #import "StringUtil.h"
 #import "UIView+Toast.h"
 
-@interface PrintViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,UartDelegate>
+@interface PrintViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,UartDelegate> {
+    BOOL isSearch;//是否正在搜索蓝牙
+}
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (strong, nonatomic) UartLib *uartLib;
+@property (strong, nonatomic) CBPeripheral *connectPeripheral;
 
 @end

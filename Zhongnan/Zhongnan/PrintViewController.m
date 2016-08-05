@@ -23,8 +23,6 @@
     
     //打印用
     UIAlertView *connectAlertView;
-    UartLib *uartLib;
-    CBPeripheral *connectPeripheral;
     NSString *printContant;
  
     
@@ -50,12 +48,15 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    
+    isSearch = NO;
     timeCount = 0;
     // Do any additional setup after loading the view.
     
     self.title = @"打印";
-    uartLib = [[UartLib alloc] init];
-    [uartLib setUartDelegate:self];
+    self.uartLib = [[UartLib alloc] init];
+    [self.uartLib setUartDelegate:self];
     connectAlertView = [[UIAlertView alloc] initWithTitle:@"连接蓝牙打印机" message: @"连接中，请稍后!" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil,nil];
     
 //    bleAlert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"无法连接上蓝牙打印机，是否返回主界面？" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确认", nil];
@@ -98,8 +99,12 @@
                 NSLog(@"Cancel Button Pressed");
                 
                 @try{
-                    [uartLib scanStop];
-                    [uartLib disconnectPeripheral:connectPeripheral];
+                    if(!self.uartLib){
+                        self.uartLib = [[UartLib alloc] init];
+                        [self.uartLib setUartDelegate:self];
+                    }
+                    [self.uartLib scanStop];
+                    [self.uartLib disconnectPeripheral:self.connectPeripheral];
                 } @catch (NSException *exception) {
                     NSLog(@"蓝牙停止扫描,出现%@",exception);
                 } @finally {
@@ -113,9 +118,20 @@
         }
     }else if(alertView==printAlert){
         if(buttonIndex==1){
-            [uartLib scanStart];//scan
+            @try {
+            if(!self.uartLib){
+                self.uartLib = [[UartLib alloc] init];
+                [self.uartLib setUartDelegate:self];
+            }
+            [self.uartLib scanStart];//scan
             NSLog(@"connect Peripheral");
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+                
+            } @catch (NSException *exception){
+                NSLog(@"蓝牙停止扫描,出现%@",exception);
+            } @finally {
+                
+            }
         }else{
             
         }
@@ -223,7 +239,7 @@
 
 //-------
 -(void)searchPrinter{
-    if(connectPeripheral ==nil){
+    if(self.connectPeripheral ==nil){
         [self.view makeToast:@"正在连接蓝牙打印机......" duration:3.0 position:CSToastPositionCenter];
         
         if(timeCount>10){
@@ -231,32 +247,51 @@
             [self.view makeToast:@"无连接上蓝牙打印机!"];
             //返回首页
             @try{
-                [uartLib scanStop];
-                [uartLib disconnectPeripheral:connectPeripheral];
+                if(!self.uartLib){
+                    self.uartLib = [[UartLib alloc] init];
+                    [self.uartLib setUartDelegate:self];
+                }
+                [self.uartLib scanStop];
+                [self.uartLib disconnectPeripheral:self.connectPeripheral];
+                self.uartLib = nil;
+                self.connectPeripheral = nil;
             } @catch (NSException *exception) {
                 NSLog(@"蓝牙停止扫描,出现%@",exception);
             } @finally {
                 //主线程延迟5秒
-                [self performSelector:@selector(delayMethod) withObject:nil afterDelay:5.0f];
+//                [self performSelector:@selector(delayMethod) withObject:nil afterDelay:20.0f];
+            }
+        }else{
+            @try{
+                if(!self.uartLib){
+                    self.uartLib = [[UartLib alloc] init];
+                    [self.uartLib setUartDelegate:self];
+                }
+                [self.uartLib scanStart];//scan
+                [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+                timeCount = timeCount+3;
+            } @catch (NSException *exception){
+                NSLog(@"蓝牙停止扫描,出现%@",exception);
+            } @finally {
+                
             }
             
-            
-//            NSArray *controllers = self.navigationController.viewControllers;
-//            for(UIViewController *viewController in controllers){
-//                if([viewController isKindOfClass:[MainViewController class]]){
-//                    [self.navigationController popToViewController:viewController animated:YES];
-//                }
-//            }
-        }else{
-            [uartLib scanStart];//scan
-            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
-            timeCount = timeCount+3;
         }
     }else{
-        [uartLib scanStop];
-        [uartLib connectPeripheral:connectPeripheral];
+        @try{
+        if(!self.uartLib){
+            self.uartLib = [[UartLib alloc] init];
+            [self.uartLib setUartDelegate:self];
+        }
+        [self.uartLib scanStop];
+        [self.uartLib connectPeripheral:self.connectPeripheral];
         [connectAlertView show];
         [self performSelector:@selector(pirntData) withObject:nil afterDelay:3];
+        } @catch (NSException *exception){
+            NSLog(@"蓝牙停止扫描,出现%@",exception);
+        } @finally {
+            
+        }
     }
     
 }
@@ -272,6 +307,8 @@
 
 //-----
 -(void)pirntData{
+    
+    @try {
     NSString *curPrintContent;
     
     curPrintContent = printContant;
@@ -306,9 +343,17 @@
             }
         }
     }
-    [uartLib scanStop];
-    [uartLib disconnectPeripheral:connectPeripheral];
-    
+    if(!self.uartLib){
+        self.uartLib = [[UartLib alloc] init];
+        [self.uartLib setUartDelegate:self];
+    }
+    [self.uartLib scanStop];
+    [self.uartLib disconnectPeripheral:self.connectPeripheral];
+    } @catch (NSException *exception){
+        NSLog(@"蓝牙停止扫描,出现%@",exception);
+    } @finally {
+        
+    }
 }
 
 
@@ -328,6 +373,7 @@
 /****************************************************************************/
 - (void) didScanedPeripherals:(NSMutableArray  *)foundPeripherals;
 {
+    @try {
     NSLog(@"didScanedPeripherals(%lu)", (unsigned long)[foundPeripherals count]);
     
     CBPeripheral	*peripheral;
@@ -337,19 +383,25 @@
     }
     
     if ([foundPeripherals count] > 0) {
-        connectPeripheral = [foundPeripherals objectAtIndex:0];
-        if ([connectPeripheral name] == nil) {
+        self.connectPeripheral = [foundPeripherals objectAtIndex:0];
+        if ([self.connectPeripheral name] == nil) {
             // [[self peripheralName] setText:@"BTCOM"];
         }else{
             // [[self peripheralName] setText:[connectPeripheral name]];
         }
     }else{
         //[[self peripheralName] setText:nil];
-        connectPeripheral = nil;
+        self.connectPeripheral = nil;
+    }
+    } @catch (NSException *exception){
+        NSLog(@"蓝牙扫描,出现%@",exception);
+    } @finally {
+        
     }
 }
 
 - (void) didConnectPeripheral:(CBPeripheral *)peripheral{
+    @try {
     NSLog(@"did Connect Peripheral");
     
     //[[self sendButton] setEnabled:TRUE];
@@ -357,9 +409,15 @@
     [connectAlertView dismissWithClickedButtonIndex:0 animated:YES];
     
     //[self printerNotifyEnable];
+    } @catch (NSException *exception){
+        NSLog(@"蓝牙停止扫描,出现%@",exception);
+    } @finally {
+        
+    }
 }
 
 - (void) didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error{
+    @try {
     NSLog(@"did Disconnect Peripheral");
     
     // [[self sendButton] setEnabled:FALSE];
@@ -371,6 +429,11 @@
 //    [uartLib scanStart];//scan
 //    NSLog(@"connect Peripheral");
 //    [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
+    } @catch (NSException *exception){
+        NSLog(@"蓝牙停止扫描,出现%@",exception);
+    } @finally {
+        
+    }
     
 }
 
@@ -381,6 +444,7 @@
 
 - (void) didReceiveData:(CBPeripheral *)peripheral recvData:(NSData *)recvData
 {
+    @try {
     NSLog(@"uart recv(%lu):%@", (unsigned long)[recvData length], recvData);
     
     if ([recvData length] == 4) {
@@ -393,6 +457,11 @@
         }
     }
     //[self promptDisplay:recvData];
+    } @catch (NSException *exception){
+        NSLog(@"蓝牙停止扫描,出现%@",exception);
+    } @finally {
+        
+    }
 }
 
 - (void) didBluetoothPoweredOff{
@@ -444,7 +513,7 @@
     
     NSData *cmdData =[[NSData alloc] initWithBytes:caPrintFmt length:5];
     
-    [uartLib sendValue:connectPeripheral sendData:cmdData type:CBCharacteristicWriteWithResponse];
+    [self.uartLib sendValue:self.connectPeripheral sendData:cmdData type:CBCharacteristicWriteWithResponse];
     NSLog(@"format:%@", cmdData);
     
     NSStringEncoding enc = CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
@@ -479,7 +548,7 @@
         //data = [strRang dataUsingEncoding: NSUTF8StringEncoding];
         //NSLog(@"print:%@", data);
         
-        [uartLib sendValue:connectPeripheral sendData:data type:CBCharacteristicWriteWithResponse];
+        [self.uartLib sendValue:self.connectPeripheral sendData:data type:CBCharacteristicWriteWithResponse];
     }
 }
 

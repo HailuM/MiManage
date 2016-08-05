@@ -486,6 +486,7 @@
             
             
         }else{
+            
             [uartLib scanStart];//scan
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
             timeCount = timeCount+3;
