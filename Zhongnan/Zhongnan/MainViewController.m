@@ -30,6 +30,16 @@
     int hasIn;//已上传的入库明细数量
     int hasDir;//已上传的直入直出明细数量
     int hasOut;//已上传的出库明细数量
+    
+    NSInteger dirN;//直入直出单条数
+    NSInteger inN;//入库单条数
+    NSInteger outN;//出库单条数
+    //查询入库单
+    NSArray *inArray;
+    //查询直入直出
+    NSArray *diroutArray;
+    //查询出库单
+    NSArray *outArray;
 }
 
 @end
@@ -177,9 +187,6 @@
         
         
         //查询当前数据库中的入库单,并上传
-        NSInteger dirN = 0;//直入直出单条数
-        NSInteger inN = 0;//入库单条数
-        NSInteger outN = 0;//出库单条数
         
         hasIn = 0;
         hasDir = 0;
@@ -188,11 +195,11 @@
         if(inToken && inToken.length>0){
             //存在入库Token
             //查询入库单
-            NSArray *inArray = [InBillChild findAll];
+            inArray = [InBillChild findAll];
             //查询直入直出
-            NSArray *diroutArray = [DirBillChild findAll];
+            diroutArray = [DirBillChild findAll];
             //查询出库单
-            NSArray *outArray = [OutBillChild findByCriteria:@" where type = 'rkck'"];
+            outArray = [OutBillChild findByCriteria:@" where type = 'rkck'"];
             
             //上传直入直出
             dirN = diroutArray.count;
@@ -211,123 +218,29 @@
             
             sum = dirN+inN+outN;
             if(sum>0){
-//                HUD = [[MBProgressHUD alloc] initWithView:self.view];
-//                [self.view addSubview:HUD];
-//                HUD.mode = MBProgressHUDModeDeterminateHorizontalBar;
-//                HUD.label.text = @"上传中......";
-//                [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-//                dispatch_after(DISPATCH_TIME_NOW, dispatch_get_main_queue(), ^{
-//                    float f = 0.0f;
-//                    //                while(f<1.0f){
-//                    //上传直入直出单
-//                    for(DirBillChild *dir in diroutArray){
-////                        f = f + (float)(1.0f/(sum+1));
-////                        [HUD setProgress:f];
-//                        NSString *json = [SCDBTool stringWithData:dir.mj_keyValues];
-//                        [self uploadDiroutWithRkToken:inToken withData:json];
-//                    }
-//                    
-//                    for (InBillChild *inChild in inArray) {
-////                        f = f + (float)(1.0f/(sum+1));
-////                        [HUD setProgress:f];
-//                        //生成入库单jsonString
-//                        NSString *json = [SCDBTool stringWithData:inChild.mj_keyValues];
-//                        [self uploadInWithRkToken:inToken withData:json];
-//                    }
-//                    
-//                    //需要上传出库单
-//                    if(outN>0){
-//                        for(OutBillChild *outChild in outArray){
-//                            f = f + (float)(1.0f/(sum+1));
-//                            [HUD setProgress:f];
-//                            NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
-//                            [self uploadOutWithCkToken:inToken withData:json withType:@"rkck"];
-//                        }
-//                        
-//                    }
-//                    //上传入库单结束
-//                    if(hasIn==inN && hasOut == outN && hasDir == dirN){
-//                        
-//                        [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
-//                        NSDate *middle = [NSDate date];
-//                        NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
-//                        
-////                        f = f + (float)(1.0f/(sum+1));
-////                        HUD.progress = f;
-//                        
-//                        [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
-//                        //删除数据库中的入库单及其关联表
-//                        [SCDBTool clearInData:inToken];
-//                        NSDate *middle1 = [NSDate date];
-//                        NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
-//                        //直接下载入库订单
-//                        [self getOrderInTitle];
-//                        NSDate *middle2 = [NSDate date];
-//                        NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
-//                    }else{
-//                        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-//                                                                      message:@"上传中断!"
-//                                                                     delegate:self
-//                                                            cancelButtonTitle:@"确定"
-//                                                            otherButtonTitles:nil, nil];
-//                        [alert show];
-//                    }
-//                    
-//                    [MBProgressHUD hideHUDForView:self.view animated:YES];
-////                    [HUD removeFromSuperViewOnHide];
-////                    HUD = nil;
-//
-//                });
+
                 
                 progress = 0.0f;
                 //SVProgressHUD
                 [SVProgressHUD showProgress:0.0 status:@"上传中..."];
                 
                 //上传直入直出单
-                for(DirBillChild *dir in diroutArray){
-                    
-                    NSString *json = [SCDBTool stringWithData:dir.mj_keyValues];
-                    [self uploadDiroutWithRkToken:inToken withData:json];
+                if(dirN>0){
+                    for(DirBillChild *child in diroutArray){
+                        [self uploadDiroutWithRkToken:inToken withData:child];
+                    }
                 }
 
-                for (InBillChild *inChild in inArray) {
-                    //生成入库单jsonString
-                    NSString *json = [SCDBTool stringWithData:inChild.mj_keyValues];
-                    [self uploadInWithRkToken:inToken withData:json];
-                }
-
-                //需要上传出库单
-                if(outN>0){
-                    for(OutBillChild *outChild in outArray){
-                        NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
-                        [self uploadOutWithCkToken:inToken withData:json withType:@"rkck"];
+                if(inN>0){
+                    for(InBillChild *child in inArray){
+                        [self uploadInWithRkToken:inToken withData:child];
                     }
                     
                 }
-                //上传入库单结束
-                if(hasIn==inN && hasOut == outN && hasDir == dirN){
-                    [SVProgressHUD dismissWithDelay:1.0];
-                    [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
-                    NSDate *middle = [NSDate date];
-                    NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
+                
 
-                    [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
-                    //删除数据库中的入库单及其关联表
-                    [SCDBTool clearInData:inToken];
-                    NSDate *middle1 = [NSDate date];
-                    NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
-                    //直接下载入库订单
-                    [self performSelector:@selector(getOrderInTitle) withObject:nil afterDelay:3.0];
-                    NSDate *middle2 = [NSDate date];
-                    NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
-                }else{
-                    UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                                  message:@"上传中断!"
-                                                                 delegate:self
-                                                        cancelButtonTitle:@"确定"
-                                                        otherButtonTitles:nil, nil];
-                    [alert show];
-                }
+                
+                
                 
                 
                 
@@ -382,9 +295,9 @@
             
             
             //查询入库单
-            NSArray *inArray = [InBillChild findAll];
+            NSArray *tempinArray = [InBillChild findAll];
             //如果存在未上传的入库单,则提示先同步入库
-            if(inArray.count>0){
+            if(tempinArray.count>0){
                 UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"存在未上传的入库单,请先同步入库!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
                 [alert show];
             }else{
@@ -394,7 +307,7 @@
                 
                 //存在出库Token
                 //查询出库单
-                NSArray *outArray = [OutBillChild findByCriteria:@" where type = 'ck'"];
+                outArray = [OutBillChild findByCriteria:@" where type = 'ck'"];
                 
                 if(outArray.count>0){
                     sum = outArray.count;
@@ -405,37 +318,9 @@
 //                    [HUD showAnimated:YES whileExecutingBlock:^{
 //                        float f = 0.f;
                     [SVProgressHUD showProgress:0.0 status:@"上传中..."];
-                        for (OutBillChild *outChild in outArray) {
-//                            f = f + (float)(1.0/outArray.count);
-//                            HUD.progress = f;
-                            NSString *json = [SCDBTool stringWithData:outChild.mj_keyValues];
-                            [self uploadOutWithCkToken:outToken withData:json withType:@"ck"];
-                            
-                        }
-                        if(hasOut==outArray.count){
-                            
-                            [SVProgressHUD dismissWithDelay:1.0];
-                            //上传出库单结束
-                            [self uploadOutCompleteWithCkToken:outToken withOutCount:outArray.count];
-                            [self.view makeToast:[NSString stringWithFormat:@"本次上传出库单明细%ld条",outArray.count] duration:5.0 position:CSToastPositionCenter];
-                            //删除数据库中的出库单及其关联表
-                            [SCDBTool clearOutData:outToken];
-                            //下载当前出库订单表头
-                            [self performSelector:@selector(getOrderOutTitle) withObject:nil afterDelay:3.0];
-                        }else{
-                            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                                          message:@"上传中断!"
-                                                                         delegate:self
-                                                                cancelButtonTitle:@"确定"
-                                                                otherButtonTitles:nil, nil];
-                            [alert show];
-                        }
-                        
-                        
-//                    } completionBlock:^{
-//                        [HUD removeFromSuperViewOnHide];
-//                        HUD = nil;
-//                    }];
+                    for(OutBillChild *child in outArray){
+                        [self uploadOutWithCkToken:outToken withData:child withType:@"ck"];
+                    }
                 }else{
                     asyncCK = [[UIAlertView alloc] initWithTitle:@"重新下载" message:@"您想重新下载数据吗？若是则会清除已下载数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
                     [asyncCK show];
@@ -465,8 +350,7 @@
  */
 -(void)getOrderInTitle {
     if([serverUrl isEqualToString:@""] || serverUrl == nil){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
+        [self.view makeToast:@"请先维护好服务器配置!" duration:3.0 position:CSToastPositionCenter];
     }else{
         NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=Mobile_DownloadOrderInfo",serverUrl];
         
@@ -529,8 +413,7 @@
  */
 -(void)getOrderInMatWithOrderId:(NSString *)orderid withRkToken:(NSString *)rkToken{
     if([serverUrl isEqualToString:@""] || serverUrl == nil){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
+        [self.view makeToast:@"请先维护好服务器配置!" duration:3.0 position:CSToastPositionCenter];
     }else{
         NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=Mobile_DownloadOrderMaterial",serverUrl];
         WebServiceConnect *da = [[WebServiceConnect alloc] initWithConnect:connectUrl :[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
@@ -566,8 +449,7 @@
  */
 -(void)getConsumerForDiroutWithOrderId:(NSString *)orderid withRkToken:(NSString *)rkToken {
     if([serverUrl isEqualToString:@""] || serverUrl == nil){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
+        [self.view makeToast:@"请先维护好服务器配置!" duration:3.0 position:CSToastPositionCenter];
     }else{
         NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=Mobile_DownloadOrderconsumer",serverUrl];
         WebServiceConnect *da = [[WebServiceConnect alloc] initWithConnect:connectUrl :[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
@@ -599,8 +481,7 @@
  */
 -(void)orderCompletewithRkToken:(NSString *)rkToken {
     if([serverUrl isEqualToString:@""] || serverUrl == nil){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
+        [self.view makeToast:@"请先维护好服务器配置!" duration:3.0 position:CSToastPositionCenter];
     }else{
         NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=Mobile_DownLoadOrderComplete",serverUrl];
         
@@ -656,8 +537,7 @@
  */
 -(void)getOrderOutTitle {
     if([serverUrl isEqualToString:@""] || serverUrl == nil){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
+        [self.view makeToast:@"请先维护好服务器配置!" duration:3.0 position:CSToastPositionCenter];
     }else{
         NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=Mobile_downloadReceiveInfo",serverUrl];
         
@@ -725,8 +605,7 @@
  */
 -(void)getOrderOutMatWithOrderId:(NSString *)orderid withCkToken:(NSString *)ckToken{
     if([serverUrl isEqualToString:@""] || serverUrl == nil){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
+        [self.view makeToast:@"请先维护好服务器配置!" duration:3.0 position:CSToastPositionCenter];
     }else{
         NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=Mobile_DownloadReceiveMaterial",serverUrl];
         
@@ -775,8 +654,7 @@
  */
 - (void)getOrderOutConsumerWithOrderId:(NSString *)orderid withCkToken:(NSString *)ckToken {
     if([serverUrl isEqualToString:@""] || serverUrl == nil){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
+        [self.view makeToast:@"请先维护好服务器配置!" duration:3.0 position:CSToastPositionCenter];
     }else{
         NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=Mobile_DownloadReceiveconsumer",serverUrl];
         
@@ -826,8 +704,7 @@
  */
 - (void)getOrderOutCompleteWithCkToken:(NSString *)ckToken {
     if([serverUrl isEqualToString:@""] || serverUrl == nil){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
+        [self.view makeToast:@"请先维护好服务器配置!" duration:3.0 position:CSToastPositionCenter];
     }else{
         NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=Mobile_DownLoadReceiveComplete",serverUrl];
         
@@ -870,10 +747,10 @@
 /**
  *  上传直入直出数据
  */
-- (void)uploadDiroutWithRkToken:(NSString *)rkToken withData:(NSString *)jsonData{
+- (void)uploadDiroutWithRkToken:(NSString *)rkToken withData:(id)object{
+    NSString *json = [SCDBTool stringWithData:((DirBillChild *)object).mj_keyValues];
     if([serverUrl isEqualToString:@""] || serverUrl == nil){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
+        [self.view makeToast:@"请先维护好服务器配置!" duration:3.0 position:CSToastPositionCenter];
     }else{
         NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=Mobile_uploadZRZCInfo",serverUrl];
         
@@ -886,42 +763,72 @@
                           "<jsonData>%@</jsonData>"
                           "</Mobile_uploadZRZCInfo>\n"
                           "</soap:Body>\n"
-                          "</soap:Envelope>\n",self.user.UserOID,rkToken,jsonData];
-        WebServiceConnect *da = [[WebServiceConnect alloc] initWithConnect:connectUrl :data :@"http://tempuri.org/Mobile_uploadZRZCInfo" :@"Mobile_uploadZRZCInfoResult"];
-        [da getTestConnet];
+                          "</soap:Envelope>\n",self.user.UserOID,rkToken,json];
         
-        NSArray<NSString *> *stringArray = [da.tempStr componentsSeparatedByString:@":"];
-        if([stringArray[0] isEqualToString:@"false"]){
-            //无数据
-            NSArray<NSString *> *stringArray = [da.tempStr componentsSeparatedByString:@":"];
+        SCSoapHttpOperation *operation = [[SCSoapHttpOperation alloc] init];
+        [operation postwithURL:connectUrl withparameter:data withSoapAction:@"http://tempuri.org/Mobile_uploadZRZCInfo" withResultDomain:@"Mobile_uploadZRZCInfoResult" WithReturnValeuBlock:^(id returnValue) {
+            NSArray<NSString *> *stringArray = [(NSString *)returnValue componentsSeparatedByString:@":"];
+            if([stringArray[0] isEqualToString:@"false"]){
+                //无数据
+                NSArray<NSString *> *stringArray = [(NSString *)returnValue componentsSeparatedByString:@":"];
+                UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                              message:stringArray[1]
+                                                             delegate:self
+                                                    cancelButtonTitle:@"确定"
+                                                    otherButtonTitles:nil, nil];
+                [alert show];//提示框的显示 必须写 不然没有任何反映
+                
+            }else if([stringArray[0] isEqualToString:@"true"]){
+                //直入直出上传成功!
+                hasDir ++;
+                progress = progress + (float)(1.0f/sum);
+                if(progress<1){
+                    [SVProgressHUD showProgress:progress status:@"上传中..."];
+                    //                if(hasDir+1<dirN){
+                    //                    [self uploadDiroutWithRkToken:inToken withData:diroutArray[hasDir]];
+                    //                }
+                }else{
+                    [SVProgressHUD dismissWithDelay:1.0];
+                }
+            }
+            //上传入库单结束
+            if(hasIn==inN && hasOut == outN && hasDir == dirN){
+                [SVProgressHUD dismissWithDelay:1.0];
+                [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
+                NSDate *middle = [NSDate date];
+                NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
+                
+                [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
+                //删除数据库中的入库单及其关联表
+                [SCDBTool clearInData:inToken];
+                outArray = nil;
+                diroutArray = nil;
+                inArray = nil;
+                NSDate *middle1 = [NSDate date];
+                NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
+                //直接下载入库订单
+                [self performSelector:@selector(getOrderInTitle) withObject:nil afterDelay:3.0];
+                NSDate *middle2 = [NSDate date];
+                NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
+            }
+        } WithFailureBlock:^{
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                          message:stringArray[1]
+                                                          message:@"网络连接中断!"
                                                          delegate:self
                                                 cancelButtonTitle:@"确定"
                                                 otherButtonTitles:nil, nil];
             [alert show];//提示框的显示 必须写 不然没有任何反映
-            
-        }else{
-            //直入直出上传成功!
-            hasDir ++;
-            progress = progress + (float)(1.0f/sum);
-            if(progress<1){
-                [SVProgressHUD showProgress:progress status:@"上传中..."];
-            }else{
-                [SVProgressHUD dismissWithDelay:1.0];
-            }
-        }
+        }];
     }
-//    sleep(1);
 }
 
 /**
  *  上传入库数据
  */
--(void)uploadInWithRkToken:(NSString *)rkToken withData:(NSString *)jsonData{
+-(void)uploadInWithRkToken:(NSString *)rkToken withData:(id)object{
+    NSString *jsonData = [SCDBTool stringWithData:((InBillChild *)object).mj_keyValues];
     if([serverUrl isEqualToString:@""] || serverUrl == nil){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
+        [self.view makeToast:@"请先维护好服务器配置!" duration:3.0 position:CSToastPositionCenter];
     }else{
         NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=Mobile_uploadrkInfo",serverUrl];
         
@@ -935,40 +842,70 @@
                           "</Mobile_uploadrkInfo>\n"
                           "</soap:Body>\n"
                           "</soap:Envelope>\n",self.user.UserOID,rkToken,jsonData];
-        WebServiceConnect *da = [[WebServiceConnect alloc] initWithConnect:connectUrl :data :@"http://tempuri.org/Mobile_uploadrkInfo" :@"Mobile_uploadrkInfoResult"];
-        [da getTestConnet];
-        NSArray<NSString *> *stringArray = [da.tempStr componentsSeparatedByString:@":"];
-        if([stringArray[0] isEqualToString:@"false"]){
-            //无数据
-//            NSArray<NSString *> *stringArray = [da.tempStr componentsSeparatedByString:@":"];
-            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                          message:stringArray[1]
-                                                         delegate:self
-                                                cancelButtonTitle:@"确定"
-                                                otherButtonTitles:nil, nil];
-            [alert show];//提示框的显示 必须写 不然没有任何反映
-            
-        }else{
-            //入库上传成功!
-            hasIn ++;
-            progress = progress + (float)(1.0f/sum);
-            if(progress<1){
-                [SVProgressHUD showProgress:progress status:@"上传中..."];
+        SCSoapHttpOperation *operation = [[SCSoapHttpOperation alloc] init];
+        [operation postwithURL:connectUrl withparameter:data withSoapAction:@"http://tempuri.org/Mobile_uploadrkInfo" withResultDomain:@"Mobile_uploadrkInfoResult" WithReturnValeuBlock:^(id returnValue) {
+            NSArray<NSString *> *stringArray = [(NSString *)returnValue componentsSeparatedByString:@":"];
+            if([stringArray[0] isEqualToString:@"false"]){
+                //无数据
+                //            NSArray<NSString *> *stringArray = [da.tempStr componentsSeparatedByString:@":"];
+                UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                              message:stringArray[1]
+                                                             delegate:self
+                                                    cancelButtonTitle:@"确定"
+                                                    otherButtonTitles:nil, nil];
+                [alert show];//提示框的显示 必须写 不然没有任何反映
+                
             }else{
-                [SVProgressHUD dismissWithDelay:1.0];
+                //入库上传成功!
+                hasIn ++;
+                progress = progress + (float)(1.0f/sum);
+                if(progress<1){
+                    [SVProgressHUD showProgress:progress status:@"上传中..."];
+                }else{
+                    [SVProgressHUD dismissWithDelay:1.0];
+                }
             }
-        }
-        
+            //上传入库单结束
+            if(hasIn==inN && hasOut == outN && hasDir == dirN){
+                [SVProgressHUD dismissWithDelay:1.0];
+                [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
+                NSDate *middle = [NSDate date];
+                NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
+                
+                [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
+                //删除数据库中的入库单及其关联表
+                [SCDBTool clearInData:inToken];
+                outArray = nil;
+                diroutArray = nil;
+                inArray = nil;
+                NSDate *middle1 = [NSDate date];
+                NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
+                //直接下载入库订单
+                [self performSelector:@selector(getOrderInTitle) withObject:nil afterDelay:3.0];
+                NSDate *middle2 = [NSDate date];
+                NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
+            }else {
+                if(hasIn==inN){
+                    //入库单上传结束,才可以上传出库单
+                    if(outN>0){
+                        for(OutBillChild *child in outArray){
+                            [self uploadOutWithCkToken:inToken withData:child withType:@"rkck"];
+                        }
+                        
+                    }
+                }
+            }
+        } WithFailureBlock:^{
+            
+        }];
     }
-//    sleep(1);
 }
 /**
  *  上传入库相关结束
  */
 -(void)uploadInCompleteWithRkToken:(NSString *)rkToken withDirout:(NSInteger)diroutCount withInCount:(NSInteger)inCount withOutCounr:(NSInteger)outCount {
     if([serverUrl isEqualToString:@""] || serverUrl == nil){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
+        [self.view makeToast:@"请先维护好服务器配置!" duration:3.0 position:CSToastPositionCenter];
     }else{
         NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=Mobile_uploadrkComplete",serverUrl];
         
@@ -1011,10 +948,10 @@
  *  @param ckToken  <#ckToken description#>
  *  @param jsonData <#jsonData description#>
  */
--(void)uploadOutWithCkToken:(NSString *)ckToken withData:(NSString *)jsonData withType:(NSString *)type{
+-(void)uploadOutWithCkToken:(NSString *)ckToken withData:(id)object withType:(NSString *)type{
+    NSString *jsonData = [SCDBTool stringWithData:((OutBillChild *)object).mj_keyValues];
     if([serverUrl isEqualToString:@""] || serverUrl == nil){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
+        [self.view makeToast:@"请先维护好服务器配置!" duration:3.0 position:CSToastPositionCenter];
     }else{
         NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=Mobile_uploadckInfo",serverUrl];
         
@@ -1029,31 +966,78 @@
                           "</Mobile_uploadckInfo>\n"
                           "</soap:Body>\n"
                           "</soap:Envelope>\n",self.user.UserOID,ckToken,jsonData,type];
-        WebServiceConnect *da = [[WebServiceConnect alloc] initWithConnect:connectUrl :data :@"http://tempuri.org/Mobile_uploadckInfo" :@"Mobile_uploadckInfoResult"];
-        [da getTestConnet];
-        NSArray<NSString *> *stringArray = [da.tempStr componentsSeparatedByString:@":"];
-        if([stringArray[0] isEqualToString:@"false"]){
-            //无数据
+        
+        SCSoapHttpOperation *operation = [[SCSoapHttpOperation alloc] init];
+        [operation postwithURL:connectUrl withparameter:data withSoapAction:@"http://tempuri.org/Mobile_uploadckInfo" withResultDomain:@"Mobile_uploadckInfoResult" WithReturnValeuBlock:^(id returnValue) {
             
-            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                          message:stringArray[1]
-                                                         delegate:self
-                                                cancelButtonTitle:@"确定"
-                                                otherButtonTitles:nil, nil];
-            [alert show];//提示框的显示 必须写 不然没有任何反映
-            
-        }else{
-            //出库上传成功!
-            
-            
-            hasOut ++;
-            progress = progress + (float)(1.0f/sum);
-            if(progress<1){
-                [SVProgressHUD showProgress:progress status:@"上传中..."];
+            NSArray<NSString *> *stringArray = [(NSString *)returnValue componentsSeparatedByString:@":"];
+            if([stringArray[0] isEqualToString:@"false"]){
+                //无数据
+                
+                UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                              message:stringArray[1]
+                                                             delegate:self
+                                                    cancelButtonTitle:@"确定"
+                                                    otherButtonTitles:nil, nil];
+                [alert show];//提示框的显示 必须写 不然没有任何反映
+                
             }else{
-                [SVProgressHUD dismissWithDelay:1.0];
+                //出库上传成功!
+                
+                
+                hasOut ++;
+                progress = progress + (float)(1.0f/sum);
+                if(progress<1){
+                    [SVProgressHUD showProgress:progress status:@"上传中..."];
+                }else{
+                    [SVProgressHUD dismissWithDelay:1.0];
+                }
             }
-        }
+            
+            if([type isEqualToString:@"rkck"]){
+                //上传入库单结束
+                if(hasIn==inN && hasOut == outN && hasDir == dirN){
+                    [SVProgressHUD dismissWithDelay:1.0];
+                    [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
+                    NSDate *middle = [NSDate date];
+                    NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
+                    
+                    [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
+                    //删除数据库中的入库单及其关联表
+                    [SCDBTool clearInData:inToken];
+                    outArray = nil;
+                    diroutArray = nil;
+                    inArray = nil;
+                    NSDate *middle1 = [NSDate date];
+                    NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
+                    //直接下载入库订单
+                    [self performSelector:@selector(getOrderInTitle) withObject:nil afterDelay:3.0];
+                    NSDate *middle2 = [NSDate date];
+                    NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
+                }
+            }else if([type isEqualToString:@"ck"]){
+                if(hasOut==outArray.count){
+                    
+                    [SVProgressHUD dismissWithDelay:1.0];
+                    //上传出库单结束
+                    [self uploadOutCompleteWithCkToken:outToken withOutCount:outArray.count];
+                    [self.view makeToast:[NSString stringWithFormat:@"本次上传出库单明细%ld条",outArray.count] duration:5.0 position:CSToastPositionCenter];
+                    //删除数据库中的出库单及其关联表
+                    [SCDBTool clearOutData:outToken];
+                    outArray = nil;
+                    diroutArray = nil;
+                    inArray = nil;
+                    //下载当前出库订单表头
+                    [self performSelector:@selector(getOrderOutTitle) withObject:nil afterDelay:3.0];
+                }
+            }
+        } WithFailureBlock:^{
+            
+        }];
+        
+        
+        
+       
     }
     
 //    sleep(1);
@@ -1063,12 +1047,11 @@
  *  上传出库单完成
  *
  *  @param ckToken
- *  @param outCount 
+ *  @param outCount
  */
 -(void)uploadOutCompleteWithCkToken:(NSString *)ckToken withOutCount:(NSInteger)outCount {
     if([serverUrl isEqualToString:@""] || serverUrl == nil){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请先维护好服务器设置!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
+        [self.view makeToast:@"请先维护好服务器配置!" duration:3.0 position:CSToastPositionCenter];
     }else{
         NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=Mobile_uploadckComplete",serverUrl];
         

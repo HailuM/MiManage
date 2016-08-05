@@ -12,6 +12,7 @@
 #import "UartLib.h"
 #import "DateTool.h"
 #import "SVProgressHUD/SVProgressHUD.h"
+#import "SCSoapHttpOperation.h"
 
 @interface MainViewController : UIViewController<UIAlertViewDelegate>{
     

@@ -9,9 +9,11 @@
 #import "LoginViewController.h"
 #import "Reachability.h"
 #import "WebServiceConnect.h"
-#import "LoginInterface.h"
 #import "MainViewController.h"
 #import "UIBarButtonItem+Extension.h"
+
+#import "SCSoapHttpOperation.h"
+
 
 
 @interface LoginViewController ()
@@ -136,15 +138,71 @@
     NSString *username=self.etUsername.text;//获取输入的用户名
     NSString *userpwd=self.etPwd.text;  //获取输入的密码
     if([isHaveNet isEqualToString:@"1"]){
-        if([self LoginVerification:username :userpwd]){
-            
+        [self LoginVerification:username :userpwd];
+    }
+}
+//验证身份
+-(void)LoginVerification:(NSString *)username :(NSString *)userpwd{
+    //输入用户名空验证
+    if(username==nil || [username isEqualToString:@""]){
+        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请输入用户名!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        [alert show];
+        return;
+    }
+    //输入密码空验证
+    if(userpwd==nil || [userpwd isEqualToString:@""]){
+        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请输入密码!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        [alert show];
+        return;
+    }
+    if([serverUrl isEqualToString:@""] || serverUrl==nil){
+        serverUrl = @"fdcwzm.zhongnangroup.cn:82";
+    }
+    NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=ToLogin",serverUrl ];
+    
+    // 使用SCSoapHttpOperation发出接口请求
+    
+    SCSoapHttpOperation *operation = [[SCSoapHttpOperation alloc] init];
+    NSString *soapMessage = [NSString stringWithFormat:
+                             @"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                             "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"
+                             "<soap:Body>\n"
+                             "<ToLogin xmlns=\"http://tempuri.org/\">\n"
+                             "<userName>%@</userName>"
+                             "<pwd>%@</pwd>\n"
+                             "</ToLogin>\n"
+                             "</soap:Body>\n"
+                             "</soap:Envelope>\n",username,userpwd
+                             ];
+    [operation postwithURL:connectUrl withparameter:soapMessage withSoapAction:@"http://tempuri.org/ToLogin" withResultDomain:@"ToLoginResult" WithReturnValeuBlock:^(id returnValue) {
+        NSArray<NSString *> *stringArray = [(NSString *)returnValue componentsSeparatedByString:@";"];
+        if(stringArray[0]&&stringArray[0].length>0){
+            //返回正确的用户信息
+            if([User isExistInTable]){
+                [User clearTable];
+            }else{
+                [User createTable];
+            }
+            if(!self.user){
+                self.user = [[User alloc] init];
+            }
+            self.user.UserOID = stringArray[0];
+            self.user.UserName = stringArray[1];
+            BOOL b = [self.user saveOrUpdate];
+            NSLog(b?@"更新成功":@"更新失败");
+            //登录到首页
             //保存用户信息到本地
             if ([chooseType isEqualToString:@"1"]) {
                 NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-                NSDictionary *remeberDictionary = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:username,userpwd,self.user.UserOID,nil] forKeys:[NSArray arrayWithObjects:@"UserName", @"UserPwd",@"UserOID",nil]];
+
+                NSMutableDictionary *remeberDictionary = [[NSMutableDictionary alloc] init];
+                [remeberDictionary setValue:username forKey:@"UserName"];
+                [remeberDictionary setValue:userpwd forKey:@"UserPwd"];
+                [remeberDictionary setValue:self.user.UserOID forKey:@"UserOID"];
+                
                 [userDefaults setObject:remeberDictionary forKey:@"getRemeberInfo"];
                 [userDefaults setInteger:1 forKey:@"autologin"];//1,下次打开自动登录到首页
-                                                                //0,下次打开还必须跳转到登录页
+                //0,下次打开还必须跳转到登录页
                 
             }else{
                 NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
@@ -152,64 +210,60 @@
             }
             //跳转到首页
             [self performSegueWithIdentifier:@"toMain" sender:self];
+        }else{
+            //错误提示框的初始化
+            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                          message:stringArray[2]
+                                                         delegate:self
+                                                cancelButtonTitle:@"确定"
+                                                otherButtonTitles:nil, nil];
+            [alert show];//提示框的显示 必须写 不然没有任何反映
         }
-    }
-}
-//验证身份
--(Boolean)LoginVerification:(NSString *)username :(NSString *)userpwd{
-    //输入用户名空验证
-    if(username==nil || [username isEqualToString:@""]){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请输入用户名!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
-        return false;
-    }
-    //输入密码空验证
-    if(userpwd==nil || [userpwd isEqualToString:@""]){
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"请输入密码!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
-        return false;
-    }
-    if([serverUrl isEqualToString:@""] || serverUrl==nil){
-        serverUrl = @"fdcwzm.zhongnangroup.cn:82";
-    }
-    NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ZNWZCRK/othersource/ZhongNanWuZiMobileServices.asmx?op=ToLogin",serverUrl ];
-    //连接webservice获取企业介绍的数据
-    WebServiceConnect *da = [[WebServiceConnect alloc] initWithConnect:connectUrl :[NSString stringWithFormat:
-                                                                                 @"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-                                                                                 "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"
-                                                                                 "<soap:Body>\n"
-                                                                                 "<ToLogin xmlns=\"http://tempuri.org/\">\n"
-                                                                                 "<userName>%@</userName>"
-                                                                                 "<pwd>%@</pwd>\n"
-                                                                                 "</ToLogin>\n"
-                                                                                 "</soap:Body>\n"
-                                                                                 "</soap:Envelope>\n",username,userpwd
-                                                                                 ]
-                                                                    :@"http://tempuri.org/ToLogin"
-                                                                    :@"ToLoginResult"
-                           ];
-    [da getTestConnet];
+    } WithFailureBlock:^{
+        
+    }];
     
-    NSString *userString = da.tempStr;
-    NSArray<NSString *> *stringArray = [userString componentsSeparatedByString:@";"];
-    self.user = [[User alloc] init];
-    if(stringArray[0]&&stringArray[0].length>0){
-        //返回正确的用户信息
-        [User clearTable];
-        self.user.UserOID = stringArray[0];
-        self.user.UserName = stringArray[1];
-        [self.user saveOrUpdate];
-    }else{
-        //错误提示框的初始化
-        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                      message:stringArray[2]
-                                                     delegate:self
-                                            cancelButtonTitle:@"确定"
-                                            otherButtonTitles:nil, nil];
-        [alert show];//提示框的显示 必须写 不然没有任何反映
-        return NO;
-    }
-    return YES;
+    
+    
+    
+    
+    
+//    //连接webservice获取企业介绍的数据
+//    WebServiceConnect *da = [[WebServiceConnect alloc] initWithConnect:connectUrl :[NSString stringWithFormat:
+//                                                                                 @"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+//                                                                                 "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"
+//                                                                                 "<soap:Body>\n"
+//                                                                                 "<ToLogin xmlns=\"http://tempuri.org/\">\n"
+//                                                                                 "<userName>%@</userName>"
+//                                                                                 "<pwd>%@</pwd>\n"
+//                                                                                 "</ToLogin>\n"
+//                                                                                 "</soap:Body>\n"
+//                                                                                 "</soap:Envelope>\n",username,userpwd
+//                                                                                 ]
+//                                                                    :@"http://tempuri.org/ToLogin"
+//                                                                    :@"ToLoginResult"
+//                           ];
+//    [da getTestConnet];
+//    
+//    NSString *userString = da.tempStr;
+//    NSArray<NSString *> *stringArray = [userString componentsSeparatedByString:@";"];
+//    self.user = [[User alloc] init];
+//    if(stringArray[0]&&stringArray[0].length>0){
+//        //返回正确的用户信息
+//        [User clearTable];
+//        self.user.UserOID = stringArray[0];
+//        self.user.UserName = stringArray[1];
+//        [self.user saveOrUpdate];
+//    }else{
+//        //错误提示框的初始化
+//        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+//                                                      message:stringArray[2]
+//                                                     delegate:self
+//                                            cancelButtonTitle:@"确定"
+//                                            otherButtonTitles:nil, nil];
+//        [alert show];//提示框的显示 必须写 不然没有任何反映
+//        return NO;
+//    }
 }
 
 - (IBAction)toChooseType:(id)sender {
