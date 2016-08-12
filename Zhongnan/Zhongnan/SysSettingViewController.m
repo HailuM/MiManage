@@ -33,8 +33,11 @@
     NSArray *array = [User findAll];
     User *user = array[0];
     
-    self.usernameLabel.text = user.UserName;
-    
+    if(user.realName.length>0){
+        self.usernameLabel.text = user.realName;
+    }else{
+        self.usernameLabel.text = user.UserName;
+    }
     NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
     NSDictionary *myDictionary  = [userDefaultes  objectForKey:@"getServerInfo"];
     NSString *serverUrl=[myDictionary valueForKey:@"ServerIP"];//取出上次的服务器地址

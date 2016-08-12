@@ -188,6 +188,7 @@
             }
             self.user.UserOID = stringArray[0];
             self.user.UserName = stringArray[1];
+            self.user.realName = stringArray[2];
             BOOL b = [self.user saveOrUpdate];
             NSLog(b?@"更新成功":@"更新失败");
             //登录到首页

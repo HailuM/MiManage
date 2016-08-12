@@ -15,7 +15,8 @@
 @interface User : JKDBModel
 
 @property (nonatomic,copy) NSString *UserOID;//用户ID
-@property (nonatomic,copy) NSString *UserName;//用户名
+@property (nonatomic,copy) NSString *UserName;//用户名,登录用
+@property (nonatomic,copy) NSString *realName;//真实姓名,显示用
 @property (nonatomic,copy) NSString *ErrMsg;//错误信息
 @property (nonatomic,copy) NSString *IsLogin;//
 
