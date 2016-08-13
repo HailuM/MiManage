@@ -247,7 +247,7 @@
                 
                 
             }else {
-                asyncRK = [[UIAlertView alloc] initWithTitle:@"提示" message:@"当前用户已存在同步入库单令牌，是否清除当前令牌；若清除，该用户原手机端数据将无法使用。" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+                asyncRK = [[UIAlertView alloc] initWithTitle:@"提示" message:@"当前用户已存在同步入库单令牌，请在PC端清除再下载!" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
                 [asyncRK show];
             }
         }else{
@@ -322,7 +322,7 @@
                         [self uploadOutWithCkToken:outToken withData:child withType:@"ck"];
                     }
                 }else{
-                    asyncCK = [[UIAlertView alloc] initWithTitle:@"提示" message:@"当前用户已存在同步入库单令牌，是否清除当前令牌；若清除，该用户原手机端数据将无法使用。" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+                    asyncCK = [[UIAlertView alloc] initWithTitle:@"提示" message:@"当前用户已存在同步入库单令牌,请在PC端清除再下载!" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
                     [asyncCK show];
                 }
             }
