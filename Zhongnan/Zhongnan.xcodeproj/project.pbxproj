@@ -95,6 +95,7 @@
 		C83E25A11D3BBF0600128C7C /* OutBillSer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25A01D3BBF0600128C7C /* OutBillSer.m */; };
 		C83E25A41D3BBF1B00128C7C /* OutBillChild.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25A31D3BBF1B00128C7C /* OutBillChild.m */; };
 		C83E25A71D3E09C600128C7C /* PrintViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E25A61D3E09C600128C7C /* PrintViewController.m */; };
+		C8A08F3A1D6449E900B58AFB /* upload.png in Resources */ = {isa = PBXBuildFile; fileRef = C8A08F391D6449E900B58AFB /* upload.png */; };
 		C8B07EC31D50421C0002FE2C /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8B07EC21D50421C0002FE2C /* QuartzCore.framework */; };
 		C8B07ECF1D50471F0002FE2C /* SVIndefiniteAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B07EC61D50471F0002FE2C /* SVIndefiniteAnimatedView.m */; };
 		C8B07ED01D50471F0002FE2C /* SVProgressAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B07EC81D50471F0002FE2C /* SVProgressAnimatedView.m */; };
@@ -267,6 +268,7 @@
 		C83E25A31D3BBF1B00128C7C /* OutBillChild.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OutBillChild.m; path = model/out/OutBillChild.m; sourceTree = "<group>"; };
 		C83E25A51D3E09C600128C7C /* PrintViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrintViewController.h; sourceTree = "<group>"; };
 		C83E25A61D3E09C600128C7C /* PrintViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrintViewController.m; sourceTree = "<group>"; };
+		C8A08F391D6449E900B58AFB /* upload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = upload.png; sourceTree = "<group>"; };
 		C8B07EC21D50421C0002FE2C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		C8B07EC51D50471F0002FE2C /* SVIndefiniteAnimatedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVIndefiniteAnimatedView.h; sourceTree = "<group>"; };
 		C8B07EC61D50471F0002FE2C /* SVIndefiniteAnimatedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVIndefiniteAnimatedView.m; sourceTree = "<group>"; };
@@ -429,6 +431,7 @@
 				A52CB37C1D22437D00402E3F /* add.png */,
 				A52CB37D1D22437D00402E3F /* btnloginbg.png */,
 				A52CB37E1D22437D00402E3F /* checked.png */,
+				C8A08F391D6449E900B58AFB /* upload.png */,
 				A52CB37F1D22437D00402E3F /* ck.png */,
 				A52CB3801D22437D00402E3F /* cspz.png */,
 				A52CB3811D22437D00402E3F /* cssz.png */,
@@ -834,6 +837,7 @@
 				A52CB3AD1D22437D00402E3F /* misspassword.png in Resources */,
 				A52CB3AF1D22437D00402E3F /* person.png in Resources */,
 				A52CB3B01D22437D00402E3F /* print.png in Resources */,
+				C8A08F3A1D6449E900B58AFB /* upload.png in Resources */,
 				C8197F531D2F47370031FCE0 /* order.png in Resources */,
 				A52CB39A1D22437D00402E3F /* 80.png in Resources */,
 				A52CB3AA1D22437D00402E3F /* left.png in Resources */,

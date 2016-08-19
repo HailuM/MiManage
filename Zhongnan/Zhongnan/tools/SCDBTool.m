@@ -244,7 +244,28 @@
     return YES;
 }
 
-
++(BOOL)clearAllData {
+    NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
+    [userDefaultes setObject:@"" forKey:@"ckToken"];
+    [userDefaultes setObject:@"" forKey:@"rkToken"];
+    
+    [PuOrder clearTable];
+    [PuOrderChild clearTable];
+    
+    [Consumer clearTable];
+    
+    [InBill clearTable];
+    [InBillChild clearTable];
+    
+    [OutBill clearTable];
+    [OutBillChild clearTable];
+    
+    [DirBill clearTable];
+    [DirBillChild clearTable];
+    
+    
+    return YES;
+}
 
 
 @end

@@ -12,7 +12,9 @@
 #import "UartLib.h"
 //#import "MBProgressHUD.h"
 
-@interface ConfirmOutViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,PassConsumerDelegate,UartDelegate,UIAlertViewDelegate>
+@interface ConfirmOutViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,PassConsumerDelegate,UartDelegate,UIAlertViewDelegate>{
+    int hasPaper;//0,正常  1,缺纸
+}
 
 @property (nonatomic, strong) PuOrder *order;
 @property (nonatomic, strong) NSMutableArray *selArray;//保存已选中材料的数组

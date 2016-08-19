@@ -21,7 +21,9 @@
 
 @end
 
-@interface ConfirmDiroutViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,PassConsumerDelegate,UartDelegate>
+@interface ConfirmDiroutViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,PassConsumerDelegate,UartDelegate>{
+    int hasPaper;//0,正常  1,缺纸
+}
 @property (nonatomic, strong) Consumer *consumer;//领料商
 @property (nonatomic, strong) PuOrder *order;
 @property (nonatomic, strong) NSMutableArray *selArray;//保存已选中材料的数组

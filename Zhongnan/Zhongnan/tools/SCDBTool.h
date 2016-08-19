@@ -74,4 +74,11 @@
  */
 +(BOOL)clearOutData:(NSString *)ckToken;
 
+
+
+/**
+ *  清除所有数据.除了user表
+ */
++(BOOL)clearAllData;
+
 @end

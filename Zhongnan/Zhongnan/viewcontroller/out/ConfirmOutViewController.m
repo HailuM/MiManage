@@ -1,4 +1,4 @@
-//
+ //
 //  ConfirmOutViewController.m
 //  Zhongnan
 //
@@ -482,6 +482,13 @@
             }
             //主线程延迟5秒
             [self performSelector:@selector(delayMethod) withObject:nil afterDelay:5.0f];
+//            //返回首页
+//            NSArray *controllers = self.navigationController.viewControllers;
+//            for(UIViewController *viewController in controllers){
+//                if([viewController isKindOfClass:[MainViewController class]]){
+//                    [self.navigationController popToViewController:viewController animated:YES];
+//                }
+//            }
             
             
             
@@ -510,16 +517,20 @@
     curPrintContent = printContant;
     
     if ([curPrintContent length]) {
-        NSString *printed = [curPrintContent stringByAppendingFormat:@"%c%c%c", '\n', '\n', '\n'];
-        
-        [self PrintWithFormat:printed];
-        outBill.printcount ++;
-        [outBill saveOrUpdate];
-        
-        for(OutBillChild *childPrint in self.array){
-            childPrint.printcount ++;
-            [childPrint saveOrUpdate];
+        if(hasPaper==0){
+            NSString *printed = [curPrintContent stringByAppendingFormat:@"%c%c%c", '\n', '\n', '\n'];
+            
+            [self PrintWithFormat:printed];
+            outBill.printcount ++;
+            [outBill saveOrUpdate];
+            for(OutBillChild *childPrint in self.array){
+                childPrint.printcount ++;
+                [childPrint saveOrUpdate];
+            }
+        }else{
+            [self.view makeToast:@"打印机缺纸!" duration:3.0 position:CSToastPositionCenter];
         }
+        
         //返回首页
         NSArray *controllers = self.navigationController.viewControllers;
         for(UIViewController *viewController in controllers){
@@ -608,8 +619,10 @@
         Byte *recvByte = (Byte *)[recvData bytes];
         
         if (recvByte[2] == 0x0c) {
+            hasPaper = 1;
             NSLog(@"缺纸");
         }else{
+            hasPaper = 0;
             NSLog(@"正常");
         }
     }

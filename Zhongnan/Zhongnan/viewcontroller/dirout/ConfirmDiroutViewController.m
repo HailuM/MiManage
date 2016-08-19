@@ -644,22 +644,26 @@
     curPrintContent = printContant;
     
     if ([curPrintContent length]) {
-        NSString *printed = [curPrintContent stringByAppendingFormat:@"%c%c%c", '\n', '\n', '\n'];
-        
-        [self PrintWithFormat:printed];
-        
-        //查找当前存入数据库的直入直出单,修改打印次数
-        DirBill *billPrint = [DirBill findFirstByCriteria:[NSString stringWithFormat:@" WHERE zrzcid = '%@'",bill.zrzcid]];
-        billPrint.printcount ++;
-        [billPrint saveOrUpdate];
-        
-        //根据当前存入数据库的直入直出单,修改对应材料的打印次数
-        NSArray *printArray = [DirBillChild findByCriteria:[NSString stringWithFormat:@" WHERE zrzcid = '%@'",billPrint.zrzcid]];
-        for(DirBillChild *childPrint in printArray){
-            childPrint.printcount ++;
-            [childPrint saveOrUpdate];
+        if(hasPaper==0){
+            NSString *printed = [curPrintContent stringByAppendingFormat:@"%c%c%c", '\n', '\n', '\n'];
+            
+            [self PrintWithFormat:printed];
+            
+            //查找当前存入数据库的直入直出单,修改打印次数
+            DirBill *billPrint = [DirBill findFirstByCriteria:[NSString stringWithFormat:@" WHERE zrzcid = '%@'",bill.zrzcid]];
+            billPrint.printcount ++;
+            [billPrint saveOrUpdate];
+            
+            //根据当前存入数据库的直入直出单,修改对应材料的打印次数
+            NSArray *printArray = [DirBillChild findByCriteria:[NSString stringWithFormat:@" WHERE zrzcid = '%@'",billPrint.zrzcid]];
+            for(DirBillChild *childPrint in printArray){
+                childPrint.printcount ++;
+                [childPrint saveOrUpdate];
+            }
+        }else{
+            [self.view makeToast:@"打印机缺纸!" duration:3.0 position:CSToastPositionCenter];
         }
-        
+
         NSArray *controllers = self.navigationController.viewControllers;
         for(UIViewController *viewController in controllers){
             if([viewController isKindOfClass:[MainViewController class]]){
@@ -739,8 +743,10 @@
         Byte *recvByte = (Byte *)[recvData bytes];
         
         if (recvByte[2] == 0x0c) {
+            hasPaper = 1;
             NSLog(@"缺纸");
         }else{
+            hasPaper = 0;
             NSLog(@"正常");
         }
     }

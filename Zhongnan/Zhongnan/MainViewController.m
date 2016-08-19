@@ -29,15 +29,20 @@
     
     int hasIn;//已上传的入库明细数量
     int hasDir;//已上传的直入直出明细数量
+    int hasInOut;//已上传的入库出库明细数量
     int hasOut;//已上传的出库明细数量
     
     NSInteger dirN;//直入直出单条数
     NSInteger inN;//入库单条数
+    NSInteger inoutN;//入库出库条数
     NSInteger outN;//出库单条数
+    
     //查询入库单
     NSArray *inArray;
     //查询直入直出
     NSArray *diroutArray;
+    //查询入库出库
+    NSArray *inoutArray;
     //查询出库单
     NSArray *outArray;
 }
@@ -83,7 +88,7 @@
     if (![self isConnectionAvailable:@"http:\\www.baidu.com"]) {
         //错误提示框的初始化
         UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                      message:@"当前的网络连接不可用，同步功能无法使用,请退出应用并到有网络的环境中再打开！"
+                                                      message:@"当前的网络连接不可用，数据上传和瞎子啊功能无法使用,请退出应用并到有网络的环境中再打开！"
                                                      delegate:self
                                             cancelButtonTitle:@"确定"
                                             otherButtonTitles:nil, nil];
@@ -105,22 +110,6 @@
     //读取出库的token
     outToken = [userDefaultes valueForKey:@"ckToken"];//
     
-//    db = [FMDatabase databaseWithPath:@"/tmp/zn.db"];
-    
-//    测试
-//    Consumer *consumer = [[Consumer alloc] init];
-//    consumer.Name = @"南通浪潮";
-//    consumer.Orderid = @"13affda-245de6-243431";
-//    consumer.consumerid = @"13affda-245ce6-24346";
-//    
-//    [consumer save];
-    
-    
-//    uartLib = [[UartLib alloc] init];
-//    [uartLib setUartDelegate:self];
-//    connectAlertView = [[UIAlertView alloc] initWithTitle:@"连接蓝牙打印机" message: @"连接中，请稍后!" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil,nil];
-    
-
 }
 
 //验证网络是否通畅
@@ -171,95 +160,136 @@
         }
     }
 }
-//同步入库
-- (IBAction)synStorage:(id)sender {
+
+
+
+//数据上传
+- (IBAction)upload:(id)sender {
     if (![self isConnectionAvailable:@"http:\\www.baidu.com"]) {
         //错误提示框的初始化
         UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                      message:@"当前的网络连接不可用，同步功能无法使用,请退出应用并到有网络的环境中再打开！"
+                                                      message:@"当前的网络连接不可用，数据上传和下载功能无法使用,请退出应用并到有网络的环境中再打开！"
                                                      delegate:self
                                             cancelButtonTitle:@"确定"
                                             otherButtonTitles:nil, nil];
         [alert show];//提示框的显示 必须写 不然没有任何反映
     }else{
-        NSDate *first = [NSDate date];
-        NSLog(@"开始时间:%@",[DateTool datetimeToString:first]);
-        
-        
-        //查询当前数据库中的入库单,并上传
-        
-        hasIn = 0;
-        hasDir = 0;
-        hasOut = 0;
-        
-        if(inToken && inToken.length>0){
-            //存在入库Token
-            //查询入库单
-            inArray = [InBillChild findAll];
-            //查询直入直出
-            diroutArray = [DirBillChild findAll];
-            //查询出库单
-            outArray = [OutBillChild findByCriteria:@" where type = 'rkck'"];
-            
-            //上传直入直出
-            dirN = diroutArray.count;
-            //上传入库单
-            inN = inArray.count;
-            //如果没有ckToken,上传出库单
-    //        if(outToken==nil||outToken.length==0){
-                outN = outArray.count;
-    //        }
-            
-            
-            //查看来源单据
-            NSArray *sourceArray = [PuOrder findAll];
-            
-            
-            
-            sum = dirN+inN+outN;
-            if(sum>0){
 
-                
-                progress = 0.0f;
-                //SVProgressHUD
-                [SVProgressHUD showProgress:0.0 status:@"上传中..."];
-                
-                //上传直入直出单
-                if(dirN>0){
-                    for(DirBillChild *child in diroutArray){
-                        [self uploadDiroutWithRkToken:inToken withData:child];
-                    }
+        [self checkToUpload];
+    
+        if(sum>0){
+            progress = 0.0f;
+            //SVProgressHUD
+            [SVProgressHUD showProgress:0.0 status:@"上传中..."];
+            
+            //上传直入直出单
+            if(dirN>0){
+                for(DirBillChild *child in diroutArray){
+                    [self uploadDiroutWithRkToken:inToken withData:child];
                 }
-
-                if(inN>0){
-                    for(InBillChild *child in inArray){
-                        [self uploadInWithRkToken:inToken withData:child];
-                    }
-                    
-                }
-                
-
-                
-                
-                
-                
-                
-                
-                
-            }else {
-                asyncRK = [[UIAlertView alloc] initWithTitle:@"提示" message:@"当前用户已存在同步入库单令牌，请在PC端清除再下载!" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
-                [asyncRK show];
             }
-        }else{
             
-            //删除数据库中的入库单及其关联表
-            [SCDBTool clearInData:inToken];
-            //直接下载入库订单
-            [self getOrderInTitle];
+            //上传入库单
+            if(inN>0){
+                for(InBillChild *child in inArray){
+                    [self uploadInWithRkToken:inToken withData:child];
+                }
+            }
+            
+            //上传出库单
+            if(outN>0){
+                for(OutBillChild *child in outArray){
+                    [self uploadOutWithCkToken:outToken withData:child withType:@"ck"];
+                }
+            }
+            
+        }else{
+            [self.view makeToast:@"暂无上传的数据!" duration:3.0 position:CSToastPositionCenter];
         }
         
-        NSDate *end = [NSDate date];
-        NSLog(@"结束时间:%@",[DateTool datetimeToString:end]);
+        
+    }
+    
+}
+
+//查询需要上传的数据
+- (void)checkToUpload
+{
+    //查询数据  直入直出、入库、入库出库、出库数据
+    hasIn = 0;
+    hasDir = 0;
+    hasInOut = 0;
+    hasOut = 0;
+    dirN = 0;//直入直出单条数
+    inN = 0;//入库单条数
+    inoutN = 0;//入库出库条数
+    outN = 0;//出库单条数
+
+    
+    NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
+    //读取入库的token
+    
+    inToken = [userDefaultes valueForKey:@"rkToken"];//
+    
+    //读取出库的token
+    outToken = [userDefaultes valueForKey:@"ckToken"];//
+    if(inToken && inToken.length>0){
+        //查询入库单
+        inArray = [InBillChild findAll];
+        //查询直入直出
+        diroutArray = [DirBillChild findAll];
+        //查询出库单
+        inoutArray = [OutBillChild findByCriteria:@" where type = 'rkck'"];
+        
+        //上传直入直出数量
+        dirN = diroutArray.count;
+        //上传入库单数量
+        inN = inArray.count;
+        //上传入库出库单数量
+        inoutN = inoutArray.count;
+    }
+    
+    if(outToken && outToken.length>0){
+        //查询出库单
+        outArray = [OutBillChild findByCriteria:@" where type = 'ck'"];
+        //上传出库单数量
+        outN =outArray.count;
+    }
+    
+    sum = dirN+inN+inoutN+outN;
+}
+
+
+
+//入库下载
+- (IBAction)synStorage:(id)sender {
+    if (![self isConnectionAvailable:@"http:\\www.baidu.com"]) {
+        //错误提示框的初始化
+        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                      message:@"当前的网络连接不可用，数据上传和下载功能无法使用,请退出应用并到有网络的环境中再打开！"
+                                                     delegate:self
+                                            cancelButtonTitle:@"确定"
+                                            otherButtonTitles:nil, nil];
+        [alert show];//提示框的显示 必须写 不然没有任何反映
+    }else{
+        //查询当前数据库中需要上传的数据
+        [self checkToUpload];
+        
+        if(sum>0){
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"提示" message:@"存在需要上传的数据,请先上传数据" delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+            [alertView show];
+        }else{
+            //查询是否存在入库相关的单据
+            if(inToken&& inToken.length>0){
+                asyncRK = [[UIAlertView alloc] initWithTitle:@"重新下载" message:@"您想重新下载数据吗？若是则会清除已下载数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+                [asyncRK show];
+            }else{
+                //删除数据库中的入库单及其关联表
+                [SCDBTool clearInData:inToken];
+                //直接下载入库订单
+                [self getOrderInTitle];
+            }
+        }
     }
 }
 
@@ -267,74 +297,27 @@
     NSLog(@"耗时操作");
 }
 
-//同步出库
+//出库下载
 - (IBAction)syncOut:(id)sender {
     if (![self isConnectionAvailable:@"http:\\www.baidu.com"]) {
         //错误提示框的初始化
         UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                      message:@"当前的网络连接不可用，同步功能无法使用,请退出应用并到有网络的环境中再打开！"
+                                                      message:@"当前的网络连接不可用，数据上传和下载功能无法使用,请退出应用并到有网络的环境中再打开！"
                                                      delegate:self
                                             cancelButtonTitle:@"确定"
                                             otherButtonTitles:nil, nil];
         [alert show];//提示框的显示 必须写 不然没有任何反映
     }else{
-        
-        
-        
-        hasOut = 0;
-        
-        
-        
-        
-        
-        
-        
-        
-        //查询当前数据库中的出库单,并上传
-        if(outToken && outToken.length>0){
-            
-            
-            //查询入库单
-            NSArray *tempinArray = [InBillChild findAll];
-            //如果存在未上传的入库单,则提示先同步入库
-            if(tempinArray.count>0){
-                UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"存在未上传的入库单,请先同步入库!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-                [alert show];
-            }else{
-            
-                progress = 0.0f;
-                //SVProgressHUD
-                
-                //存在出库Token
-                //查询出库单
-                outArray = [OutBillChild findByCriteria:@" where type = 'ck'"];
-                
-                if(outArray.count>0){
-                    sum = outArray.count;
-//                    HUD = [[MBProgressHUD alloc] initWithView:self.view];
-//                    [self.view addSubview:HUD];
-//                    HUD.mode = MBProgressHUDModeDeterminateHorizontalBar;
-//                    HUD.label.text = @"上传中......";
-//                    [HUD showAnimated:YES whileExecutingBlock:^{
-//                        float f = 0.f;
-                    [SVProgressHUD showProgress:0.0 status:@"上传中..."];
-                    for(OutBillChild *child in outArray){
-                        [self uploadOutWithCkToken:outToken withData:child withType:@"ck"];
-                    }
-                }else{
-                    asyncCK = [[UIAlertView alloc] initWithTitle:@"提示" message:@"当前用户已存在同步入库单令牌,请在PC端清除再下载!" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
-                    [asyncCK show];
-                }
-            }
+        //查询当前数据库中需要上传的数据
+        [self checkToUpload];
+        if(sum>0){
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"提示" message:@"存在需要上传的数据,请先上传数据" delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+            [alertView show];
         }else{
-            //查询入库单
-            NSArray *inArray = [InBillChild findAll];
-            //如果存在未上传的入库单,则提示先同步入库
-            if(inArray.count>0){
-                UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示!" message:@"存在未上传的入库单,请先同步入库!" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-                [alert show];
+            if(outToken && outToken.length>0){
+                asyncCK = [[UIAlertView alloc] initWithTitle:@"重新下载" message:@"您想重新下载数据吗？若是则会清除已下载数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+                [asyncCK show];
             }else{
-            
                 //删除数据库中的出库单及其关联表
                 [SCDBTool clearOutData:outToken];
                 
@@ -342,7 +325,6 @@
                 [self getOrderOutTitle];
             }
         }
-    
     }
 }
 /**
@@ -509,7 +491,7 @@
                 [alert show];//提示框的显示 必须写 不然没有任何反映
                 
             }else{
-                [self.view makeToast:@"同步入库下载成功!" duration:3.0 position:CSToastPositionCenter];
+                [self.view makeToast:@"入库下载成功!" duration:3.0 position:CSToastPositionCenter];
             }
         }else{
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
@@ -734,7 +716,7 @@
         }else{
             //结束下载出库订单成功!
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
-                                                          message:@"同步出库成功!"
+                                                          message:@"出库下载成功!"
                                                          delegate:self
                                                 cancelButtonTitle:@"确定"
                                                 otherButtonTitles:nil, nil];
@@ -788,28 +770,44 @@
                     //                    [self uploadDiroutWithRkToken:inToken withData:diroutArray[hasDir]];
                     //                }
                 }else{
-                    [SVProgressHUD dismissWithDelay:1.0];
+                    [SVProgressHUD dismissWithDelay:0.0];
+                    
+                    NSString *string00 = @"本次上传";
+                    NSString *string01 = @"";//入库明细
+                    NSString *string02 = @"";//入库出库明细
+                    NSString *string03 = @"";//直入直出明细
+                    NSString *string04 = @"";//出库明细
+                    if(inN>0){
+                        string01 = [NSString stringWithFormat:@"入库单明细%ld条 ",inN];
+                    }
+                    
+                    if(inoutN>0){
+                        string02 = [NSString stringWithFormat:@"入库出库单明细%ld条 ",inoutN];
+                    }
+                    
+                    if(dirN>0){
+                        string03 = [NSString stringWithFormat:@"直入直出单明细%ld条 ",dirN];
+                    }
+                    
+                    if(outN>0){
+                        string04 = [NSString stringWithFormat:@"出库单明细%ld条 ",outN];
+                    }
+                    
+                    
+                    NSString *string = [NSString stringWithFormat:@"%@%@%@%@%@",string00,string01,string02,string03,string04];
+                    [self.view makeToast:string duration:3.0 position:CSToastPositionCenter];
                 }
             }
             //上传入库单结束
-            if(hasIn==inN && hasOut == outN && hasDir == dirN){
-                [SVProgressHUD dismissWithDelay:1.0];
-                [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
-                NSDate *middle = [NSDate date];
-                NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
-                
-                [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
+            if(hasIn==inN && hasInOut == inoutN && hasDir == dirN){
+//                [SVProgressHUD dismissWithDelay:0.0];
+                [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:inoutN];
                 //删除数据库中的入库单及其关联表
                 [SCDBTool clearInData:inToken];
-                outArray = nil;
+                inoutArray = nil;
                 diroutArray = nil;
                 inArray = nil;
-                NSDate *middle1 = [NSDate date];
-                NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
-                //直接下载入库订单
-                [self performSelector:@selector(getOrderInTitle) withObject:nil afterDelay:3.0];
-                NSDate *middle2 = [NSDate date];
-                NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
+                
             }
         } WithFailureBlock:^{
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
@@ -862,33 +860,50 @@
                 if(progress<1){
                     [SVProgressHUD showProgress:progress status:@"上传中..."];
                 }else{
-                    [SVProgressHUD dismissWithDelay:1.0];
+                    [SVProgressHUD dismissWithDelay:0.0];
+                    
+                    NSString *string00 = @"本次上传";
+                    NSString *string01 = @"";//入库明细
+                    NSString *string02 = @"";//入库出库明细
+                    NSString *string03 = @"";//直入直出明细
+                    NSString *string04 = @"";//出库明细
+                    if(inN>0){
+                        string01 = [NSString stringWithFormat:@"入库单明细%ld条 ",inN];
+                    }
+                    
+                    if(inoutN>0){
+                        string02 = [NSString stringWithFormat:@"入库出库单明细%ld条 ",inoutN];
+                    }
+                    
+                    if(dirN>0){
+                        string03 = [NSString stringWithFormat:@"直入直出单明细%ld条 ",dirN];
+                    }
+                    
+                    if(outN>0){
+                        string04 = [NSString stringWithFormat:@"出库单明细%ld条 ",outN];
+                    }
+                    
+                    
+                    NSString *string = [NSString stringWithFormat:@"%@%@%@%@%@",string00,string01,string02,string03,string04];
+                    [self.view makeToast:string duration:3.0 position:CSToastPositionCenter];
                 }
             }
             //上传入库单结束
-            if(hasIn==inN && hasOut == outN && hasDir == dirN){
-                [SVProgressHUD dismissWithDelay:1.0];
-                [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
-                NSDate *middle = [NSDate date];
-                NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
+            if(hasIn==inN && hasInOut == inoutN && hasDir == dirN){
+//                [SVProgressHUD dismissWithDelay:0.0];
+                [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:inoutN];
                 
-                [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
                 //删除数据库中的入库单及其关联表
                 [SCDBTool clearInData:inToken];
-                outArray = nil;
+                inoutArray = nil;
                 diroutArray = nil;
                 inArray = nil;
-                NSDate *middle1 = [NSDate date];
-                NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
-                //直接下载入库订单
-                [self performSelector:@selector(getOrderInTitle) withObject:nil afterDelay:3.0];
-                NSDate *middle2 = [NSDate date];
-                NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
+
             }else {
                 if(hasIn==inN){
                     //入库单上传结束,才可以上传出库单
-                    if(outN>0){
-                        for(OutBillChild *child in outArray){
+                    if(inoutN>0){
+                        for(OutBillChild *child in inoutArray){
                             [self uploadOutWithCkToken:inToken withData:child withType:@"rkck"];
                         }
                         
@@ -896,7 +911,12 @@
                 }
             }
         } WithFailureBlock:^{
-            
+            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                          message:@"网络连接中断!"
+                                                         delegate:self
+                                                cancelButtonTitle:@"确定"
+                                                otherButtonTitles:nil, nil];
+            [alert show];//提示框的显示 必须写 不然没有任何反映
         }];
     }
 }
@@ -935,11 +955,14 @@
             [alert show];//提示框的显示 必须写 不然没有任何反映
             
         }else{
-            //入库上传成功!
-            [self.view makeToast:@"同步上传入库成功!" duration:3.0 position:CSToastPositionCenter];
+            if(diroutCount>0 && inCount>0 && outCount>0){
+                //入库上传成功!
+                if(outN==hasOut){
+                    [self.view makeToast:@"上传入库成功!" duration:3.0 position:CSToastPositionCenter];
+                }
+            }
         }
     }
-//    sleep(1);
 }
 
 /**
@@ -984,63 +1007,78 @@
             }else{
                 //出库上传成功!
                 
-                
-                hasOut ++;
+                if([type isEqual:@"ck"]){
+                    hasOut ++;
+                }else{
+                    hasInOut ++;
+                }
                 progress = progress + (float)(1.0f/sum);
                 if(progress<1){
                     [SVProgressHUD showProgress:progress status:@"上传中..."];
                 }else{
-                    [SVProgressHUD dismissWithDelay:1.0];
+                    [SVProgressHUD dismissWithDelay:0.0];
+                    NSString *string00 = @"本次上传";
+                    NSString *string01 = @"";//入库明细
+                    NSString *string02 = @"";//入库出库明细
+                    NSString *string03 = @"";//直入直出明细
+                    NSString *string04 = @"";//出库明细
+                    if(inN>0){
+                        string01 = [NSString stringWithFormat:@"入库单明细%ld条 ",inN];
+                    }
+                    
+                    if(inoutN>0){
+                        string02 = [NSString stringWithFormat:@"入库出库单明细%ld条 ",inoutN];
+                    }
+                    
+                    if(dirN>0){
+                        string03 = [NSString stringWithFormat:@"直入直出单明细%ld条 ",dirN];
+                    }
+                    
+                    if(outN>0){
+                        string04 = [NSString stringWithFormat:@"出库单明细%ld条 ",outN];
+                    }
+                    
+                    
+                    NSString *string = [NSString stringWithFormat:@"%@%@%@%@%@",string00,string01,string02,string03,string04];
+                    [self.view makeToast:string duration:3.0 position:CSToastPositionCenter];
                 }
             }
             
             if([type isEqualToString:@"rkck"]){
                 //上传入库单结束
-                if(hasIn==inN && hasOut == outN && hasDir == dirN){
-                    [SVProgressHUD dismissWithDelay:1.0];
-                    [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:outN];
-                    NSDate *middle = [NSDate date];
-                    NSLog(@"上传结束时间:%@",[DateTool datetimeToString:middle]);
+                if(hasIn==inN && hasInOut == inoutN && hasDir == dirN){
+//                    [SVProgressHUD dismissWithDelay:0.0];
+                    [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:inoutN];
                     
-                    [self.view makeToast:[NSString stringWithFormat:@"本次上传直入直出单明细%ld条,入库单明细%ld条,出库单明细%ld条",(long)dirN,(long)inN,(long)outN] duration:5.0 position:CSToastPositionCenter];
                     //删除数据库中的入库单及其关联表
                     [SCDBTool clearInData:inToken];
-                    outArray = nil;
+                    inoutArray = nil;
                     diroutArray = nil;
                     inArray = nil;
-                    NSDate *middle1 = [NSDate date];
-                    NSLog(@"清除数据时间:%@",[DateTool datetimeToString:middle1]);
-                    //直接下载入库订单
-                    [self performSelector:@selector(getOrderInTitle) withObject:nil afterDelay:3.0];
-                    NSDate *middle2 = [NSDate date];
-                    NSLog(@"下载结束时间:%@",[DateTool datetimeToString:middle2]);
+                    
                 }
             }else if([type isEqualToString:@"ck"]){
-                if(hasOut==outArray.count){
+                if(hasOut==outN){
                     
-                    [SVProgressHUD dismissWithDelay:1.0];
+//                    [SVProgressHUD dismissWithDelay:0.0];
                     //上传出库单结束
-                    [self uploadOutCompleteWithCkToken:outToken withOutCount:outArray.count];
-                    [self.view makeToast:[NSString stringWithFormat:@"本次上传出库单明细%ld条",outArray.count] duration:5.0 position:CSToastPositionCenter];
+                    [self uploadOutCompleteWithCkToken:outToken withOutCount:outN];
+                    
                     //删除数据库中的出库单及其关联表
                     [SCDBTool clearOutData:outToken];
                     outArray = nil;
-                    diroutArray = nil;
-                    inArray = nil;
-                    //下载当前出库订单表头
-                    [self performSelector:@selector(getOrderOutTitle) withObject:nil afterDelay:3.0];
+                    
                 }
             }
         } WithFailureBlock:^{
-            
+            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
+                                                          message:@"网络连接中断!"
+                                                         delegate:self
+                                                cancelButtonTitle:@"确定"
+                                                otherButtonTitles:nil, nil];
+            [alert show];//提示框的显示 必须写 不然没有任何反映
         }];
-        
-        
-        
-       
     }
-    
-//    sleep(1);
 }
 
 /**
@@ -1080,7 +1118,11 @@
             
         }else{
             //出库上传成功!
-            [self.view makeToast:@"同步上传出库成功!" duration:3.0 position:CSToastPositionCenter];
+            if(outCount>0){
+                if(hasIn==inN && hasInOut == inoutN && hasDir == dirN){
+                    [self.view makeToast:@"上传出库成功!" duration:3.0 position:CSToastPositionCenter];
+                }
+            }
         }
         //        [self.view makeToast:da.tempStr duration:3.0 position:CSToastPositionCenter];
     }
@@ -1093,153 +1135,7 @@
 //补打
 - (IBAction)rePrint:(id)sender {
     //跳转到补打页面
-    //查询出所有未打印的出库单和直入直出单
-    
-//    //查询出库单
-//    NSArray *orderOutArray = [SCOrderMOut findByCriteria:@" WHERE isPrint = 0 "];//未打印的出库单
-////    NSArray *outArray = [SCOut findByCriteria:@" WHERE printcount = 0 "];//
-//    for(SCOrderMOut *orderout in orderOutArray){
-//        //待打印的材料数组
-//        NSArray *outArray = [SCOut findByCriteria:[NSString stringWithFormat:@" WHERE  deliverid = '%@' ",orderout.gid]];
-//        //准备打印出库单数据
-//        if(outArray.count>0){
-//            printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
-//                          @"------------------------------",
-//                          (orderout.printcount+1),
-//                          @"\n出库单号:",orderout.deliverNo,
-//                          @"\n项目:",orderout.ProjectName,
-//                          @"\n领用商:",orderout.consumerName,
-//                          @"\n地产公司:",orderout.Company,
-//                          @"\n------------------------------"];
-//            for (int i = 0; i<outArray.count; i++) {
-//                SCOut *outM = outArray[i];
-//                outM.isPrint = 1;
-//                outM.printcount ++;
-//                [outM saveOrUpdate];
-//                SCOrderOutMat *outMat = [SCOrderOutMat findFirstByCriteria:[NSString stringWithFormat:@" WHERE wareentry = '%@'",outM.wareentry]];
-//                NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%f%@%f%@%@\n ",
-//                                       @"\n材料名称:",outMat.Name,
-//                                       @"\n品牌:",outMat.brand,
-//                                       @"\n规格型号:",outMat.model,
-//                                       @"\n数量:",outM.qty,
-//                                       @"\n单价:",outMat.price,
-//                                       @"\n金额:",outM.qty*outMat.price,
-//                                       @"\n备注:",outMat.note];
-//                printContant = [printContant stringByAppendingString:matString];
-//            }
-//            printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
-//                            @"\n收货人:__________________",
-//                            @"\n                        ",
-//                            @"\n证明人:__________________"];
-//            //开始打印
-//            //--------------
-//            [uartLib scanStart];//scan
-//            NSLog(@"connect Peripheral");
-//            
-//            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
-//        }
-//        orderout.isPrint = 1;
-//        orderout.printcount ++;
-//        [orderout saveOrUpdate];
-//    }
-//    
-//    
-//    
-//    //查询直入直出单
-//    NSArray *orderInArray = [SCOrderMDirout findByCriteria:@" WHERE isPrint = 0 "];//未打印的直入直出单
-////    NSArray *inArray = [SCDirout findByCriteria:@" WHERE printcount = 0 "];//直入直出单
-//    for(SCOrderMDirout *orderDirout in orderInArray){
-//        //待打印的材料数组
-//        NSArray *diroutArray = [SCDirout findByCriteria:[NSString stringWithFormat:@" WHERE  zrzcid = '%@' ",orderDirout.gid]];
-//        //准备打印出库单数据
-//        if(diroutArray.count>0){
-//            printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
-//                          @"------------------------------",
-//                          (orderDirout.printcount+1),
-//                          @"\n出库单号:",orderDirout.deliverNo,
-//                          @"\n项目:",orderDirout.ProjectName,
-//                          @"\n领用商:",orderDirout.consumerName,
-//                          @"\n地产公司:",orderDirout.Company,
-//                          @"\n------------------------------"];
-//            for (int i = 0; i<diroutArray.count; i++) {
-//                SCDirout *dirout = diroutArray[i];
-//                dirout.isPrint = 1;
-//                dirout.printcount ++;
-//                [dirout saveOrUpdate];
-//                SCOrderInMat *inMat = [SCOrderInMat findFirstByCriteria:[NSString stringWithFormat:@" WHERE wareentry = '%@'",dirout.wareentry]];
-//                NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%f%@%f%@%f%@%@\n ",
-//                                       @"\n材料名称:",inMat.Name,
-//                                       @"\n品牌:",inMat.brand,
-//                                       @"\n规格型号:",inMat.model,
-//                                       @"\n数量:",dirout.qty,
-//                                       @"\n单价:",inMat.price,
-//                                       @"\n金额:",dirout.qty*inMat.price,
-//                                       @"\n备注:",inMat.note];
-//                printContant = [printContant stringByAppendingString:matString];
-//            }
-//            printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
-//                            @"\n收货人:____________________",
-//                            @"\n                          ",
-//                            @"\n证明人:____________________"];
-//            //开始打印
-//            //--------------
-//            [uartLib scanStart];//scan
-//            NSLog(@"connect Peripheral");
-//            
-//            [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
-//        }
-//        orderDirout.isPrint = 1;
-//        orderDirout.printcount ++;
-//        [orderDirout saveOrUpdate];
-//        
-//    }
-    
 }
-//-------
-//-(void)searchPrinter{
-//    if(connectPeripheral ==nil){
-//        [uartLib scanStart];//scan
-//        [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
-//    }else{
-//        [uartLib scanStop];
-//        [uartLib connectPeripheral:connectPeripheral];
-//        [connectAlertView show];
-//        [self performSelector:@selector(pirntData) withObject:nil afterDelay:3];
-//    }
-//    
-//}
-////-----
-//-(void)pirntData{
-//    NSString *curPrintContent;
-//    
-//    curPrintContent = printContant;
-//    
-//    if ([curPrintContent length]) {
-//        NSString *printed = [curPrintContent stringByAppendingFormat:@"%c%c%c", '\n', '\n', '\n'];
-//        
-//        [self PrintWithFormat:printed];
-//        //打印完成 记得该状态  todo
-//        if(outPrintArray.count>0){
-//            for(SCOut *scout in outPrintArray){
-//                scout.isPrint = 1;
-//                [scout saveOrUpdate];
-//            }
-//            outPrintArray = nil;
-//        }
-//        
-//        if(dirPrintArray.count>0){
-//            for (SCDirout *dirout in dirPrintArray) {
-//                dirout.isPrint = 1;
-//                [dirout saveOrUpdate];
-//            }
-//            dirPrintArray = nil;
-//        }
-//    }
-//    [uartLib scanStop];
-//    [uartLib disconnectPeripheral:connectPeripheral];
-//    
-//}
-//
 //参数设置
 - (IBAction)toSetting:(id)sender {
 }
@@ -1252,169 +1148,6 @@
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
 }
-
-
-//#pragma mark -
-//#pragma mark UartDelegate
-///****************************************************************************/
-///*                       UartDelegate Methods                        */
-///****************************************************************************/
-//- (void) didScanedPeripherals:(NSMutableArray  *)foundPeripherals;
-//{
-//    NSLog(@"didScanedPeripherals(%lu)", (unsigned long)[foundPeripherals count]);
-//    
-//    CBPeripheral	*peripheral;
-//    
-//    for (peripheral in foundPeripherals) {
-//        NSLog(@"--Peripheral:%@", [peripheral name]);
-//    }
-//    
-//    if ([foundPeripherals count] > 0) {
-//        connectPeripheral = [foundPeripherals objectAtIndex:0];
-//        if ([connectPeripheral name] == nil) {
-//            // [[self peripheralName] setText:@"BTCOM"];
-//        }else{
-//            // [[self peripheralName] setText:[connectPeripheral name]];
-//        }
-//    }else{
-//        //[[self peripheralName] setText:nil];
-//        connectPeripheral = nil;
-//    }
-//}
-//
-//- (void) didConnectPeripheral:(CBPeripheral *)peripheral{
-//    NSLog(@"did Connect Peripheral");
-//    
-//    //[[self sendButton] setEnabled:TRUE];
-//    
-//    [connectAlertView dismissWithClickedButtonIndex:0 animated:YES];
-//    
-//    //[self printerNotifyEnable];
-//}
-//
-//- (void) didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error{
-//    NSLog(@"did Disconnect Peripheral");
-//    
-//    // [[self sendButton] setEnabled:FALSE];
-//    //[[self peripheralName] setText:@""];
-//    [connectAlertView dismissWithClickedButtonIndex:0 animated:YES];
-//    
-//    //  [[[UIAlertView alloc] initWithTitle:@"Connect fail" message: @"Fail to connect,Please reconnect!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil,nil] show];
-//    //--------------wynadd
-//    [uartLib scanStart];//scan
-//    NSLog(@"connect Peripheral");
-//    [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
-//    
-//}
-//
-//- (void) didWriteData:(CBPeripheral *)peripheral error:(NSError *)error{
-//    NSLog(@"didWriteData:%@", [peripheral name]);
-//}
-//
-//
-//- (void) didReceiveData:(CBPeripheral *)peripheral recvData:(NSData *)recvData
-//{
-//    NSLog(@"uart recv(%lu):%@", (unsigned long)[recvData length], recvData);
-//    
-//    if ([recvData length] == 4) {
-//        Byte *recvByte = (Byte *)[recvData bytes];
-//        
-//        if (recvByte[2] == 0x0c) {
-//            NSLog(@"缺纸");
-//        }else{
-//            NSLog(@"正常");
-//        }
-//    }
-//    //[self promptDisplay:recvData];
-//}
-//
-//- (void) didBluetoothPoweredOff{
-//    
-//}
-//- (void) didBluetoothPoweredOn{
-//    
-//}
-//
-//- (void) didRetrievePeripheral:(NSArray *)peripherals{
-//    
-//}
-//
-//- (void) didRecvRSSI:(CBPeripheral *)peripheral RSSI:(NSNumber *)RSSI{
-//    
-//}
-//- (void) didDiscoverPeripheral:(CBPeripheral *)peripheral RSSI:(NSNumber *)RSSI{
-//    
-//}
-//
-//- (void) didDiscoverPeripheralAndName:(CBPeripheral *)peripheral DevName:(NSString *)devName{
-//    
-//}
-//
-//- (void) didrecvCustom:(CBPeripheral *)peripheral CustomerRight:(bool) bRight{
-//    
-//}
-//
-//- (void) PrintWithFormat:(NSString *)printContent{
-//#define MAX_CHARACTERISTIC_VALUE_SIZE 20
-//    NSData  *data	= nil;
-//    NSUInteger i;
-//    NSUInteger strLength;
-//    NSUInteger cellCount;
-//    NSUInteger cellMin;
-//    NSUInteger cellLen;
-//    
-//    Byte caPrintFmt[5];
-//    
-//    /*初始化命令：ESC @ 即0x1b,0x40*/
-//    caPrintFmt[0] = 0x1b;
-//    caPrintFmt[1] = 0x40;
-//    
-//    /*字符设置命令：ESC ! n即0x1b,0x21,n*/
-//    caPrintFmt[2] = 0x1b;
-//    caPrintFmt[3] = 0x21;
-//    
-//    caPrintFmt[4] = 0x00;
-//    
-//    NSData *cmdData =[[NSData alloc] initWithBytes:caPrintFmt length:5];
-//    
-//    [uartLib sendValue:connectPeripheral sendData:cmdData type:CBCharacteristicWriteWithResponse];
-//    NSLog(@"format:%@", cmdData);
-//    
-//    NSStringEncoding enc = CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
-//    //NSData *data = [curPrintContent dataUsingEncoding:enc];
-//    //NSLog(@"dd:%@", data);
-//    //NSString *retStr = [[NSString alloc] initWithData:data encoding:enc];
-//    //NSLog(@"str:%@", retStr);
-//    
-//    strLength = [printContent length];
-//    if (strLength < 1) {
-//        return;
-//    }
-//    
-//    cellCount = (strLength%MAX_CHARACTERISTIC_VALUE_SIZE)?(strLength/MAX_CHARACTERISTIC_VALUE_SIZE + 1):(strLength/MAX_CHARACTERISTIC_VALUE_SIZE);
-//    for (i=0; i<cellCount; i++) {
-//        cellMin = i*MAX_CHARACTERISTIC_VALUE_SIZE;
-//        if (cellMin + MAX_CHARACTERISTIC_VALUE_SIZE > strLength) {
-//            cellLen = strLength-cellMin;
-//        }
-//        else {
-//            cellLen = MAX_CHARACTERISTIC_VALUE_SIZE;
-//        }
-//        
-//        //NSLog(@"print:%d,%d,%d,%d", strLength,cellCount, cellMin, cellLen);
-//        NSRange rang = NSMakeRange(cellMin, cellLen);
-//        NSString *strRang = [printContent substringWithRange:rang];
-//        NSLog(@"print:%@", strRang);
-//        
-//        data = [strRang dataUsingEncoding: enc];
-//        //data = [strRang dataUsingEncoding: NSUTF8StringEncoding];
-//        NSLog(@"print:%@", data);
-//        //data = [strRang dataUsingEncoding: NSUTF8StringEncoding];
-//        //NSLog(@"print:%@", data);
-//        
-//        [uartLib sendValue:connectPeripheral sendData:data type:CBCharacteristicWriteWithResponse];
-//    }
-//}
 
 
 @end

@@ -314,27 +314,32 @@
     curPrintContent = printContant;
     
     if ([curPrintContent length]) {
-        NSString *printed = [curPrintContent stringByAppendingFormat:@"%c%c%c", '\n', '\n', '\n'];
-        
-        [self PrintWithFormat:printed];
-        if(type==0){
-            outBill.printcount ++;
-            [outBill saveOrUpdate];
-            for(OutBillChild *childPrint in outChildArray){
-                childPrint.printcount ++;
-                [childPrint saveOrUpdate];
+        if(hasPaper==0){
+            NSString *printed = [curPrintContent stringByAppendingFormat:@"%c%c%c", '\n', '\n', '\n'];
+            
+            [self PrintWithFormat:printed];
+            if(type==0){
+                outBill.printcount ++;
+                [outBill saveOrUpdate];
+                for(OutBillChild *childPrint in outChildArray){
+                    childPrint.printcount ++;
+                    [childPrint saveOrUpdate];
+                }
+                
             }
             
+            if(type==1){
+                dirBill.printcount ++;
+                [dirBill saveOrUpdate];
+                for(DirBillChild *childPrint in outChildArray){
+                    childPrint.printcount ++;
+                    [childPrint saveOrUpdate];
+                }
+            }
+        }else{
+            [self.view makeToast:@"打印机缺纸!" duration:3.0 position:CSToastPositionCenter];
         }
         
-        if(type==1){
-            dirBill.printcount ++;
-            [dirBill saveOrUpdate];
-            for(DirBillChild *childPrint in outChildArray){
-                childPrint.printcount ++;
-                [childPrint saveOrUpdate];
-            }
-        }
         
         NSArray *controllers = self.navigationController.viewControllers;
         for(UIViewController *viewController in controllers){
@@ -451,8 +456,10 @@
         Byte *recvByte = (Byte *)[recvData bytes];
         
         if (recvByte[2] == 0x0c) {
+            hasPaper = 1;
             NSLog(@"缺纸");
         }else{
+            hasPaper = 0;
             NSLog(@"正常");
         }
     }
