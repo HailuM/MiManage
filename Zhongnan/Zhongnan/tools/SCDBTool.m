@@ -189,7 +189,7 @@
             }
             //删除入库订单的领料商
             if([Consumer isExistInTable]){
-                [Consumer deleteObjectsByCriteria:[NSString stringWithFormat:@" where orderid = '%@'",order.id]];
+                [Consumer deleteObjectsByCriteria:[NSString stringWithFormat:@" where orderid = '%@'",order.OrderId]];
             }else{
                 [Consumer createTable];
             }
