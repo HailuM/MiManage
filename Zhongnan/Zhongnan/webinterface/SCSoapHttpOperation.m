@@ -20,6 +20,7 @@ WithReturnValeuBlock : (ReturnValueBlock)block
     resultDomain = result;
     recordResults = NO;
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    manager.requestSerializer.timeoutInterval = 300;
     manager.responseSerializer = [[AFHTTPResponseSerializer alloc] init];
     [manager.requestSerializer setValue:@"text/xml; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
     
