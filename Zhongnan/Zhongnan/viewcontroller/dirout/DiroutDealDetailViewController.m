@@ -82,7 +82,7 @@
  *  查询订单上的材料
  */
 -(void)initData {
-    matArray = [PuOrderChild findByCriteria:[NSString stringWithFormat:@" WHERE orderid = '%@' and isFinish = 0 ",self.order.id]];
+    matArray = [PuOrderChild findByCriteria:[NSString stringWithFormat:@" WHERE orderid = '%@' and isFinish = 0  order by xsxh",self.order.id]];
     unSelArray = [[NSMutableArray alloc] initWithArray:matArray];
     for(PuOrderChild *inMat in unSelArray){
         inMat.curQty = [NSString stringWithFormat:@"%f",[inMat.sourceQty doubleValue]-[inMat.rkQty doubleValue]];//默认当前的入库数量为订单上的sourceQty-已入库数量;如果<0,则,为0

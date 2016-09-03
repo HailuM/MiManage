@@ -365,6 +365,7 @@
                 OutBillChild *outChild = [[OutBillChild alloc] init];
                 outChild.outgid = outBill.gid;
                 
+                outChild.xsxh = outMat.xsxh;
                 outChild.preparertime = outBill.preparertime;
                 outChild.deliverNo = outBill.deliverNo;
                 outChild.deliverid = [UUIDUtil getUUID];
@@ -394,7 +395,7 @@
             int finish = 0;//判断单据是否结束:0,未结束  >0,已结束
             if(self.unSelArray.count>0){
                 //未结束
-                finish = 0;
+                finish = 1;
             }else{
                 for (int i = 0; i<self.array.count; i++) {
                     PuOrderChild *outMat = self.selArray[i];
@@ -411,7 +412,7 @@
             
             [self.order saveOrUpdate];
             //开始打印
-            printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
+            printContant=[NSString stringWithFormat:@"%@\n打印次数:%d%@%@%@%@%@%@%@%@%@",
                           @"------------------------------",
                           (outBill.printcount+1),
                           @"\n出库单号:",outBill.deliverNo,

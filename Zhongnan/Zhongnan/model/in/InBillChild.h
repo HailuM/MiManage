@@ -25,4 +25,6 @@
 /** 来源订单表头ID*/
 @property(nonatomic,copy)NSString *orderid;
 
+@property(nonatomic,assign) int xsxh;//排序
+
 @end

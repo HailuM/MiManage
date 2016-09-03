@@ -166,7 +166,7 @@
         NSString *cri = [NSString stringWithFormat:@" WHERE outgid = '%@'",((OutBill*)value).gid];
         outChildArray = [OutBillChild findByCriteria:cri];
         //开始打印
-        printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
+        printContant=[NSString stringWithFormat:@"%@\n打印次数:%d%@%@%@%@%@%@%@%@%@",
                       @"------------------------------",
                       (outBill.printcount+1),
                       @"\n出库单号:",outBill.deliverNo,
@@ -198,7 +198,7 @@
         //生成打印的字符串
         dirBill = value;
         //开始打印
-        printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
+        printContant=[NSString stringWithFormat:@"%@\n打印次数:%d%@%@%@%@%@%@%@%@%@",
                       @"\n-----------------------------",
                       (dirBill.printcount+1),
                       @"\n出库单号:",dirBill.number,

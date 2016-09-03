@@ -57,7 +57,7 @@
 //    bleAlert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"无法连接上蓝牙打印机" delegate:self cancelButtonTitle:@"确认" otherButtonTitles: nil];
     
     
-    finishAlert = [[UIAlertView alloc] initWithTitle:@"确认返回" message:@"已经保存并打印的出库单将失效!是否确认返回?" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确认", nil];
+    finishAlert = [[UIAlertView alloc] initWithTitle:@"确认返回" message:@"该直入直出未完毕，请点击取消后继续进行“直入直出”操作；如果只需要部分入库或出库，请点击确认按钮，退出“直入直出”功能，进入“入库”或“出库”功能，原直入直出已保存的入库、出库单据，打印的出库单将失效，是否确认返回?" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确认", nil];
     
     self.navigationItem.leftBarButtonItem = [UIBarButtonItem itemWithImageName:@"left" highImageName:@"left" target:self action:@selector(back)];
     
@@ -126,6 +126,9 @@
         viewController.flag = 1;
         viewController.orderid = self.order.id;
         viewController.delegate = self;
+    }else if([segue.identifier isEqualToString:@"dirtoin"]){
+        InDealDetailViewController *viewController = segue.destinationViewController;
+        viewController.order = self.order;
     }
 }
 
@@ -180,14 +183,6 @@
     UILabel *label = sender;
     NSInteger tag = label.tag-2000;
     PuOrderChild *inMat = self.selArray[tag];
-//    double limit = 0;
-//    //获取最终上限
-//    if([inMat.limitQty doubleValue]<=0)
-//    {
-//        limit = [inMat.sourceQty doubleValue];
-//    } else {
-//        limit = [inMat.limitQty doubleValue];
-//    }
     double cur = [inMat.curQty doubleValue];
     double source = [inMat.sourceQty doubleValue];
     double rk = [inMat.rkQty doubleValue];
@@ -331,6 +326,9 @@
                     [self.navigationController popToViewController:viewController animated:YES];
                 }
             }
+            //跳转到入库界面
+//            [self performSegueWithIdentifier:@"dirtoin" sender:self];
+//            InDealDetailViewController *viewController =
         }
     }
     else {
@@ -458,6 +456,7 @@
                     
                     //生成入库单
                     DirBillChild *billChild = [[DirBillChild alloc] init];
+                    billChild.xsxh = inMat.xsxh;
                     billChild.orderid = bill.orderid;
                     billChild.preparertime = bill.preparertime;
                     billChild.consumerid = bill.consumerid;
@@ -497,7 +496,7 @@
             //还有就是剩下的物料 curQty=0;
             
             //开始打印
-            printContant=[NSString stringWithFormat:@"%@\n第%d次打印%@%@%@%@%@%@%@%@%@",
+            printContant=[NSString stringWithFormat:@"%@\n打印次数:%d%@%@%@%@%@%@%@%@%@",
                           @"\n------------------------------",
                           (bill.printcount+1),
                           @"\n出库单号:",bill.number,

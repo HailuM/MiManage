@@ -274,6 +274,7 @@
             billC.orderEntryid = inMat.orderentryid; //来源单据的表体id
             billC.preparertime = bill.preparertime;
             billC.orderid = bill.orderid;
+            billC.xsxh = inMat.xsxh;
             
             if(![InBillChild isExistInTable]){
                 [InBillChild createTable];
@@ -289,7 +290,7 @@
             
             rkChild.orderid = rkOrder.id;
             
-            
+            rkChild.xsxh = inMat.xsxh;
             rkChild.sourceid = inMat.orderid;
             rkChild.sourcecid = bill.receiveid;
             rkChild.isFinish = 0;
@@ -310,14 +311,16 @@
         int finish = 0;//判断单据是否结束:0,未结束  >0,已结束
         if(self.unSelArray.count>0){
             //未结束
-            finish = 0;
+            finish = 1;
         }else{
-            for (int i = 0; i<self.selArray.count; i++) {
-                PuOrderChild *inMat = self.selArray[i];
-                if(inMat.isFinish==0){
-                    finish++;
+            
+                for (int i = 0; i<self.selArray.count; i++) {
+                    PuOrderChild *inMat = self.selArray[i];
+                    if(inMat.isFinish==0){
+                        finish++;
+                    }
                 }
-            }
+            
         }
         
         

@@ -56,7 +56,7 @@
     if([PuOrder isExistInTable]){
         NSString *criteria;
         NSArray *array;
-        criteria = [NSString stringWithFormat:@" WHERE type = 'rk' and isFinish = 0 and zcwc = 0 and number like '%%%@%%' and supplier like '%%%@%%'",order,suppliername];
+        criteria = [NSString stringWithFormat:@" WHERE type = 'rk' and isFinish = 0 and zcwc = 0 and number like '%%%@%%' and supplier like '%%%@%%' ",order,suppliername];
         array = [PuOrder findByCriteria:criteria];
         
         if(array.count>0){

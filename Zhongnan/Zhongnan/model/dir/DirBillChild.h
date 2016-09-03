@@ -33,4 +33,7 @@
 @property(nonatomic,assign) int temp;//0,临时
 
 
+@property(nonatomic,assign) int xsxh;//排序
+
+
 @end

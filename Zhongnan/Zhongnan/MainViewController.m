@@ -203,6 +203,12 @@
                 }
             }
             
+            // TODO 2016-09-03 15:43:53
+            
+            
+            
+            
+            
         }else{
             [self.view makeToast:@"暂无上传的数据!" duration:3.0 position:CSToastPositionCenter];
         }
@@ -417,7 +423,6 @@
                 [mat saveOrUpdate];
             }
         }
-        //        [self.view makeToast:da.tempStr duration:3.0 position:CSToastPositionCenter];
         NSDate *middle = [NSDate date];
         NSLog(@"下载表头结束时间:%@",[DateTool datetimeToString:middle]);
     }
@@ -800,15 +805,33 @@
             }
             //上传入库单结束
             if(hasIn==inN && hasInOut == inoutN && hasDir == dirN){
-//                [SVProgressHUD dismissWithDelay:0.0];
+                //                    [SVProgressHUD dismissWithDelay:0.0];
                 [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:inoutN];
+                
                 //删除数据库中的入库单及其关联表
                 [SCDBTool clearInData:inToken];
                 inoutArray = nil;
                 diroutArray = nil;
                 inArray = nil;
-                
             }
+            if(outN==0){
+                if(outToken&&outToken.length>0){
+                    [self uploadOutCompleteWithCkToken:outToken withOutCount:outN];
+                }
+                [SCDBTool clearOutData:outToken];
+            }
+//            //上传出库结束
+//            if(hasOut==outN){
+//                
+//                //                    [SVProgressHUD dismissWithDelay:0.0];
+//                //上传出库单结束
+//                [self uploadOutCompleteWithCkToken:outToken withOutCount:outN];
+//                
+//                //删除数据库中的出库单及其关联表
+//                [SCDBTool clearOutData:outToken];
+//                outArray = nil;
+//                
+//            }
         } WithFailureBlock:^{
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
                                                           message:@"网络连接中断!"
@@ -910,6 +933,24 @@
                     }
                 }
             }
+            if(outN==0){
+                if(outToken&&outToken.length>0){
+                    [self uploadOutCompleteWithCkToken:outToken withOutCount:outN];
+                }
+                [SCDBTool clearOutData:outToken];
+            }
+//            //上传出库结束
+//            if(hasOut==outN){
+//                
+//                //                    [SVProgressHUD dismissWithDelay:0.0];
+//                //上传出库单结束
+//                [self uploadOutCompleteWithCkToken:outToken withOutCount:outN];
+//                
+//                //删除数据库中的出库单及其关联表
+//                [SCDBTool clearOutData:outToken];
+//                outArray = nil;
+//                
+//            }
         } WithFailureBlock:^{
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
                                                           message:@"网络连接中断!"
@@ -1055,12 +1096,46 @@
                     inoutArray = nil;
                     diroutArray = nil;
                     inArray = nil;
-                    
                 }
+                if(outN==0){
+                    if(outToken&&outToken.length>0){
+                        [self uploadOutCompleteWithCkToken:outToken withOutCount:outN];
+                    }
+                    [SCDBTool clearOutData:outToken];
+                }
+//                //上传出库结束
+//                if(hasOut==outN){
+//                    //                    [SVProgressHUD dismissWithDelay:0.0];
+//                    //上传出库单结束
+//                    [self uploadOutCompleteWithCkToken:outToken withOutCount:outN];
+//                    
+//                    //删除数据库中的出库单及其关联表
+//                    [SCDBTool clearOutData:outToken];
+//                    outArray = nil;
+//                    
+//                }
             }else if([type isEqualToString:@"ck"]){
+                //上传入库单结束
+//                if(hasIn==inN && hasInOut == inoutN && hasDir == dirN){
+//                    //                    [SVProgressHUD dismissWithDelay:0.0];
+//                    [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:inoutN];
+//                    //删除数据库中的入库单及其关联表
+//                    [SCDBTool clearInData:inToken];
+//                    inoutArray = nil;
+//                    diroutArray = nil;
+//                    inArray = nil;
+//                }
+                
+                if(inN==0&& dirN==0 && inoutN==0){
+                    if(inToken&&inToken.length>0){
+                        [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:inoutN];
+                    }
+                    [SCDBTool clearInData:inToken];
+                }
+                //上传出库结束
                 if(hasOut==outN){
                     
-//                    [SVProgressHUD dismissWithDelay:0.0];
+                    //                    [SVProgressHUD dismissWithDelay:0.0];
                     //上传出库单结束
                     [self uploadOutCompleteWithCkToken:outToken withOutCount:outN];
                     

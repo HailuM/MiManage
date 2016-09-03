@@ -14,6 +14,7 @@
 #import "DiroutDealViewController.h"
 #import "ChooseConsumerViewController.h"
 #import "UartLib.h"
+#import "InDealDetailViewController.h"
 
 @protocol DiroutDelegate <NSObject>
 

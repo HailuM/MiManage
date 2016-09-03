@@ -66,7 +66,7 @@
  *  查询订单上的材料
  */
 -(void)initData {
-    matArray = [PuOrderChild findByCriteria:[NSString stringWithFormat:@" WHERE orderid = '%@' and isFinish = 0 ",self.order.id]];
+    matArray = [PuOrderChild findByCriteria:[NSString stringWithFormat:@" WHERE orderid = '%@' and isFinish = 0  order by xsxh",self.order.id]];
     unSelArray = [[NSMutableArray alloc] init];
     for(PuOrderChild *inMat in matArray){
         double source = [inMat.sourceQty doubleValue];

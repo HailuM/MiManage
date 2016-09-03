@@ -34,6 +34,9 @@
 @property(nonatomic,copy) NSDate *time;
 @property(nonatomic,copy) NSString *price;
 @property(nonatomic,copy) NSString *orderid; // 来源订单 外键表id
+
+@property(nonatomic,assign) int xsxh;//排序
+
 @property(nonatomic,assign)int isFinish;//0,未完成;1,已完成
 
 //手机自制的入库单生成出库任务

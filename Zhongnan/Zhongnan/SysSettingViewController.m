@@ -79,7 +79,7 @@
         //删除缓存数据
         [SCDBTool clearAllData];
         
-        [self.view makeToast:@"清除数据成功" duration:3.0 position:CSToastPositionCenter];
+        [self.view makeToast:@"清除数据成功，请到PC端清除Token" duration:3.0 position:CSToastPositionCenter];
     }
 }
 

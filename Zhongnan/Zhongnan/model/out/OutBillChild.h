@@ -34,4 +34,8 @@
 
 @property (nonatomic,copy) NSString *type;//@"ck"  @"rkck"
 
+
+
+@property(nonatomic,assign) int xsxh;//排序
+
 @end

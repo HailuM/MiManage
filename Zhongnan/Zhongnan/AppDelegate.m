@@ -19,6 +19,12 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    //启动基本SDK
+//    [[PgyManager sharedPgyManager] startManagerWithAppId:@"a08ce576600b1822efcee6e158942edc"];
+//    //启动更新检查SDK
+//    [[PgyUpdateManager sharedPgyManager] startManagerWithAppId:@"a08ce576600b1822efcee6e158942edc"];
+//    [[PgyUpdateManager sharedPgyManager] checkUpdate];
+    
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
