@@ -12,6 +12,8 @@
 #import "StringUtil.h"
 #import "UUIDUtil.h"
 #import "UIView+Toast.h"
+#import "ImageToBase64.h"
+#import "OrderImage.h"
 
 @interface ConfirmOutViewController (){
     UIAlertView *connectAlertView;
@@ -323,131 +325,15 @@
             [alert show];//提示框的显示 必须写 不然没有任何反映
         }else{
             //保存数据库
-            // TODO 涉及到出入库的数量判断
-            NSDate *now = [NSDate date];
             
+            [self saveOrder];
+            sheet = [[IBActionSheet alloc] initWithTitle:@"选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择", nil];
+            [sheet setFont:[UIFont systemFontOfSize:15.f]];
+            [sheet setButtonTextColor:[UIColor blackColor]];
+            [sheet setButtonBackgroundColor:[UIColor whiteColor]];
+            [sheet showInView:self.view];
+
             
-            
-            
-            //生成出库单主表
-            outBill = [[OutBill alloc] init];
-            
-            outBill.gid = [UUIDUtil getUUID];
-            outBill.orderid = self.order.id;
-            outBill.preparertime = [DateTool datetimeToString:now];
-            outBill.deliverNo = [StringUtil generateNo:@"SCCK"];
-            outBill.consumerid = self.consumer.consumerid;
-            outBill.consumername = self.consumer.Name;
-            outBill.printcount = 0;
-            // TODO
-            outBill.receiveid = self.order.id;
-            outBill.receiverOID = self.consumer.receiverOID;
-            
-            outBill.supplier = self.order.supplier;
-            outBill.materialDesc = self.order.materialDesc;
-            outBill.Addr = self.order.Addr;
-            outBill.ProjectName= self.order.ProjectName;
-            outBill.Company = self.order.Company;
-            outBill.type = self.order.type;
-            
-            [outBill saveOrUpdate];//保存出库单主表
-            
-            
-            self.array = [[NSMutableArray alloc] init];
-            for (int i = 0; i<self.selArray.count; i++) {
-                PuOrderChild *outMat = self.selArray[i];
-                outMat.ckQty = [NSString stringWithFormat:@"%f",[outMat.ckQty doubleValue]+[outMat.curQty doubleValue]];
-                if([outMat.ckQty doubleValue]==[outMat.sourceQty doubleValue]){
-                    outMat.isFinish = 1;
-                }
-                
-                //生成出库单子表
-                OutBillChild *outChild = [[OutBillChild alloc] init];
-                outChild.outgid = outBill.gid;
-                
-                outChild.xsxh = outMat.xsxh;
-                outChild.preparertime = outBill.preparertime;
-                outChild.deliverNo = outBill.deliverNo;
-                outChild.deliverid = [UUIDUtil getUUID];
-                outChild.consumerid = self.consumer.consumerid;
-                outChild.orderEntryid = outMat.orderentryid;
-                outChild.printcount = 0;
-                outChild.qty = outMat.curQty;
-                // TODO
-//                outChild.receiveid = outBill.receiveid;//确认来源
-                outChild.receiveid = outMat.sourcecid;
-                outChild.type = self.order.type;
-                outChild.orderid = self.order.sourceid;
-                outChild.receiverOID = self.consumer.receiverOID;
-                outChild.wareentryid = outMat.wareentryid;
-                outChild.Name = outMat.Name;
-                outChild.model = outMat.model;
-                outChild.unit = outMat.unit;
-                outChild.brand = outMat.brand;
-                outChild.note = outMat.note;
-                outChild.price = outMat.price;
-                
-                [outChild saveOrUpdate];
-                [self.array addObject:outChild];
-                outMat.curQty = 0;
-                [outMat saveOrUpdate];
-            }
-            int finish = 0;//判断单据是否结束:0,未结束  >0,已结束
-            if(self.unSelArray.count>0){
-                //未结束
-                finish = 1;
-            }else{
-                for (int i = 0; i<self.array.count; i++) {
-                    PuOrderChild *outMat = self.selArray[i];
-                    if(outMat.isFinish==0){
-                        finish++;
-                    }
-                }
-            }
-            if(finish>0){
-                self.order.isFinish = 0;
-            }else{
-                self.order.isFinish = 1;
-            }
-            
-            [self.order saveOrUpdate];
-            //开始打印
-            printContant=[NSString stringWithFormat:@"%@\n打印次数:%d%@%@%@%@%@%@%@%@%@",
-                          @"------------------------------",
-                          (outBill.printcount+1),
-                          @"\n出库单号:",outBill.deliverNo,
-                          @"\n项目:",outBill.ProjectName,
-                          @"\n领用商:",outBill.consumername,
-                          @"\n地产公司:",outBill.Company,
-                          @"\n------------------------------"];
-            for (int i = 0; i<self.array.count; i++) {
-                OutBillChild *outMat = self.array[i];
-                NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n",
-                                       @"\n材料名称:",outMat.Name,
-                                       @"\n品牌:",outMat.brand,
-                                       @"\n规格型号:",outMat.model,
-                                       @"\n数量:",[StringUtil changeFloat:outMat.qty],
-                                       @"\n备注:",outMat.note];
-                printContant = [printContant stringByAppendingString:matString];
-            }
-            printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
-                            @"\n收货人:________________________",
-                            @"\n  "
-                            @"\n证明人:________________________"];
-            
-            //准备好的打印字符串
-            //--------------
-            printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"打印", nil];
-            NSArray *subViewArray = printAlert.subviews;
-            for(int x=0;x<[subViewArray count];x++){
-                if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
-                {
-                    UILabel *label = [subViewArray objectAtIndex:x];
-                    label.textAlignment = UITextAlignmentLeft;
-                }
-                
-            }
-            [printAlert show];
             
 //            //返回首页
 //            NSArray *controllers = self.navigationController.viewControllers;
@@ -462,6 +348,237 @@
     }
     
 }
+
+-(void)saveOrder{
+    // TODO 涉及到出入库的数量判断
+    NSDate *now = [NSDate date];
+
+    //生成出库单主表
+    outBill = [[OutBill alloc] init];
+    
+    outBill.gid = [UUIDUtil getUUID];
+    outBill.orderid = self.order.id;
+    outBill.preparertime = [DateTool datetimeToString:now];
+    outBill.deliverNo = [StringUtil generateNo:@"SCCK"];
+    outBill.consumerid = self.consumer.consumerid;
+    outBill.consumername = self.consumer.Name;
+    outBill.printcount = 0;
+    // TODO
+    outBill.receiveid = self.order.id;
+    outBill.receiverOID = self.consumer.receiverOID;
+    
+    outBill.supplier = self.order.supplier;
+    outBill.materialDesc = self.order.materialDesc;
+    outBill.Addr = self.order.Addr;
+    outBill.ProjectName= self.order.ProjectName;
+    outBill.Company = self.order.Company;
+    outBill.type = self.order.type;
+    
+    [outBill saveOrUpdate];//保存出库单主表
+    
+    
+    self.array = [[NSMutableArray alloc] init];
+    for (int i = 0; i<self.selArray.count; i++) {
+        PuOrderChild *outMat = self.selArray[i];
+        outMat.ckQty = [NSString stringWithFormat:@"%f",[outMat.ckQty doubleValue]+[outMat.curQty doubleValue]];
+        if([outMat.ckQty doubleValue]==[outMat.sourceQty doubleValue]){
+            outMat.isFinish = 1;
+        }
+        
+        //生成出库单子表
+        OutBillChild *outChild = [[OutBillChild alloc] init];
+        outChild.outgid = outBill.gid;
+        
+        outChild.xsxh = outMat.xsxh;
+        outChild.preparertime = outBill.preparertime;
+        outChild.deliverNo = outBill.deliverNo;
+        outChild.deliverid = [UUIDUtil getUUID];
+        outChild.consumerid = self.consumer.consumerid;
+        outChild.orderEntryid = outMat.orderentryid;
+        outChild.printcount = 0;
+        outChild.qty = outMat.curQty;
+        // TODO
+        //                outChild.receiveid = outBill.receiveid;//确认来源
+        outChild.receiveid = outMat.sourcecid;
+        outChild.type = self.order.type;
+        outChild.orderid = self.order.sourceid;
+        outChild.receiverOID = self.consumer.receiverOID;
+        outChild.wareentryid = outMat.wareentryid;
+        outChild.Name = outMat.Name;
+        outChild.model = outMat.model;
+        outChild.unit = outMat.unit;
+        outChild.brand = outMat.brand;
+        outChild.note = outMat.note;
+        outChild.price = outMat.price;
+        
+        [outChild saveOrUpdate];
+        [self.array addObject:outChild];
+        outMat.curQty = 0;
+        [outMat saveOrUpdate];
+    }
+    int finish = 0;//判断单据是否结束:0,未结束  >0,已结束
+    if(self.unSelArray.count>0){
+        //未结束
+        finish = 1;
+    }else{
+        for (int i = 0; i<self.array.count; i++) {
+            PuOrderChild *outMat = self.selArray[i];
+            if(outMat.isFinish==0){
+                finish++;
+            }
+        }
+    }
+    if(finish>0){
+        self.order.isFinish = 0;
+    }else{
+        self.order.isFinish = 1;
+    }
+    
+    [self.order saveOrUpdate];
+}
+
+#pragma mark - IBActionSheet delegate
+-(void)actionSheet:(IBActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if(buttonIndex == sheet.cancelButtonIndex){
+        //不上传图片
+        //打印数据
+        //开始打印
+        printContant=[NSString stringWithFormat:@"%@\n打印次数:%d%@%@%@%@%@%@%@%@%@",
+                      @"------------------------------",
+                      (outBill.printcount+1),
+                      @"\n出库单号:",outBill.deliverNo,
+                      @"\n项目:",outBill.ProjectName,
+                      @"\n领用商:",outBill.consumername,
+                      @"\n地产公司:",outBill.Company,
+                      @"\n------------------------------"];
+        for (int i = 0; i<self.array.count; i++) {
+            OutBillChild *outMat = self.array[i];
+            NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n",
+                                   @"\n材料名称:",outMat.Name,
+                                   @"\n品牌:",outMat.brand,
+                                   @"\n规格型号:",outMat.model,
+                                   @"\n数量:",[StringUtil changeFloat:outMat.qty],
+                                   @"\n备注:",outMat.note];
+            printContant = [printContant stringByAppendingString:matString];
+        }
+        printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
+                        @"\n收货人:________________________",
+                        @"\n  "
+                        @"\n证明人:________________________"];
+        
+        //准备好的打印字符串
+        //--------------
+        printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"打印", nil];
+        NSArray *subViewArray = printAlert.subviews;
+        for(int x=0;x<[subViewArray count];x++){
+            if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
+            {
+                UILabel *label = [subViewArray objectAtIndex:x];
+                label.textAlignment = UITextAlignmentLeft;
+            }
+            
+        }
+        [printAlert show];
+    }
+    if(buttonIndex == 0){
+        //拍照
+        
+        SCCNavigationController *nav = [[SCCNavigationController alloc] init];
+        nav.scNaigationDelegate = self;
+        [nav showCameraWithParentController:self];
+        
+    }else if(buttonIndex == 1){
+        //从手机相册选择
+        
+        DoImagePickerController *cont = [[DoImagePickerController alloc] initWithNibName:@"DoImagePickerController" bundle:nil];
+        cont.nResultType = DO_PICKER_RESULT_UIIMAGE;
+        cont.delegate = self;
+        cont.nMaxCount = -1;
+        cont.nColumnCount = 3;
+        [self presentViewController:cont animated:YES completion:nil];
+    }
+}
+
+#pragma mark - SCNavigationController delegate
+//拍照委托
+- (void)didTakePicture:(SCCNavigationController *)navigationController image:(UIImage *)image {
+    [navigationController dismissModalViewControllerAnimated:YES];
+    //将图片转成字符串保存到数据库
+    NSString *imageData = [ImageToBase64 imageToBase64:image];
+    OrderImage *orderImage = [[OrderImage alloc] init];
+    orderImage.orderId = outBill.gid;
+    orderImage.imageData = imageData;
+    [orderImage saveOrUpdate];
+    
+    //弹出alert是否继续拍照
+    sheet = [[IBActionSheet alloc] initWithTitle:@"选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择", nil];
+    [sheet setFont:[UIFont systemFontOfSize:15.f]];
+    [sheet setButtonTextColor:[UIColor blackColor]];
+    [sheet setButtonBackgroundColor:[UIColor whiteColor]];
+    [sheet showInView:self.view];
+    
+}
+#pragma mark - DoImagePickerControllerDelegate
+//选择照片的委托
+- (void)didCancelDoImagePickerController
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+- (void)didSelectPhotosFromDoImagePickerController:(DoImagePickerController *)picker result:(NSArray *)aSelected
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+    if (picker.nResultType == DO_PICKER_RESULT_UIIMAGE)
+    {
+        if(aSelected && aSelected.count >0){
+            
+            for(UIImage *image in aSelected){
+                NSString *imageData = [ImageToBase64 imageToBase64:image];
+                OrderImage *orderImage = [[OrderImage alloc] init];
+                orderImage.orderId = outBill.gid;
+                orderImage.imageData = imageData;
+                [orderImage saveOrUpdate];
+            }
+        }
+        //开始打印
+        printContant=[NSString stringWithFormat:@"%@\n打印次数:%d%@%@%@%@%@%@%@%@%@",
+                      @"------------------------------",
+                      (outBill.printcount+1),
+                      @"\n出库单号:",outBill.deliverNo,
+                      @"\n项目:",outBill.ProjectName,
+                      @"\n领用商:",outBill.consumername,
+                      @"\n地产公司:",outBill.Company,
+                      @"\n------------------------------"];
+        for (int i = 0; i<self.array.count; i++) {
+            OutBillChild *outMat = self.array[i];
+            NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n",
+                                   @"\n材料名称:",outMat.Name,
+                                   @"\n品牌:",outMat.brand,
+                                   @"\n规格型号:",outMat.model,
+                                   @"\n数量:",[StringUtil changeFloat:outMat.qty],
+                                   @"\n备注:",outMat.note];
+            printContant = [printContant stringByAppendingString:matString];
+        }
+        printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
+                        @"\n收货人:________________________",
+                        @"\n  "
+                        @"\n证明人:________________________"];
+        
+        //准备好的打印字符串
+        //--------------
+        printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"打印", nil];
+        NSArray *subViewArray = printAlert.subviews;
+        for(int x=0;x<[subViewArray count];x++){
+            if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
+            {
+                UILabel *label = [subViewArray objectAtIndex:x];
+                label.textAlignment = UITextAlignmentLeft;
+            }
+            
+        }
+        [printAlert show];
+    }
+}
+
 
 //-------
 -(void)searchPrinter{
@@ -531,7 +648,7 @@
         }else{
             [self.view makeToast:@"打印机缺纸!" duration:3.0 position:CSToastPositionCenter];
         }
-        
+        // TODO 2016/09/21 选择上传图片
         //返回首页
         NSArray *controllers = self.navigationController.viewControllers;
         for(UIViewController *viewController in controllers){

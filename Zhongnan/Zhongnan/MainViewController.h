@@ -13,8 +13,9 @@
 #import "DateTool.h"
 #import "SVProgressHUD/SVProgressHUD.h"
 #import "SCSoapHttpOperation.h"
+#import "UploadFile.h"
 
-@interface MainViewController : UIViewController<UIAlertViewDelegate>{
+@interface MainViewController : UIViewController<UIAlertViewDelegate,UploadFileDelegate>{
     
     NSString *isHaveNet;         //是否有网络
     NSString *serverUrl;         //服务地址

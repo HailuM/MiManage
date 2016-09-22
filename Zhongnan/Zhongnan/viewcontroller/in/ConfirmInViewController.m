@@ -7,6 +7,8 @@
 //
 
 #import "ConfirmInViewController.h"
+#import "OrderImage.h"
+#import "ImageToBase64.h"
 
 @interface ConfirmInViewController ()
 
@@ -217,128 +219,210 @@
         [alert show];//提示框的显示 必须写 不然没有任何反映
     }else{
         //保存数据库
-        // TODO 涉及到出入库的数量判断
-        NSDate *now = [NSDate date];
-//        NSString *deliverNo = [NSString stringWithFormat:@"%@%@",[DateTool dateToString:now],[DateTool randomNumber]];
-        //保存入库单
-        bill = [[InBill alloc] init];
+        [self saveOrder];
+        
+        sheet = [[IBActionSheet alloc] initWithTitle:@"选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择", nil];
+        [sheet setFont:[UIFont systemFontOfSize:15.f]];
+        [sheet setButtonTextColor:[UIColor blackColor]];
+        [sheet setButtonBackgroundColor:[UIColor whiteColor]];
+        [sheet showInView:self.view];
+        
+    }
+
+}
+
+
+-(void)saveOrder{
+    // TODO 涉及到出入库的数量判断
+    NSDate *now = [NSDate date];
+    //        NSString *deliverNo = [NSString stringWithFormat:@"%@%@",[DateTool dateToString:now],[DateTool randomNumber]];
+    //保存入库单
+    bill = [[InBill alloc] init];
+    
+    
+    bill.receiveid = [UUIDUtil getUUID];
+    bill.orderid = self.order.id;
+    bill.date = self.order.date;
+    bill.supplier = self.order.supplier;
+    bill.materialDesc = self.order.materialDesc;
+    bill.Addr = self.order.Addr;
+    bill.ProjectName= self.order.ProjectName;
+    bill.Company = self.order.Company;
+    bill.preparertime = [DateTool datetimeToString:now];
+    
+    
+    
+    [bill saveOrUpdate];//保存入库单
+    //手机根据刚刚做的入库单生成新的出库来源订单主表
+    rkOrder = [[PuOrder alloc] init];
+    rkOrder.id = [UUIDUtil getUUID];//手机生成的入库单id
+    rkOrder.sourceid = self.order.id;
+    rkOrder.number = [StringUtil generateNo:@"SCRK"];
+    rkOrder.supplier = self.order.supplier;
+    rkOrder.materialDesc = self.order.materialDesc;
+    rkOrder.Addr = self.order.Addr;
+    rkOrder.type = @"rkck";
+    rkOrder.zcwc = NO;
+    rkOrder.name = self.order.name;
+    rkOrder.ProjectName = self.order.ProjectName;
+    rkOrder.Company = self.order.Company;
+    rkOrder.date = [DateTool dateWithString:now];
+    rkOrder.isFinish = 0;
+    
+    [rkOrder saveOrUpdate];
+    
+    for (int i = 0; i<self.selArray.count; i++) {
+        PuOrderChild *inMat = self.selArray[i];
+        //之前处理的数量+这一次的处理数量
+        inMat.rkQty = [NSString stringWithFormat:@"%f",[inMat.curQty doubleValue]+[inMat.rkQty doubleValue]];
+        //如果已处理数量介于sourceQty和limitQty
+        //则说明此次材料已处理结束
+        if([inMat.rkQty doubleValue]>=[inMat.sourceQty doubleValue] && [inMat.rkQty doubleValue]<=[inMat.limitQty doubleValue]){
+            //此次处理完成
+            inMat.isFinish = 1;
+        }
+        [inMat saveOrUpdate];
+        //生成入库单子表
+        InBillChild *billC = [[InBillChild alloc] init];
+        billC.receiveid = bill.receiveid;
+        billC.wareentryid = [UUIDUtil getUUID];
+        billC.qty = inMat.curQty;
+        billC.orderEntryid = inMat.orderentryid; //来源单据的表体id
+        billC.preparertime = bill.preparertime;
+        billC.orderid = bill.orderid;
+        billC.xsxh = inMat.xsxh;
+        
+        if(![InBillChild isExistInTable]){
+            [InBillChild createTable];
+        }
+        [billC saveOrUpdate];
         
         
-        bill.receiveid = [UUIDUtil getUUID];
-        bill.orderid = self.order.id;
-        bill.date = self.order.date;
-        bill.supplier = self.order.supplier;
-        bill.materialDesc = self.order.materialDesc;
-        bill.Addr = self.order.Addr;
-        bill.ProjectName= self.order.ProjectName;
-        bill.Company = self.order.Company;
-        bill.preparertime = [DateTool datetimeToString:now];
+        //child
+        PuOrderChild *rkChild = [[PuOrderChild alloc] init];
+        //rkChild 生成入库单的子表
+        //            rkChild.orderentryid = [UUIDUtil getUUID];
+        rkChild.orderentryid = inMat.orderentryid;
         
+        rkChild.orderid = rkOrder.id;
         
+        rkChild.xsxh = inMat.xsxh;
+        rkChild.sourceid = inMat.orderid;
+        rkChild.sourcecid = bill.receiveid;
+        rkChild.isFinish = 0;
+        rkChild.note = inMat.note;
+        rkChild.brand = inMat.brand;
+        rkChild.model = inMat.model;
+        rkChild.Name = inMat.Name;
+        rkChild.price = inMat.price;
+        rkChild.ckQty = 0;
+        rkChild.sourceQty = inMat.curQty;
+        rkChild.wareentryid = billC.wareentryid;
+        /////如果是手机生成入库单,那么材料明细的wareentryid是手机生成的,带到出库单明细的wareentryid
+        [rkChild saveOrUpdate];
         
-        [bill saveOrUpdate];//保存入库单
-        //手机根据刚刚做的入库单生成新的出库来源订单主表
-        PuOrder *rkOrder = [[PuOrder alloc] init];
-        rkOrder.id = [UUIDUtil getUUID];//手机生成的入库单id
-        rkOrder.sourceid = self.order.id;
-        rkOrder.number = [StringUtil generateNo:@"SCRK"];
-        rkOrder.supplier = self.order.supplier;
-        rkOrder.materialDesc = self.order.materialDesc;
-        rkOrder.Addr = self.order.Addr;
-        rkOrder.type = @"rkck";
-        rkOrder.zcwc = NO;
-        rkOrder.name = self.order.name;
-        rkOrder.ProjectName = self.order.ProjectName;
-        rkOrder.Company = self.order.Company;
-        rkOrder.date = [DateTool dateWithString:now];
-        rkOrder.isFinish = 0;
-        
-        [rkOrder saveOrUpdate];
+    }
+    
+    
+    int finish = 0;//判断单据是否结束:0,未结束  >0,已结束
+    if(self.unSelArray.count>0){
+        //未结束
+        finish = 1;
+    }else{
         
         for (int i = 0; i<self.selArray.count; i++) {
             PuOrderChild *inMat = self.selArray[i];
-            //之前处理的数量+这一次的处理数量
-            inMat.rkQty = [NSString stringWithFormat:@"%f",[inMat.curQty doubleValue]+[inMat.rkQty doubleValue]];
-            //如果已处理数量介于sourceQty和limitQty
-            //则说明此次材料已处理结束
-            if([inMat.rkQty doubleValue]>=[inMat.sourceQty doubleValue] && [inMat.rkQty doubleValue]<=[inMat.limitQty doubleValue]){
-                //此次处理完成
-                inMat.isFinish = 1;
+            if(inMat.isFinish==0){
+                finish++;
             }
-            [inMat saveOrUpdate];
-            //生成入库单子表
-            InBillChild *billC = [[InBillChild alloc] init];
-            billC.receiveid = bill.receiveid;
-            billC.wareentryid = [UUIDUtil getUUID];
-            billC.qty = inMat.curQty;
-            billC.orderEntryid = inMat.orderentryid; //来源单据的表体id
-            billC.preparertime = bill.preparertime;
-            billC.orderid = bill.orderid;
-            billC.xsxh = inMat.xsxh;
-            
-            if(![InBillChild isExistInTable]){
-                [InBillChild createTable];
+        }
+        
+    }
+    
+    
+    if(finish>0){
+        //有材料未完成
+        self.order.isFinish = 0;
+    }else{
+        self.order.isFinish = 1;
+    }
+    self.order.zcwc = 1;
+    [self.order saveOrUpdate];
+}
+
+#pragma mark - IBActionSheet delegate
+-(void)actionSheet:(IBActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if(buttonIndex == sheet.cancelButtonIndex){
+        //不上传图片
+        //返回首页
+        NSArray *controllers = self.navigationController.viewControllers;
+        for(UIViewController *viewController in controllers){
+            if([viewController isKindOfClass:[MainViewController class]]){
+                [self.navigationController popToViewController:viewController animated:YES];
             }
-            [billC saveOrUpdate];
+        }
+    }
+    if(buttonIndex == 0){
+        //拍照
+        
+        SCCNavigationController *nav = [[SCCNavigationController alloc] init];
+        nav.scNaigationDelegate = self;
+        [nav showCameraWithParentController:self];
+        
+    }else if(buttonIndex == 1){
+        //从手机相册选择
+        
+        DoImagePickerController *cont = [[DoImagePickerController alloc] initWithNibName:@"DoImagePickerController" bundle:nil];
+        cont.nResultType = DO_PICKER_RESULT_UIIMAGE;
+        cont.delegate = self;
+        cont.nMaxCount = -1;
+        cont.nColumnCount = 3;
+        [self presentViewController:cont animated:YES completion:nil];
+    }
+}
+
+#pragma mark - SCNavigationController delegate
+//拍照委托
+- (void)didTakePicture:(SCCNavigationController *)navigationController image:(UIImage *)image {
+    [navigationController dismissModalViewControllerAnimated:YES];
+    //将图片转成字符串保存到数据库
+    NSString *imageData = [ImageToBase64 imageToBase64:image];
+    OrderImage *orderImage = [[OrderImage alloc] init];
+    orderImage.orderId = rkOrder.id;
+    orderImage.imageData = imageData;
+    [orderImage saveOrUpdate];
+    
+    //弹出alert是否继续拍照
+    sheet = [[IBActionSheet alloc] initWithTitle:@"选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择", nil];
+    [sheet setFont:[UIFont systemFontOfSize:15.f]];
+    [sheet setButtonTextColor:[UIColor blackColor]];
+    [sheet setButtonBackgroundColor:[UIColor whiteColor]];
+    [sheet showInView:self.view];
+    
+}
+#pragma mark - DoImagePickerControllerDelegate
+//选择照片的委托
+- (void)didCancelDoImagePickerController
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+- (void)didSelectPhotosFromDoImagePickerController:(DoImagePickerController *)picker result:(NSArray *)aSelected
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+    if (picker.nResultType == DO_PICKER_RESULT_UIIMAGE)
+    {
+        if(aSelected && aSelected.count >0){
             
-            
-            //child
-            PuOrderChild *rkChild = [[PuOrderChild alloc] init];
-            //rkChild 生成入库单的子表
-//            rkChild.orderentryid = [UUIDUtil getUUID];
-            rkChild.orderentryid = inMat.orderentryid;
-            
-            rkChild.orderid = rkOrder.id;
-            
-            rkChild.xsxh = inMat.xsxh;
-            rkChild.sourceid = inMat.orderid;
-            rkChild.sourcecid = bill.receiveid;
-            rkChild.isFinish = 0;
-            rkChild.note = inMat.note;
-            rkChild.brand = inMat.brand;
-            rkChild.model = inMat.model;
-            rkChild.Name = inMat.Name;
-            rkChild.price = inMat.price;
-            rkChild.ckQty = 0;
-            rkChild.sourceQty = inMat.curQty;
-            rkChild.wareentryid = billC.wareentryid;
-            /////如果是手机生成入库单,那么材料明细的wareentryid是手机生成的,带到出库单明细的wareentryid
-            [rkChild saveOrUpdate];
-            
+            for(UIImage *image in aSelected){
+                NSString *imageData = [ImageToBase64 imageToBase64:image];
+                OrderImage *orderImage = [[OrderImage alloc] init];
+                orderImage.orderId = rkOrder.id;
+                orderImage.imageData = imageData;
+                [orderImage saveOrUpdate];
+            }
         }
         
         
-        int finish = 0;//判断单据是否结束:0,未结束  >0,已结束
-        if(self.unSelArray.count>0){
-            //未结束
-            finish = 1;
-        }else{
-            
-                for (int i = 0; i<self.selArray.count; i++) {
-                    PuOrderChild *inMat = self.selArray[i];
-                    if(inMat.isFinish==0){
-                        finish++;
-                    }
-                }
-            
-        }
-        
-        
-        if(finish>0){
-            //有材料未完成
-            self.order.isFinish = 0;
-        }else{
-            self.order.isFinish = 1;
-        }
-        self.order.zcwc = 1;
-        [self.order saveOrUpdate];
-        
-        
-        
-//        //手机根据刚刚做的入库单生成新的出库来源订单子表
-//        for(PuOrderChild *child in self.selArray){
-//            
-//        }
         
         //返回首页
         NSArray *controllers = self.navigationController.viewControllers;
@@ -347,11 +431,7 @@
                 [self.navigationController popToViewController:viewController animated:YES];
             }
         }
-        
-        
     }
-
 }
-
 
 @end

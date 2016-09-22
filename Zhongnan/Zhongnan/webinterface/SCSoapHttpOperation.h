@@ -29,4 +29,8 @@ typedef void (^FailureBlock)();
 WithReturnValeuBlock : (ReturnValueBlock)block
     WithFailureBlock : (FailureBlock)failureBlock;
 
+
+//-(void)postwithURL:(NSString *)url withFile:) withResultDomain:(NSString *)result WithReturnValeuBlock:(ReturnValueBlock)block WithFailureBlock:(FailureBlock)failureBlock
+
+
 @end

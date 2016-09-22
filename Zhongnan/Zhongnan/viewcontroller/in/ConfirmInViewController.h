@@ -15,10 +15,14 @@
 #import "InBill.h"
 #import "InBillChild.h"
 #import "UUIDUtil.h"
+#import "IBActionSheet.h"
+#import "SCCNavigationController.h"
+#import "DoImagePickerController.h"
 
-@interface ConfirmInViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>{
+@interface ConfirmInViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,SCCNavigationControllerDelegate,DoImagePickerControllerDelegate,IBActionSheetDelegate>{
     InBill *bill;
-    
+    IBActionSheet *sheet;
+    PuOrder *rkOrder;
 }
 
 @property (nonatomic, strong) PuOrder *order;

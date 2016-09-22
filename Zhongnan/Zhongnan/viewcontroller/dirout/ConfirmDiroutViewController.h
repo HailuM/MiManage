@@ -22,8 +22,9 @@
 
 @end
 
-@interface ConfirmDiroutViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,PassConsumerDelegate,UartDelegate>{
+@interface ConfirmDiroutViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,PassConsumerDelegate,UartDelegate,IBActionSheetDelegate,SCCNavigationControllerDelegate,DoImagePickerControllerDelegate>{
     int hasPaper;//0,正常  1,缺纸
+    IBActionSheet *sheet;
 }
 @property (nonatomic, strong) Consumer *consumer;//领料商
 @property (nonatomic, strong) PuOrder *order;

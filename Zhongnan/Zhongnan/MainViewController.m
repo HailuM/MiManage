@@ -14,6 +14,8 @@
 #import "MJExtension.h"
 #import "UIBarButtonItem+Extension.h"
 #import <CoreGraphics/CoreGraphics.h>
+#import "OrderImage.h"
+#import "UploadFile.h"
 //#import "MBProgressHUD.h"
 
 @interface MainViewController (){
@@ -36,6 +38,14 @@
     NSInteger inN;//入库单条数
     NSInteger inoutN;//入库出库条数
     NSInteger outN;//出库单条数
+    
+    
+    
+    
+    int hasImg;//已上传成功的图片数量
+    NSInteger imgN;//图片条数
+    
+    NSArray *imgArray;//图片数组
     
     //查询入库单
     NSArray *inArray;
@@ -263,6 +273,11 @@
     }
     
     sum = dirN+inN+inoutN+outN;
+    
+    imgArray = [OrderImage findAll];
+    imgN = imgArray.count;
+    
+    
 }
 
 
@@ -801,6 +816,13 @@
                     
                     NSString *string = [NSString stringWithFormat:@"%@%@%@%@%@",string00,string01,string02,string03,string04];
                     [self.view makeToast:string duration:3.0 position:CSToastPositionCenter];
+                    
+                    
+                    
+                    
+                    
+                    
+                    
                 }
             }
             //上传入库单结束
@@ -909,6 +931,12 @@
                     
                     NSString *string = [NSString stringWithFormat:@"%@%@%@%@%@",string00,string01,string02,string03,string04];
                     [self.view makeToast:string duration:3.0 position:CSToastPositionCenter];
+                    
+                    //上传所有单据结束
+                    //开始上传图片
+                    for(OrderImage *orderImage in imgArray){
+                        [self uploadImg:orderImage];
+                    }
                 }
             }
             //上传入库单结束
@@ -1082,6 +1110,12 @@
                     
                     NSString *string = [NSString stringWithFormat:@"%@%@%@%@%@",string00,string01,string02,string03,string04];
                     [self.view makeToast:string duration:3.0 position:CSToastPositionCenter];
+                    
+                    //上传所有单据结束
+                    //开始上传图片
+                    for(OrderImage *orderImage in imgArray){
+                        [self uploadImg:orderImage];
+                    }
                 }
             }
             
@@ -1222,6 +1256,37 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
+}
+
+
+-(void)uploadImg:(OrderImage *)orderImage {
+    UploadFile *upload = [[UploadFile alloc] init];
+    upload.delegate = self;
+    NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ReceiveImg/ReceiveImg.ashx",serverUrl];
+    NSData *data = [orderImage.imageData dataUsingEncoding:NSUTF8StringEncoding];
+    [upload uploadFileWithUrl:connectUrl orderId:orderImage.orderId type:orderImage.type data:data];
+}
+
+#pragma mark UploadFile delegate
+-(void)returnSuccess:(NSString *)success {
+    hasImg ++;
+    if(hasImg==imgN){
+        if([OrderImage isExistInTable]){
+            //删除图片
+            [OrderImage clearTable];
+        }else{
+            [OrderImage createTable];
+        }
+        [self.view makeToast:@"图片上传成功" duration:3.0 position:CSToastPositionCenter];
+    }
+}
+
+-(void)returnUrl:(NSArray *)array data:(NSData *)data {
+    UploadFile *upload = [[UploadFile alloc] init];
+    upload.delegate = self;
+    if(array&&array.count==3){
+    [upload uploadFileWithUrl:array[0] orderId:array[1] type:array[2] data:data];
+    }
 }
 
 

@@ -10,10 +10,14 @@
 #import "OutDealViewController.h"
 #import "ChooseConsumerViewController.h"
 #import "UartLib.h"
+#import "IBActionSheet.h"
+#import "DoImagePickerController.h"
+#import "SCCNavigationController.h"
 //#import "MBProgressHUD.h"
 
-@interface ConfirmOutViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,PassConsumerDelegate,UartDelegate,UIAlertViewDelegate>{
+@interface ConfirmOutViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,PassConsumerDelegate,UartDelegate,UIAlertViewDelegate,SCCNavigationControllerDelegate,DoImagePickerControllerDelegate,IBActionSheetDelegate>{
     int hasPaper;//0,正常  1,缺纸
+    IBActionSheet *sheet;
 }
 
 @property (nonatomic, strong) PuOrder *order;
