@@ -507,6 +507,7 @@
     NSString *imageData = [ImageToBase64 imageToBase64:image];
     OrderImage *orderImage = [[OrderImage alloc] init];
     orderImage.orderId = outBill.gid;
+    orderImage.type= @"ck";
     orderImage.imageData = imageData;
     [orderImage saveOrUpdate];
     
@@ -535,6 +536,7 @@
                 NSString *imageData = [ImageToBase64 imageToBase64:image];
                 OrderImage *orderImage = [[OrderImage alloc] init];
                 orderImage.orderId = outBill.gid;
+                orderImage.type= @"ck";
                 orderImage.imageData = imageData;
                 [orderImage saveOrUpdate];
             }
