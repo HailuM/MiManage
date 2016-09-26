@@ -14,4 +14,6 @@
 @property (nonatomic,copy) NSString *imageData;//存储的图片字符串
 @property (nonatomic,copy) NSString *type;//入库出库类型
 
+@property (nonatomic,copy) NSString *flag;//区分入库出库和出库类型
+
 @end

@@ -387,12 +387,15 @@
         
         //生成出库单子表
         OutBillChild *outChild = [[OutBillChild alloc] init];
-        outChild.outgid = outBill.gid;
+        outChild.outgid = outBill.gid;//出库单子表关联的主表id
         
         outChild.xsxh = outMat.xsxh;
         outChild.preparertime = outBill.preparertime;
         outChild.deliverNo = outBill.deliverNo;
-        outChild.deliverid = [UUIDUtil getUUID];
+//        outChild.deliverid = [UUIDUtil getUUID];
+        outChild.deliverid = outBill.gid;
+        
+        
         outChild.consumerid = self.consumer.consumerid;
         outChild.orderEntryid = outMat.orderentryid;
         outChild.printcount = 0;
@@ -400,9 +403,19 @@
         // TODO
         //                outChild.receiveid = outBill.receiveid;//确认来源
         outChild.receiveid = outMat.sourcecid;
+        if(!outMat.sourcecid || outMat.sourcecid.length==0){
+            outChild.receiveid = self.order.id;
+        }
         outChild.type = self.order.type;
         outChild.orderid = self.order.sourceid;
         outChild.receiverOID = self.consumer.receiverOID;
+        
+        //目前未知
+        outChild.wareid = outMat.orderid;
+        
+        
+        
+        
         outChild.wareentryid = outMat.wareentryid;
         outChild.Name = outMat.Name;
         outChild.model = outMat.model;
@@ -504,9 +517,15 @@
 - (void)didTakePicture:(SCCNavigationController *)navigationController image:(UIImage *)image {
     [navigationController dismissModalViewControllerAnimated:YES];
     //将图片转成字符串保存到数据库
-    NSString *imageData = [ImageToBase64 imageToBase64:image];
+    NSString *imageData = [ImageToBase64 imageWithNoCompressToBase64:image];
     OrderImage *orderImage = [[OrderImage alloc] init];
     orderImage.orderId = outBill.gid;
+    if([self.order.type isEqualToString:@"ck"]){
+        orderImage.flag= @"ck";
+    }else{
+        orderImage.flag= @"rk";
+    }
+
     orderImage.type= @"ck";
     orderImage.imageData = imageData;
     [orderImage saveOrUpdate];
@@ -533,10 +552,18 @@
         if(aSelected && aSelected.count >0){
             
             for(UIImage *image in aSelected){
-                NSString *imageData = [ImageToBase64 imageToBase64:image];
+                NSString *imageData = [ImageToBase64 imageWithNoCompressToBase64:image];
                 OrderImage *orderImage = [[OrderImage alloc] init];
                 orderImage.orderId = outBill.gid;
+                orderImage.orderId = outBill.gid;
+                if([self.order.type isEqualToString:@"ck"]){
+                    orderImage.flag= @"ck";
+                }else{
+                    orderImage.flag= @"rk";
+                }
+                
                 orderImage.type= @"ck";
+                
                 orderImage.imageData = imageData;
                 [orderImage saveOrUpdate];
             }

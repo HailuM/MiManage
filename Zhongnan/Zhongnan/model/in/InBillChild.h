@@ -16,8 +16,10 @@
 @property(nonatomic,copy)NSString *wareentryid;
 /** 入库单行的数量*/
 @property(nonatomic,copy)NSString *qty;
+
 /** 生成的入库单主表ID  我使用的是UUID*/
 @property(nonatomic,copy)NSString *receiveid;
+
 /** 来源订单表体ID*/
 @property(nonatomic,copy)NSString *orderEntryid;
 /** 制单时间  格式 yyyy-mm-dd hh:mm:ss*/

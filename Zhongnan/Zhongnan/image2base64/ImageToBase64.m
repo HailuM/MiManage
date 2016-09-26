@@ -25,7 +25,14 @@
 
 +(NSString *)imageWithNoCompressToBase64:(UIImage *)img {
     NSData *data;
-    data = UIImageJPEGRepresentation(img, 1);
+    if(UIImagePNGRepresentation(img)==nil){
+        data = UIImageJPEGRepresentation(img, 1);
+    }else{
+        data = UIImagePNGRepresentation(img);
+        //转成jpg格式
+//        UIImage *jpg = 以后优化
+    }
+    
     NSString *imageStr;
     imageStr = [data base64Encoding];
     if(imageStr.length>=1024*1024*10){

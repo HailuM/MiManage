@@ -7,6 +7,7 @@
 //
 
 #import "SCDBTool.h"
+#import "OrderImage.h"
 
 @implementation SCDBTool
 
@@ -263,6 +264,8 @@
     [DirBill clearTable];
     [DirBillChild clearTable];
     
+    //删除图片
+    [OrderImage clearTable];
     
     return YES;
 }

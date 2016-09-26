@@ -8,6 +8,8 @@
 
 #import "UploadFile.h"
 #import "UUIDUtil.h"
+#import "AFHTTPRequestOperationManager.h"
+#import "ImageToBase64.h"
 
 @interface UploadFile()
 
@@ -18,6 +20,9 @@
 @property (nonatomic, strong) NSData *imageData;//图片data
 @property (nonatomic,copy) NSString *orderId;//单据id
 @property (nonatomic,copy) NSString *type;//单据类型
+@property (nonatomic,strong) UIImage *image;
+@property (nonatomic,assign) int pk;//表内主键
+@property (nonatomic,assign) int index;//第几次上传
 
 @end
 
@@ -47,72 +52,50 @@
     //把刚刚图片转换的data对象拷贝至沙盒中 并保存为image.png
     [fileManager createDirectoryAtPath:DocumentsPath withIntermediateDirectories:YES attributes:nil error:nil];
     NSString *gid = [UUIDUtil getUUID];
-    [fileManager createFileAtPath:[DocumentsPath stringByAppendingString:[NSString stringWithFormat:@"/%@.png",gid]] contents:data attributes:nil];
+    BOOL success = [fileManager createFileAtPath:[DocumentsPath stringByAppendingString:[NSString stringWithFormat:@"/%@.png",gid]] contents:data attributes:nil];
     
-    //得到选择后沙盒中图片的完整路径
-    NSString *filePath = [[NSString alloc]initWithFormat:@"%@%@",DocumentsPath,  @"/image.png"];
-    return filePath;
+    if(success){
+        //得到选择后沙盒中图片的完整路径
+        NSString *filePath1 = [[NSString alloc]initWithFormat:@"%@/%@.png",DocumentsPath,gid];
+        return filePath1;
+    }else{
+        return nil;
+    }
+    
 }
 
 
-#pragma mark - 上传文件
-- (void)uploadFileWithUrl:(NSString*)url orderId:(NSString*)orderId type:(NSString *)type data:(NSData *)data
-{
+
+-(void)uploadFileWithUrl:(NSString *)url orderId:(NSString *)orderId type:(NSString *)type image:(UIImage *)image pk:(int)pk index:(int)index success:(void (^)(id responseObject))success fail:(void (^)())fail {
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    manager.requestSerializer.timeoutInterval = 300.f;
     self.url = url;
-    self.imageData = data;
     self.orderId = orderId;
     self.type = type;
+    self.image  = image;
+    self.pk = pk;
+    self.index = index;
     
-    NSString *filePath = [self saveImage:data];
-    NSString *inputStream = [NSInputStream inputStreamWithFileAtPath:filePath];
-    
-    NSNumber *contentLength = (NSNumber *)[[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:NULL] objectForKey:NSFileSize];
-    NSMutableURLRequest *request;
-    NSString *desUrl = [NSString stringWithFormat:@"%@?id=%@&lx=%@",url,orderId,type];
-    
-    request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:desUrl]];
-    [request setHTTPMethod:@"POST"];
-    [request setHTTPBodyStream:inputStream];
-    [request setValue:@"image/png" forHTTPHeaderField:@"Content-Type"];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
-    [request setValue:[contentLength description] forHTTPHeaderField:@"Content-Length"];
-    NSURLConnection *task = [NSURLConnection connectionWithRequest:request delegate:self];
-}
-
-//接收到服务器回应的时候调用此方法
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
-{
-    
-    NSHTTPURLResponse *res = (NSHTTPURLResponse *)response;
-    NSLog(@"%@",[res allHeaderFields]);
-    self.receiveData = [NSMutableData data];
-    
-}
-
-//接收到服务器传输数据的时候调用，此方法根据数据大小执行若干次
--(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
-{
-    [self.receiveData appendData:data];
-}
-
--(void)connectionDidFinishLoading:(NSURLConnection *)connection
-{
-    NSData  *infoData = [[NSMutableData alloc] init];
-    infoData =self.receiveData;
-//    NSString *receiveStr = [[NSString alloc]initWithData:infoData encoding:NSUTF8StringEncoding];
-//    NSError *error;
-    //将请求的url数据放到NSData对象中
-    NSString *result = [[NSString alloc] initWithData:infoData  encoding:NSUTF8StringEncoding];
-    if([result isEqualToString:@"success"]){
-        //成功
-        if([self.delegate respondsToSelector:@selector(returnSuccess:)]){
-            [self.delegate performSelector:@selector(returnSuccess:) withObject:@"success"];
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+    [dict setObject:orderId forKey:@"id"];
+    [dict setObject:type forKey:@"lx"];
+    [manager POST:url parameters:dict constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+                [formData appendPartWithFileData:UIImagePNGRepresentation(image) name:@"" fileName:@"pic.png" mimeType:@"image/png"];
+    } success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSString *result = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
+        NSLog(@"成功:%@", result);
+        if([result isEqualToString:@"success"]){
+            success(@[@"success",[NSString stringWithFormat:@"%d",self.pk]]);
+        }else{
+            self.index++;
+            
+                success(@[self.orderId,self.type,self.image,[NSString stringWithFormat:@"%d",self.pk],[NSString stringWithFormat:@"%d",self.index]]);
+            
         }
-    }else{
-        //失败  需要再次上传
-        if([self.delegate respondsToSelector:@selector(returnUrl:orderId:type:data:)]){
-            [self.delegate performSelector:@selector(returnUrl:orderId:type:data:) withObject:@[self.url,self.orderId,self.type] withObject:self.imageData];
-        }
-    }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"失败:%@/n%@",operation,error);
+    }];
+    
 }
 @end

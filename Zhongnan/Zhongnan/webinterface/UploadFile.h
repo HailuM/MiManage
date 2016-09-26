@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @protocol UploadFileDelegate <NSObject>
 @optional
@@ -15,9 +16,15 @@
 
 @end
 
-@interface UploadFile : NSObject
+@interface UploadFile : NSObject {
+    NSString *filePath;
+}
 
 @property (nonatomic, strong) id<UploadFileDelegate> delegate;
 
-- (void)uploadFileWithUrl:(NSString*)url orderId:(NSString*)orderId type:(NSString *)type data:(NSData *)data;
+//- (void)uploadFileWithUrl:(NSString*)url orderId:(NSString*)orderId type:(NSString *)type data:(NSData *)data;
+
+
+
+-(void)uploadFileWithUrl:(NSString *)url orderId:(NSString *)orderId type:(NSString *)type image:(UIImage *)image pk:(int)pk index:(int)index success:(void (^)(id responseObject))success fail:(void (^)())fail;
 @end

@@ -16,6 +16,7 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import "OrderImage.h"
 #import "UploadFile.h"
+#import "ImageToBase64.h"
 //#import "MBProgressHUD.h"
 
 @interface MainViewController (){
@@ -25,6 +26,11 @@
 //    MBProgressHUD *HUD;
     UIAlertView *asyncRK;//同步入库,如果本地没有上传的单据,确认用户是否删除已下载的入库订单
     UIAlertView *asyncCK;//同步出库,如果本地没有上传的单据,确认用户是否删除已下载的出库订单
+    
+    
+    
+    
+    UIAlertView *clearAlert;
     
     NSInteger sum;
     float progress;
@@ -46,6 +52,9 @@
     NSInteger imgN;//图片条数
     
     NSArray *imgArray;//图片数组
+    
+    NSArray *inImages;//图片数组
+    NSArray *outImages;//图片数组
     
     //查询入库单
     NSArray *inArray;
@@ -86,6 +95,10 @@
     
     //读取出库的token
     outToken = [userDefaultes valueForKey:@"ckToken"];//
+    
+    
+    
+    NSLog(@"文件路径%@",[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"]);
 }
 
 - (void)viewDidLoad {
@@ -167,6 +180,20 @@
             
             //下载当前出库订单表头
             [self getOrderOutTitle];
+        }
+    }else if ([alertView isEqual:clearAlert]){
+        if(buttonIndex==1){
+            //清除出入库token
+            NSUserDefaults *userDefaultes = [NSUserDefaults standardUserDefaults];
+            
+            [userDefaultes setObject:@"" forKey:@"rkToken"];
+            
+            [userDefaultes setObject:@"" forKey:@"ckToken"];
+            
+            //删除缓存数据
+            [SCDBTool clearAllData];
+            
+            [self.view makeToast:@"清除数据成功，请到PC端清除Token" duration:3.0 position:CSToastPositionCenter];
         }
     }
 }
@@ -274,8 +301,12 @@
     
     sum = dirN+inN+inoutN+outN;
     
-    imgArray = [OrderImage findAll];
-    imgN = imgArray.count;
+//    imgArray = [OrderImage findAll];
+//    imgN = imgArray.count;
+    
+    NSLog(@"文件路径%@",[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"]);
+    inImages = [OrderImage findByCriteria:@" where type = 'rk' or type = 'zrzc' or ( type = 'ck' and flag = 'rk' ) "];
+    outImages = [OrderImage findByCriteria:@" where type = 'ck' "];
     
     
 }
@@ -932,11 +963,7 @@
                     NSString *string = [NSString stringWithFormat:@"%@%@%@%@%@",string00,string01,string02,string03,string04];
                     [self.view makeToast:string duration:3.0 position:CSToastPositionCenter];
                     
-                    //上传所有单据结束
-                    //开始上传图片
-                    for(OrderImage *orderImage in imgArray){
-                        [self uploadImg:orderImage];
-                    }
+                    
                 }
             }
             //上传入库单结束
@@ -949,7 +976,9 @@
                 inoutArray = nil;
                 diroutArray = nil;
                 inArray = nil;
-
+                
+                
+                
             }else {
                 if(hasIn==inN){
                     //入库单上传结束,才可以上传出库单
@@ -967,18 +996,6 @@
                 }
                 [SCDBTool clearOutData:outToken];
             }
-//            //上传出库结束
-//            if(hasOut==outN){
-//                
-//                //                    [SVProgressHUD dismissWithDelay:0.0];
-//                //上传出库单结束
-//                [self uploadOutCompleteWithCkToken:outToken withOutCount:outN];
-//                
-//                //删除数据库中的出库单及其关联表
-//                [SCDBTool clearOutData:outToken];
-//                outArray = nil;
-//                
-//            }
         } WithFailureBlock:^{
             UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示！"
                                                           message:@"网络连接中断!"
@@ -1028,7 +1045,15 @@
                 //入库上传成功!
                 if(outN==hasOut){
                     [self.view makeToast:@"上传入库成功!" duration:3.0 position:CSToastPositionCenter];
+                    
+                    
+
                 }
+            }
+            //上传所有单据结束
+            //开始上传图片
+            for(OrderImage *orderImage in inImages){
+                [self uploadImg:orderImage index:0];
             }
         }
     }
@@ -1111,11 +1136,6 @@
                     NSString *string = [NSString stringWithFormat:@"%@%@%@%@%@",string00,string01,string02,string03,string04];
                     [self.view makeToast:string duration:3.0 position:CSToastPositionCenter];
                     
-                    //上传所有单据结束
-                    //开始上传图片
-                    for(OrderImage *orderImage in imgArray){
-                        [self uploadImg:orderImage];
-                    }
                 }
             }
             
@@ -1137,28 +1157,9 @@
                     }
                     [SCDBTool clearOutData:outToken];
                 }
-//                //上传出库结束
-//                if(hasOut==outN){
-//                    //                    [SVProgressHUD dismissWithDelay:0.0];
-//                    //上传出库单结束
-//                    [self uploadOutCompleteWithCkToken:outToken withOutCount:outN];
-//                    
-//                    //删除数据库中的出库单及其关联表
-//                    [SCDBTool clearOutData:outToken];
-//                    outArray = nil;
-//                    
-//                }
+
             }else if([type isEqualToString:@"ck"]){
-                //上传入库单结束
-//                if(hasIn==inN && hasInOut == inoutN && hasDir == dirN){
-//                    //                    [SVProgressHUD dismissWithDelay:0.0];
-//                    [self uploadInCompleteWithRkToken:inToken withDirout:dirN withInCount:inN withOutCounr:inoutN];
-//                    //删除数据库中的入库单及其关联表
-//                    [SCDBTool clearInData:inToken];
-//                    inoutArray = nil;
-//                    diroutArray = nil;
-//                    inArray = nil;
-//                }
+
                 
                 if(inN==0&& dirN==0 && inoutN==0){
                     if(inToken&&inToken.length>0){
@@ -1169,7 +1170,6 @@
                 //上传出库结束
                 if(hasOut==outN){
                     
-                    //                    [SVProgressHUD dismissWithDelay:0.0];
                     //上传出库单结束
                     [self uploadOutCompleteWithCkToken:outToken withOutCount:outN];
                     
@@ -1232,6 +1232,11 @@
                     [self.view makeToast:@"上传出库成功!" duration:3.0 position:CSToastPositionCenter];
                 }
             }
+            //上传所有单据结束
+            //开始上传图片
+            for(OrderImage *orderImage in outImages){
+                [self uploadImg:orderImage index:0];
+            }
         }
         //        [self.view makeToast:da.tempStr duration:3.0 position:CSToastPositionCenter];
     }
@@ -1247,8 +1252,14 @@
 }
 //参数设置
 - (IBAction)toSetting:(id)sender {
+    NSLog(@"11111");
 }
 
+- (IBAction)clearData:(id)sender {
+    
+    clearAlert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"是否清除数据" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+    [clearAlert show];
+}
 
 #pragma mark - Navigation
 
@@ -1259,35 +1270,40 @@
 }
 
 
--(void)uploadImg:(OrderImage *)orderImage {
+-(void)uploadImg:(OrderImage *)orderImage index:(int)index{
     UploadFile *upload = [[UploadFile alloc] init];
-    upload.delegate = self;
-    NSString *connectUrl=[NSString stringWithFormat:@"http://%@/ReceiveImg/ReceiveImg.ashx",serverUrl];
-    NSData *data = [orderImage.imageData dataUsingEncoding:NSUTF8StringEncoding];
-    [upload uploadFileWithUrl:connectUrl orderId:orderImage.orderId type:orderImage.type data:data];
-}
-
-#pragma mark UploadFile delegate
--(void)returnSuccess:(NSString *)success {
-    hasImg ++;
-    if(hasImg==imgN){
-        if([OrderImage isExistInTable]){
-            //删除图片
-            [OrderImage clearTable];
-        }else{
-            [OrderImage createTable];
+    
+    NSString *connectUrl=[NSString stringWithFormat:@"http://%@/DataRoles/ReceiveImg.ashx",serverUrl];
+    
+    NSString *imageStr = orderImage.imageData;
+    UIImage *image = [ImageToBase64 base64ToImage:imageStr];
+    
+    [upload uploadFileWithUrl:connectUrl orderId:orderImage.orderId type:orderImage.type image:image pk:orderImage.pk index:index success:^(id responseObject) {
+        NSArray *array = (NSArray *)responseObject;
+        if(array.count==2){
+            //上传成功!
+            //删除表内记录
+            NSString *pk = array[1];
+            [OrderImage deleteObjectsByCriteria:[NSString stringWithFormat:@" where pk = %@",pk]];
+        }else if(array.count == 5){
+            //上传不成功,重复上传
+            NSString *indexString = array[4];
+            if([indexString intValue]<5){
+            OrderImage *newOImage = [[OrderImage alloc] init];
+            newOImage.pk = [(NSString *)array[3] intValue];
+            newOImage.orderId = array[0];
+            newOImage.type = array[1];
+            newOImage.imageData = [ImageToBase64 imageToBase64:(UIImage *)array[2]];
+            [self uploadImg:orderImage index:[indexString intValue]];
+            }else{
+                [self.view makeToast:@"请在PC端上传图片!" duration:3.0 position:CSToastPositionCenter];
+            }
         }
-        [self.view makeToast:@"图片上传成功" duration:3.0 position:CSToastPositionCenter];
-    }
+    } fail:^{
+        [self.view makeToast:@"网络错误!" duration:3.0 position:CSToastPositionCenter];
+    }];
 }
 
--(void)returnUrl:(NSArray *)array data:(NSData *)data {
-    UploadFile *upload = [[UploadFile alloc] init];
-    upload.delegate = self;
-    if(array&&array.count==3){
-    [upload uploadFileWithUrl:array[0] orderId:array[1] type:array[2] data:data];
-    }
-}
 
 
 @end

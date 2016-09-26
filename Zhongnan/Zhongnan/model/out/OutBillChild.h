@@ -21,6 +21,7 @@
 @property (nonatomic,assign) int printcount;//打印次数 4
 @property (nonatomic,copy) NSString * receiveid;//来源入库单的主表id
 @property (nonatomic,copy) NSString * receiverOID;//领用商id ????
+@property (nonatomic,copy) NSString * wareid;//来源入库单的主表id  2016/09/24新增
 @property (nonatomic,copy) NSString *wareentryid;//来源入库单的子表id
 /** 出库单行的数量*/
 @property(nonatomic,copy) NSString *qty;

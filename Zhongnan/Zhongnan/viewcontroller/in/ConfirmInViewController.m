@@ -386,9 +386,9 @@
 - (void)didTakePicture:(SCCNavigationController *)navigationController image:(UIImage *)image {
     [navigationController dismissModalViewControllerAnimated:YES];
     //将图片转成字符串保存到数据库
-    NSString *imageData = [ImageToBase64 imageToBase64:image];
+    NSString *imageData = [ImageToBase64 imageWithNoCompressToBase64:image];
     OrderImage *orderImage = [[OrderImage alloc] init];
-    orderImage.orderId = rkOrder.id;
+    orderImage.orderId = bill.receiveid;
     orderImage.type= @"rk";
     orderImage.imageData = imageData;
     [orderImage saveOrUpdate];
@@ -415,9 +415,9 @@
         if(aSelected && aSelected.count >0){
             
             for(UIImage *image in aSelected){
-                NSString *imageData = [ImageToBase64 imageToBase64:image];
+                NSString *imageData = [ImageToBase64 imageWithNoCompressToBase64:image];
                 OrderImage *orderImage = [[OrderImage alloc] init];
-                orderImage.orderId = rkOrder.id;
+                orderImage.orderId = bill.receiveid;
                 orderImage.type= @"rk";
                 orderImage.imageData = imageData;
                 [orderImage saveOrUpdate];
