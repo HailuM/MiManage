@@ -10,6 +10,7 @@
 #import "UUIDUtil.h"
 #import "AFHTTPRequestOperationManager.h"
 #import "ImageToBase64.h"
+#import "StringUtil.h"
 
 @interface UploadFile()
 
@@ -81,7 +82,10 @@
     [dict setObject:orderId forKey:@"id"];
     [dict setObject:type forKey:@"lx"];
     [manager POST:url parameters:dict constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
-                [formData appendPartWithFileData:UIImagePNGRepresentation(image) name:@"" fileName:@"pic.png" mimeType:@"image/png"];
+        
+        NSString *fileName = [NSString stringWithFormat:@"%@.png",[StringUtil generateName]];
+        
+                [formData appendPartWithFileData:UIImagePNGRepresentation(image) name:@"" fileName:fileName mimeType:@"image/png"];
     } success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSString *result = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
         NSLog(@"成功:%@", result);

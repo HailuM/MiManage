@@ -37,6 +37,18 @@
     return nil;
 }
 
+
+
++(NSString *)generateName {
+    NSDate *today = [NSDate date];
+    //获取纳秒
+    NSTimeInterval record = [today timeIntervalSince1970]*1000*1000*1000;
+    double i = record;
+    NSString *nano = [NSString stringWithFormat:@"%.f",i];
+    NSString *newNano = [nano substringFromIndex:nano.length-5];
+    return [NSString stringWithFormat:@"%@%@",[DateTool dateToString:today],newNano];
+}
+
 +(NSString *)generateNo:(NSString *)type {
     NSDate *today = [NSDate date];
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];

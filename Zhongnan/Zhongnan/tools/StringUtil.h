@@ -26,4 +26,7 @@
  */
 +(NSString *)generateNo:(NSString *)type;
 
+
++(NSString *)generateName;
+
 @end

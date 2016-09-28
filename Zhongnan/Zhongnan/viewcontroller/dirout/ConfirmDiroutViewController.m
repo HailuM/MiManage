@@ -538,14 +538,28 @@
     orderImage.imageData = imageData;
     [orderImage saveOrUpdate];
     
-    //弹出alert是否继续拍照
-    sheet = [[IBActionSheet alloc] initWithTitle:@"选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择", nil];
-    [sheet setFont:[UIFont systemFontOfSize:15.f]];
-    [sheet setButtonTextColor:[UIColor blackColor]];
-    [sheet setButtonBackgroundColor:[UIColor whiteColor]];
-    [sheet showInView:self.view];
-    
+//    //弹出alert是否继续拍照
+//    sheet = [[IBActionSheet alloc] initWithTitle:@"选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择", nil];
+//    [sheet setFont:[UIFont systemFontOfSize:15.f]];
+//    [sheet setButtonTextColor:[UIColor blackColor]];
+//    [sheet setButtonBackgroundColor:[UIColor whiteColor]];
+//    [sheet showInView:self.view];
 }
+
+-(BOOL)willDismissNavigationController:(SCCNavigationController *)navigatonController {
+    if(sheet){
+        [sheet showInView:self.view];
+    }else{
+        //弹出alert是否继续拍照
+        sheet = [[IBActionSheet alloc] initWithTitle:@"选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择", nil];
+        [sheet setFont:[UIFont systemFontOfSize:15.f]];
+        [sheet setButtonTextColor:[UIColor blackColor]];
+        [sheet setButtonBackgroundColor:[UIColor whiteColor]];
+        [sheet showInView:self.view];
+    }
+    return YES;
+}
+
 #pragma mark - DoImagePickerControllerDelegate
 //选择照片的委托
 - (void)didCancelDoImagePickerController
