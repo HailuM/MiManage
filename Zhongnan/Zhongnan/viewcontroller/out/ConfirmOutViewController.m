@@ -327,11 +327,10 @@
             //保存数据库
             
             [self saveOrder];
-            sheet = [[IBActionSheet alloc] initWithTitle:@"选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择", nil];
-            [sheet setFont:[UIFont systemFontOfSize:15.f]];
-            [sheet setButtonTextColor:[UIColor blackColor]];
-            [sheet setButtonBackgroundColor:[UIColor whiteColor]];
-            [sheet showInView:self.view];
+            
+            
+            
+            [self preparePrintString];
 
             
             
@@ -348,6 +347,51 @@
     }
     
 }
+
+-(void) preparePrintString {
+    //不上传图片
+    //打印数据
+    //开始打印
+    printContant=[NSString stringWithFormat:@"%@\n打印次数:%d%@%@%@%@%@%@%@%@%@",
+                  @"------------------------------",
+                  (outBill.printcount+1),
+                  @"\n出库单号:",outBill.deliverNo,
+                  @"\n项目:",outBill.ProjectName,
+                  @"\n领用商:",outBill.consumername,
+                  @"\n地产公司:",outBill.Company,
+                  @"\n------------------------------"];
+    for (int i = 0; i<self.array.count; i++) {
+        OutBillChild *outMat = self.array[i];
+        NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n",
+                               @"\n材料名称:",outMat.Name,
+                               @"\n品牌:",outMat.brand,
+                               @"\n规格型号:",outMat.model,
+                               @"\n数量:",[StringUtil changeFloat:outMat.qty],
+                               @"\n备注:",outMat.note];
+        printContant = [printContant stringByAppendingString:matString];
+    }
+    printContant = [NSString stringWithFormat:@"%@%@%@%@%@%@",printContant,
+                    @"\n领用人:________________________",
+                    @"\n  ",
+                    @"\n施工单位:_____________________",
+                    @"\n",
+                    @"\n证明人(监理):________________________"];
+    
+    //准备好的打印字符串
+    //--------------
+    printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"打印", nil];
+    NSArray *subViewArray = printAlert.subviews;
+    for(int x=0;x<[subViewArray count];x++){
+        if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
+        {
+            UILabel *label = [subViewArray objectAtIndex:x];
+            label.textAlignment = UITextAlignmentLeft;
+        }
+        
+    }
+    [printAlert show];
+}
+
 
 -(void)saveOrder{
     // TODO 涉及到出入库的数量判断
@@ -453,45 +497,17 @@
 #pragma mark - IBActionSheet delegate
 -(void)actionSheet:(IBActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
     if(buttonIndex == sheet.cancelButtonIndex){
-        //不上传图片
-        //打印数据
-        //开始打印
-        printContant=[NSString stringWithFormat:@"%@\n打印次数:%d%@%@%@%@%@%@%@%@%@",
-                      @"------------------------------",
-                      (outBill.printcount+1),
-                      @"\n出库单号:",outBill.deliverNo,
-                      @"\n项目:",outBill.ProjectName,
-                      @"\n领用商:",outBill.consumername,
-                      @"\n地产公司:",outBill.Company,
-                      @"\n------------------------------"];
-        for (int i = 0; i<self.array.count; i++) {
-            OutBillChild *outMat = self.array[i];
-            NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n",
-                                   @"\n材料名称:",outMat.Name,
-                                   @"\n品牌:",outMat.brand,
-                                   @"\n规格型号:",outMat.model,
-                                   @"\n数量:",[StringUtil changeFloat:outMat.qty],
-                                   @"\n备注:",outMat.note];
-            printContant = [printContant stringByAppendingString:matString];
-        }
-        printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
-                        @"\n收货人:________________________",
-                        @"\n  "
-                        @"\n证明人:________________________"];
         
-        //准备好的打印字符串
-        //--------------
-        printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"打印", nil];
-        NSArray *subViewArray = printAlert.subviews;
-        for(int x=0;x<[subViewArray count];x++){
-            if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
-            {
-                UILabel *label = [subViewArray objectAtIndex:x];
-                label.textAlignment = UITextAlignmentLeft;
+        //todo
+        //取消拍照或者选择图片
+        //返回首页
+        NSArray *controllers = self.navigationController.viewControllers;
+        for(UIViewController *viewController in controllers){
+            if([viewController isKindOfClass:[MainViewController class]]){
+                [self.navigationController popToViewController:viewController animated:YES];
             }
-            
         }
-        [printAlert show];
+        
     }
     if(buttonIndex == 0){
         //拍照
@@ -529,8 +545,6 @@
     orderImage.type= @"ck";
     orderImage.imageData = imageData;
     [orderImage saveOrUpdate];
-    
-    
     
 }
 
@@ -578,43 +592,6 @@
                 [orderImage saveOrUpdate];
             }
         }
-        //开始打印
-        printContant=[NSString stringWithFormat:@"%@\n打印次数:%d%@%@%@%@%@%@%@%@%@",
-                      @"------------------------------",
-                      (outBill.printcount+1),
-                      @"\n出库单号:",outBill.deliverNo,
-                      @"\n项目:",outBill.ProjectName,
-                      @"\n领用商:",outBill.consumername,
-                      @"\n地产公司:",outBill.Company,
-                      @"\n------------------------------"];
-        for (int i = 0; i<self.array.count; i++) {
-            OutBillChild *outMat = self.array[i];
-            NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n",
-                                   @"\n材料名称:",outMat.Name,
-                                   @"\n品牌:",outMat.brand,
-                                   @"\n规格型号:",outMat.model,
-                                   @"\n数量:",[StringUtil changeFloat:outMat.qty],
-                                   @"\n备注:",outMat.note];
-            printContant = [printContant stringByAppendingString:matString];
-        }
-        printContant = [NSString stringWithFormat:@"%@%@%@",printContant,
-                        @"\n收货人:________________________",
-                        @"\n  "
-                        @"\n证明人:________________________"];
-        
-        //准备好的打印字符串
-        //--------------
-        printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"打印", nil];
-        NSArray *subViewArray = printAlert.subviews;
-        for(int x=0;x<[subViewArray count];x++){
-            if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
-            {
-                UILabel *label = [subViewArray objectAtIndex:x];
-                label.textAlignment = UITextAlignmentLeft;
-            }
-            
-        }
-        [printAlert show];
     }
 }
 
@@ -687,14 +664,15 @@
         }else{
             [self.view makeToast:@"打印机缺纸!" duration:3.0 position:CSToastPositionCenter];
         }
-        // TODO 2016/09/21 选择上传图片
-        //返回首页
-        NSArray *controllers = self.navigationController.viewControllers;
-        for(UIViewController *viewController in controllers){
-            if([viewController isKindOfClass:[MainViewController class]]){
-                [self.navigationController popToViewController:viewController animated:YES];
-            }
-        }
+        // TODO 2016/10/08 修改,打印完成后选择上传图片
+        
+        sheet = [[IBActionSheet alloc] initWithTitle:@"选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择", nil];
+        [sheet setFont:[UIFont systemFontOfSize:15.f]];
+        [sheet setButtonTextColor:[UIColor blackColor]];
+        [sheet setButtonBackgroundColor:[UIColor whiteColor]];
+        [sheet showInView:self.view];
+        
+        
     }
     [uartLib scanStop];
     [uartLib disconnectPeripheral:connectPeripheral];

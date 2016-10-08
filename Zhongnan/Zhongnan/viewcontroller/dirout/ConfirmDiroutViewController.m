@@ -240,40 +240,14 @@
             NSLog(@"connect Peripheral");
             [self performSelector:@selector(searchPrinter) withObject:nil afterDelay:3];
         }else{
-            //判断直入直出是否结束
-            //整个收货通知单`结束
-            if([self isFinish]){
-                
-                //保存所有的直入直出单为正式单据,同时将来源单据保存为已完成状态
-                self.order.type = @"zrzc";
-                self.order.isFinish = 1;
-                self.order.zrzcwc = 1;
-                [self.order saveOrUpdate];
-                
-                
-                //查找所有临时主表
-                NSArray *dirArray = [DirBill findByCriteria:@" where temp = 0 "];
-                for(DirBill *tempBill in dirArray) {
-                    tempBill.temp = 1;
-                    [tempBill update];
-                }
-                
-                NSArray *childArray = [DirBillChild findByCriteria:@" where temp = 0 "];
-                for(DirBillChild *tempChild in childArray){
-                    tempChild.temp = 1;
-                    [tempChild saveOrUpdate];
-                }
-                
-                
-                //返回首页
-                NSArray *controllers = self.navigationController.viewControllers;
-                for(UIViewController *viewController in controllers){
-                    if([viewController isKindOfClass:[MainViewController class]]){
-                        [self.navigationController popToViewController:viewController animated:YES];
-                    }
-                }
-                
-            }
+            
+            //不打印,选择图片
+            sheet = [[IBActionSheet alloc] initWithTitle:@"选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择", nil];
+            [sheet setFont:[UIFont systemFontOfSize:15.f]];
+            [sheet setButtonTextColor:[UIColor blackColor]];
+            [sheet setButtonBackgroundColor:[UIColor whiteColor]];
+            [sheet showInView:self.view];
+            
         }
     }
 //    else if([alertView isEqual:bleAlert]){
@@ -425,11 +399,12 @@
             
             [self saveOrder];
             
-            sheet = [[IBActionSheet alloc] initWithTitle:@"选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择", nil];
-            [sheet setFont:[UIFont systemFontOfSize:15.f]];
-            [sheet setButtonTextColor:[UIColor blackColor]];
-            [sheet setButtonBackgroundColor:[UIColor whiteColor]];
-            [sheet showInView:self.view];
+            
+            //打印
+            [self preparePrintString];
+            
+            
+            
             
             
             //还有就是剩下的物料 curQty=0;
@@ -444,68 +419,40 @@
 #pragma mark - IBActionSheet delegate
 -(void)actionSheet:(IBActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
     if(buttonIndex == sheet.cancelButtonIndex){
-        //不上传图片
-        //打印数据
-        //开始打印
-        //开始打印
-        printContant=[NSString stringWithFormat:@"%@\n打印次数:%d%@%@%@%@%@%@%@%@%@",
-                      @"\n------------------------------",
-                      (bill.printcount+1),
-                      @"\n出库单号:",bill.number,
-                      @"\n项目:",bill.ProjectName,
-                      @"\n领用商:",bill.consumername,
-                      @"\n地产公司:",bill.Company,
-                      @"\n-----------------------------"];
-        for (int i = 0; i<self.array.count; i++) {
-            DirBillChild *billChild = self.array[i];
-            NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n ",
-                                   @"\n材料名称:",billChild.Name,
-                                   @"\n品牌:",billChild.brand,
-                                   @"\n规格型号:",billChild.model,
-                                   @"\n数量:",[StringUtil changeFloat:billChild.qty],
-                                   @"\n备注:",billChild.note];
-            printContant = [printContant stringByAppendingString:matString];
-        }
-        printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
-                        @"\n收货人:_____________________",
-                        @"\n    ",
-                        @"\n证明人:_____________________"];
-        
-        
-        
-        //            重新刷新数据,将已经完成的材料remove
-        
-        NSMutableArray *tempArray = [[NSMutableArray alloc] init];
-        for (int i = 0; i<self.selArray.count; i++) {
-            PuOrderChild *inMat = self.selArray[i];
-            if([inMat.rkQty doubleValue]<[inMat.sourceQty doubleValue] || [inMat.rkQty doubleValue]>[inMat.limitQty doubleValue]){
-                inMat.curQty = [NSString stringWithFormat:@"%f",[inMat.sourceQty doubleValue]-[inMat.rkQty doubleValue]];
-                [tempArray addObject:inMat];
-            }else{
-                [self.finishArray addObject:inMat];
+        //判断直入直出是否结束
+        //整个收货通知单`结束
+        if([self isFinish]){
+            
+            //保存所有的直入直出单为正式单据,同时将来源单据保存为已完成状态
+            self.order.type = @"zrzc";
+            self.order.isFinish = 1;
+            self.order.zrzcwc = 1;
+            [self.order saveOrUpdate];
+            
+            
+            //查找所有临时主表
+            NSArray *dirArray = [DirBill findByCriteria:@" where temp = 0 "];
+            for(DirBill *tempBill in dirArray) {
+                tempBill.temp = 1;
+                [tempBill update];
             }
+            
+            NSArray *childArray = [DirBillChild findByCriteria:@" where temp = 0 "];
+            for(DirBillChild *tempChild in childArray){
+                tempChild.temp = 1;
+                [tempChild saveOrUpdate];
+            }
+            
+            
+            //返回首页
+            NSArray *controllers = self.navigationController.viewControllers;
+            for(UIViewController *viewController in controllers){
+                if([viewController isKindOfClass:[MainViewController class]]){
+                    [self.navigationController popToViewController:viewController animated:YES];
+                }
+            }
+            
         }
-        
-        self.selArray = [NSMutableArray arrayWithArray:tempArray];
-        [self.selArray addObjectsFromArray:self.unSelArray];
-        [self.unSelArray removeAllObjects];
-        [self.tableView reloadData];
-        
-        
-        //准备好的打印字符串
-        //--------------
-        
-        printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"打印", nil];
-        NSArray *subViewArray = printAlert.subviews;
-        //            for(int x=0;x<[subViewArray count];x++){
-        //                if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
-        //                {
-        //                    UILabel *label = [subViewArray objectAtIndex:x];
-        //                    label.textAlignment = NSTextAlignmentLeft;
-        //                }
-        //
-        //            }
-        [printAlert show];
     }
     if(buttonIndex == 0){
         //拍照
@@ -582,66 +529,40 @@
                 [orderImage saveOrUpdate];
             }
         }
-        //开始打印
-        //开始打印
-        printContant=[NSString stringWithFormat:@"%@\n打印次数:%d%@%@%@%@%@%@%@%@%@",
-                      @"\n------------------------------",
-                      (bill.printcount+1),
-                      @"\n出库单号:",bill.number,
-                      @"\n项目:",bill.ProjectName,
-                      @"\n领用商:",bill.consumername,
-                      @"\n地产公司:",bill.Company,
-                      @"\n-----------------------------"];
-        for (int i = 0; i<self.array.count; i++) {
-            DirBillChild *billChild = self.array[i];
-            NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n ",
-                                   @"\n材料名称:",billChild.Name,
-                                   @"\n品牌:",billChild.brand,
-                                   @"\n规格型号:",billChild.model,
-                                   @"\n数量:",[StringUtil changeFloat:billChild.qty],
-                                   @"\n备注:",billChild.note];
-            printContant = [printContant stringByAppendingString:matString];
-        }
-        printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
-                        @"\n收货人:_____________________",
-                        @"\n    ",
-                        @"\n证明人:_____________________"];
-        
-        
-        
-        //            重新刷新数据,将已经完成的材料remove
-        
-        NSMutableArray *tempArray = [[NSMutableArray alloc] init];
-        for (int i = 0; i<self.selArray.count; i++) {
-            PuOrderChild *inMat = self.selArray[i];
-            if([inMat.rkQty doubleValue]<[inMat.sourceQty doubleValue] || [inMat.rkQty doubleValue]>[inMat.limitQty doubleValue]){
-                inMat.curQty = [NSString stringWithFormat:@"%f",[inMat.sourceQty doubleValue]-[inMat.rkQty doubleValue]];
-                [tempArray addObject:inMat];
-            }else{
-                [self.finishArray addObject:inMat];
+        //判断直入直出是否结束
+        //整个收货通知单`结束
+        if([self isFinish]){
+            
+            //保存所有的直入直出单为正式单据,同时将来源单据保存为已完成状态
+            self.order.type = @"zrzc";
+            self.order.isFinish = 1;
+            self.order.zrzcwc = 1;
+            [self.order saveOrUpdate];
+            
+            
+            //查找所有临时主表
+            NSArray *dirArray = [DirBill findByCriteria:@" where temp = 0 "];
+            for(DirBill *tempBill in dirArray) {
+                tempBill.temp = 1;
+                [tempBill update];
             }
+            
+            NSArray *childArray = [DirBillChild findByCriteria:@" where temp = 0 "];
+            for(DirBillChild *tempChild in childArray){
+                tempChild.temp = 1;
+                [tempChild saveOrUpdate];
+            }
+            
+            
+            //返回首页
+            NSArray *controllers = self.navigationController.viewControllers;
+            for(UIViewController *viewController in controllers){
+                if([viewController isKindOfClass:[MainViewController class]]){
+                    [self.navigationController popToViewController:viewController animated:YES];
+                }
+            }
+            
         }
-        
-        self.selArray = [NSMutableArray arrayWithArray:tempArray];
-        [self.selArray addObjectsFromArray:self.unSelArray];
-        [self.unSelArray removeAllObjects];
-        [self.tableView reloadData];
-        
-        
-        //准备好的打印字符串
-        //--------------
-        
-        printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"打印", nil];
-        NSArray *subViewArray = printAlert.subviews;
-        //            for(int x=0;x<[subViewArray count];x++){
-        //                if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
-        //                {
-        //                    UILabel *label = [subViewArray objectAtIndex:x];
-        //                    label.textAlignment = NSTextAlignmentLeft;
-        //                }
-        //
-        //            }
-        [printAlert show];
     }
 }
 
@@ -717,7 +638,69 @@
     [self.order saveOrUpdate];
 }
 
-
+-(void) preparePrintString {
+    //开始打印
+    printContant=[NSString stringWithFormat:@"%@\n打印次数:%d%@%@%@%@%@%@%@%@%@",
+                  @"\n------------------------------",
+                  (bill.printcount+1),
+                  @"\n出库单号:",bill.number,
+                  @"\n项目:",bill.ProjectName,
+                  @"\n领用商:",bill.consumername,
+                  @"\n地产公司:",bill.Company,
+                  @"\n-----------------------------"];
+    for (int i = 0; i<self.array.count; i++) {
+        DirBillChild *billChild = self.array[i];
+        NSString *matString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@\n ",
+                               @"\n材料名称:",billChild.Name,
+                               @"\n品牌:",billChild.brand,
+                               @"\n规格型号:",billChild.model,
+                               @"\n数量:",[StringUtil changeFloat:billChild.qty],
+                               @"\n备注:",billChild.note];
+        printContant = [printContant stringByAppendingString:matString];
+    }
+    printContant = [NSString stringWithFormat:@"%@%@%@%@%@%@",printContant,
+                    @"\n领用人:_____________________",
+                    @"\n    ",
+                    @"\n施工单位:_____________________",
+                    @"\n",
+                    @"\n证明人(监理):_____________________"];
+    
+    
+    
+    //            重新刷新数据,将已经完成的材料remove
+    
+    NSMutableArray *tempArray = [[NSMutableArray alloc] init];
+    for (int i = 0; i<self.selArray.count; i++) {
+        PuOrderChild *inMat = self.selArray[i];
+        if([inMat.rkQty doubleValue]<[inMat.sourceQty doubleValue] || [inMat.rkQty doubleValue]>[inMat.limitQty doubleValue]){
+            inMat.curQty = [NSString stringWithFormat:@"%f",[inMat.sourceQty doubleValue]-[inMat.rkQty doubleValue]];
+            [tempArray addObject:inMat];
+        }else{
+            [self.finishArray addObject:inMat];
+        }
+    }
+    
+    self.selArray = [NSMutableArray arrayWithArray:tempArray];
+    [self.selArray addObjectsFromArray:self.unSelArray];
+    [self.unSelArray removeAllObjects];
+    [self.tableView reloadData];
+    
+    
+    //准备好的打印字符串
+    //--------------
+    
+    printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"打印", nil];
+    NSArray *subViewArray = printAlert.subviews;
+    //            for(int x=0;x<[subViewArray count];x++){
+    //                if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
+    //                {
+    //                    UILabel *label = [subViewArray objectAtIndex:x];
+    //                    label.textAlignment = NSTextAlignmentLeft;
+    //                }
+    //
+    //            }
+    [printAlert show];
+}
 
 
 - (void)willPresentAlertView:(UIAlertView *)alertView{
@@ -816,12 +799,12 @@
             [self.view makeToast:@"打印机缺纸!" duration:3.0 position:CSToastPositionCenter];
         }
 
-        NSArray *controllers = self.navigationController.viewControllers;
-        for(UIViewController *viewController in controllers){
-            if([viewController isKindOfClass:[MainViewController class]]){
-                [self.navigationController popToViewController:viewController animated:YES];
-            }
-        }
+        sheet = [[IBActionSheet alloc] initWithTitle:@"选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择", nil];
+        [sheet setFont:[UIFont systemFontOfSize:15.f]];
+        [sheet setButtonTextColor:[UIColor blackColor]];
+        [sheet setButtonBackgroundColor:[UIColor whiteColor]];
+        [sheet showInView:self.view];
+        
     }
     [uartLib scanStop];
     [uartLib disconnectPeripheral:connectPeripheral];

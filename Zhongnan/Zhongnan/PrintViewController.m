@@ -184,10 +184,12 @@
                                    @"\n备注:",outMat.note];
             printContant = [printContant stringByAppendingString:matString];
         }
-        printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
-                        @"\n收货人:________________________",
+        printContant = [NSString stringWithFormat:@"%@%@%@%@%@%@",printContant,
+                        @"\n领用人:________________________",
                         @"\n                                ",
-                        @"\n证明人:________________________"];
+                        @"\n施工单位:_____________________",
+                        @"\n",
+                        @"\n证明人(监理):________________________"];
     }
     if([value isKindOfClass:[DirBill class]]){
         //直入直出单
@@ -216,10 +218,12 @@
                                    @"\n备注:",billChild.note];
             printContant = [printContant stringByAppendingString:matString];
         }
-        printContant = [NSString stringWithFormat:@"%@%@%@%@",printContant,
-                        @"\n收货人:_____________________",
+        printContant = [NSString stringWithFormat:@"%@%@%@%@%@%@",printContant,
+                        @"\n领用人:_____________________",
                         @"\n",
-                        @"\n证明人:_____________________"];
+                        @"\n施工单位:_____________________",
+                        @"\n",
+                        @"\n证明人(监理):_____________________"];
     }
     //准备好的打印字符串
     //--------------
@@ -341,12 +345,7 @@
         }
         
         
-        NSArray *controllers = self.navigationController.viewControllers;
-        for(UIViewController *viewController in controllers){
-            if([viewController isKindOfClass:[MainViewController class]]){
-                [self.navigationController popToViewController:viewController animated:YES];
-            }
-        }
+        //
     }
     if(!self.uartLib){
         self.uartLib = [[UartLib alloc] init];
