@@ -691,14 +691,14 @@
     
     printAlert = [[UIAlertView alloc] initWithTitle:@"打印预览" message:printContant delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"打印", nil];
     NSArray *subViewArray = printAlert.subviews;
-    //            for(int x=0;x<[subViewArray count];x++){
-    //                if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
-    //                {
-    //                    UILabel *label = [subViewArray objectAtIndex:x];
-    //                    label.textAlignment = NSTextAlignmentLeft;
-    //                }
-    //
-    //            }
+    for(int x=0;x<[subViewArray count];x++){
+        if([[[subViewArray objectAtIndex:x] class] isSubclassOfClass:[UILabel class]])
+        {
+            UILabel *label = [subViewArray objectAtIndex:x];
+            label.textAlignment = NSTextAlignmentLeft;
+        }
+
+    }
     [printAlert show];
 }
 
