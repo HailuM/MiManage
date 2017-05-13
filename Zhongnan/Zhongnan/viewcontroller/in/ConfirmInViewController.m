@@ -251,8 +251,9 @@
     bill.preparertime = [DateTool datetimeToString:now];
     
     
-    
-    [bill saveOrUpdate];//保存入库单
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [bill saveOrUpdate];//保存入库单
+    });
     //手机根据刚刚做的入库单生成新的出库来源订单主表
     rkOrder = [[PuOrder alloc] init];
     rkOrder.id = [UUIDUtil getUUID];//手机生成的入库单id
@@ -269,7 +270,9 @@
     rkOrder.date = [DateTool dateWithString:now];
     rkOrder.isFinish = 0;
     
-    [rkOrder saveOrUpdate];
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [rkOrder saveOrUpdate];
+    });
     
     for (int i = 0; i<self.selArray.count; i++) {
         PuOrderChild *inMat = self.selArray[i];
@@ -281,7 +284,9 @@
             //此次处理完成
             inMat.isFinish = 1;
         }
-        [inMat saveOrUpdate];
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+            [inMat saveOrUpdate];
+        });
         //生成入库单子表
         InBillChild *billC = [[InBillChild alloc] init];
         billC.receiveid = bill.receiveid;
@@ -295,7 +300,9 @@
         if(![InBillChild isExistInTable]){
             [InBillChild createTable];
         }
-        [billC saveOrUpdate];
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+            [billC saveOrUpdate];
+        });
         
         
         //child
@@ -318,8 +325,10 @@
         rkChild.ckQty = 0;
         rkChild.sourceQty = inMat.curQty;
         rkChild.wareentryid = billC.wareentryid;
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
         /////如果是手机生成入库单,那么材料明细的wareentryid是手机生成的,带到出库单明细的wareentryid
-        [rkChild saveOrUpdate];
+            [rkChild saveOrUpdate];
+        });
         
     }
     
@@ -347,7 +356,9 @@
         self.order.isFinish = 1;
     }
     self.order.zcwc = 1;
-    [self.order saveOrUpdate];
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [self.order saveOrUpdate];
+    });
 }
 
 #pragma mark - IBActionSheet delegate
@@ -391,7 +402,9 @@
     orderImage.orderId = bill.receiveid;
     orderImage.type= @"rk";
     orderImage.imageData = imageData;
-    [orderImage saveOrUpdate];
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [orderImage saveOrUpdate];
+    });
     
 //    //弹出alert是否继续拍照
 //    sheet = [[IBActionSheet alloc] initWithTitle:@"选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择", nil];
@@ -435,7 +448,9 @@
                 orderImage.orderId = bill.receiveid;
                 orderImage.type= @"rk";
                 orderImage.imageData = imageData;
-                [orderImage saveOrUpdate];
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [orderImage saveOrUpdate];
+                });
             }
         }
         

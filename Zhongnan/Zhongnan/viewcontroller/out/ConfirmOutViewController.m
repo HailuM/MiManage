@@ -418,7 +418,9 @@
     outBill.Company = self.order.Company;
     outBill.type = self.order.type;
     
-    [outBill saveOrUpdate];//保存出库单主表
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [outBill saveOrUpdate];//保存出库单主表
+    });
     
     
     self.array = [[NSMutableArray alloc] init];
@@ -468,10 +470,14 @@
         outChild.note = outMat.note;
         outChild.price = outMat.price;
         
-        [outChild saveOrUpdate];
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+            [outChild saveOrUpdate];
+        });
         [self.array addObject:outChild];
         outMat.curQty = 0;
-        [outMat saveOrUpdate];
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+            [outMat saveOrUpdate];
+        });
     }
     int finish = 0;//判断单据是否结束:0,未结束  >0,已结束
     if(self.unSelArray.count>0){
@@ -490,8 +496,9 @@
     }else{
         self.order.isFinish = 1;
     }
-    
-    [self.order saveOrUpdate];
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [self.order saveOrUpdate];
+    });
 }
 
 #pragma mark - IBActionSheet delegate
@@ -544,8 +551,9 @@
 
     orderImage.type= @"ck";
     orderImage.imageData = imageData;
-    [orderImage saveOrUpdate];
-    
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [orderImage saveOrUpdate];
+    });
 }
 
 -(BOOL)willDismissNavigationController:(SCCNavigationController *)navigatonController {
@@ -589,7 +597,9 @@
                 orderImage.type= @"ck";
                 
                 orderImage.imageData = imageData;
-                [orderImage saveOrUpdate];
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [orderImage saveOrUpdate];
+                });
             }
         }
     }
@@ -656,10 +666,14 @@
             
             [self PrintWithFormat:printed];
             outBill.printcount ++;
-            [outBill saveOrUpdate];
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                [outBill saveOrUpdate];
+            });
             for(OutBillChild *childPrint in self.array){
                 childPrint.printcount ++;
-                [childPrint saveOrUpdate];
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [childPrint saveOrUpdate];
+                });
             }
         }else{
             [self.view makeToast:@"打印机缺纸!" duration:3.0 position:CSToastPositionCenter];

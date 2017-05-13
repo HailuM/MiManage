@@ -423,7 +423,9 @@
                 }
                 for(PuOrder *order in orderInArray){
                     order.type = @"rk";
-                    [order saveOrUpdate];
+                    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                        [order saveOrUpdate];
+                    });
                 }
                 //遍历下载订单对应的物料信息和领料商
                 if(rkToken.length>0){
@@ -466,7 +468,9 @@
             NSArray *matArray = [PuOrderChild mj_objectArrayWithKeyValuesArray:array];
             //保存材料明细
             for(PuOrderChild *mat in matArray){
-                [mat saveOrUpdate];
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [mat saveOrUpdate];
+                });
             }
         }
         NSDate *middle = [NSDate date];
@@ -501,7 +505,9 @@
             NSArray *consumerArray = [Consumer mj_objectArrayWithKeyValuesArray:array];
             //保存订单入库领料商
             for(Consumer *consumer in consumerArray){
-                [consumer saveOrUpdate];
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [consumer saveOrUpdate];
+                });
             }
         }
         //        [self.view makeToast:da.tempStr duration:3.0 position:CSToastPositionCenter];
@@ -610,7 +616,9 @@
                 }
                 for(PuOrder *orderOut in orderOutArray){
                     orderOut.type = @"ck";
-                    [orderOut saveOrUpdate];
+                    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                        [orderOut saveOrUpdate];
+                    });
                 }
                 //遍历下载订单对应的材料信息和领料商信息
                 if(outToken){
@@ -671,7 +679,9 @@
                 NSArray *matArray = [PuOrderChild mj_objectArrayWithKeyValuesArray:array];
                 //保存材料明细
                 for(PuOrderChild *mat in matArray){
-                    [mat saveOrUpdate];
+                    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                        [mat saveOrUpdate];
+                    });
                 }
             }
         }
@@ -723,7 +733,9 @@
                     //保存出库领料商
                     for(Consumer *consumer in matArray){
                         consumer.Orderid = [consumer.Orderid uppercaseString];
-                        [consumer saveOrUpdate];
+                        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                            [consumer saveOrUpdate];
+                        });
                     }
                 }
             }

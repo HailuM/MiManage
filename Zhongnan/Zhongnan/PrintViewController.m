@@ -324,20 +324,28 @@
             [self PrintWithFormat:printed];
             if(type==0){
                 outBill.printcount ++;
-                [outBill saveOrUpdate];
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [outBill saveOrUpdate];
+                });
                 for(OutBillChild *childPrint in outChildArray){
                     childPrint.printcount ++;
-                    [childPrint saveOrUpdate];
+                    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                        [childPrint saveOrUpdate];
+                    });
                 }
                 
             }
             
             if(type==1){
                 dirBill.printcount ++;
-                [dirBill saveOrUpdate];
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [dirBill saveOrUpdate];
+                });
                 for(DirBillChild *childPrint in outChildArray){
                     childPrint.printcount ++;
-                    [childPrint saveOrUpdate];
+                    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                        [childPrint saveOrUpdate];
+                    });
                 }
             }
         }else{

@@ -16,7 +16,7 @@
             startingLineNumber = "235"
             endingLineNumber = "235"
             landmarkName = "-alertView:clickedButtonAtIndex:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -32,7 +32,7 @@
             startingLineNumber = "348"
             endingLineNumber = "348"
             landmarkName = "-delToCheck:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -64,7 +64,7 @@
             startingLineNumber = "287"
             endingLineNumber = "287"
             landmarkName = "-searchPrinter"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -80,7 +80,7 @@
             startingLineNumber = "351"
             endingLineNumber = "351"
             landmarkName = "-pirntData"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -96,7 +96,7 @@
             startingLineNumber = "386"
             endingLineNumber = "386"
             landmarkName = "-didScanedPeripherals:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -112,7 +112,7 @@
             startingLineNumber = "516"
             endingLineNumber = "516"
             landmarkName = "-PrintWithFormat:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -128,7 +128,7 @@
             startingLineNumber = "551"
             endingLineNumber = "551"
             landmarkName = "-PrintWithFormat:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -144,7 +144,7 @@
             startingLineNumber = "107"
             endingLineNumber = "107"
             landmarkName = "-alertView:clickedButtonAtIndex:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -160,7 +160,7 @@
             startingLineNumber = "256"
             endingLineNumber = "256"
             landmarkName = "-searchPrinter"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -176,7 +176,7 @@
             startingLineNumber = "897"
             endingLineNumber = "897"
             landmarkName = "-uploadDiroutWithRkToken:withData:"
-            landmarkType = "5">
+            landmarkType = "7">
             <Locations>
                <Location
                   shouldBeEnabled = "No"
@@ -224,7 +224,7 @@
             startingLineNumber = "693"
             endingLineNumber = "693"
             landmarkName = "-getOrderOutConsumerWithOrderId:withCkToken:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -256,7 +256,7 @@
             startingLineNumber = "387"
             endingLineNumber = "387"
             landmarkName = "-getOrderInTitle"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -288,7 +288,7 @@
             startingLineNumber = "450"
             endingLineNumber = "450"
             landmarkName = "-getOrderInMatWithOrderId:withRkToken:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -304,7 +304,7 @@
             startingLineNumber = "659"
             endingLineNumber = "659"
             landmarkName = "-getOrderOutMatWithOrderId:withCkToken:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -336,7 +336,7 @@
             startingLineNumber = "1230"
             endingLineNumber = "1230"
             landmarkName = "-uploadOutCompleteWithCkToken:withOutCount:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -368,7 +368,7 @@
             startingLineNumber = "409"
             endingLineNumber = "409"
             landmarkName = "-saveOrder"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -384,7 +384,7 @@
             startingLineNumber = "1055"
             endingLineNumber = "1055"
             landmarkName = "-uploadInCompleteWithRkToken:withDirout:withInCount:withOutCounr:"
-            landmarkType = "5">
+            landmarkType = "7">
             <Locations>
                <Location
                   shouldBeEnabled = "Yes"
@@ -393,13 +393,13 @@
                   symbolName = "-[MainViewController uploadInCompleteWithRkToken:withDirout:withInCount:withOutCounr:]"
                   moduleName = "Zhongnan"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/wongsuechang/Documents/iOSProject/MiManage/Zhongnan/Zhongnan/MainViewController.m"
-                  timestampString = "496748209.806046"
+                  urlString = "file:///Users/wongsuechang/Documents/iOS_Project/MiManage/Zhongnan/Zhongnan/MainViewController.m"
+                  timestampString = "515387684.549766"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "1055"
                   endingLineNumber = "1055"
-                  offsetFromSymbolStart = "1512">
+                  offsetFromSymbolStart = "1332">
                </Location>
                <Location
                   shouldBeEnabled = "Yes"
@@ -408,13 +408,13 @@
                   symbolName = "-[MainViewController uploadInCompleteWithRkToken:withDirout:withInCount:withOutCounr:]"
                   moduleName = "Zhongnan"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/wongsuechang/Documents/iOSProject/MiManage/Zhongnan/Zhongnan/MainViewController.m"
-                  timestampString = "496748209.806295"
+                  urlString = "file:///Users/wongsuechang/Documents/iOS_Project/MiManage/Zhongnan/Zhongnan/MainViewController.m"
+                  timestampString = "515387684.552127"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "1055"
                   endingLineNumber = "1055"
-                  offsetFromSymbolStart = "1527">
+                  offsetFromSymbolStart = "1352">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -432,7 +432,7 @@
             startingLineNumber = "1255"
             endingLineNumber = "1255"
             landmarkName = "-toSetting:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

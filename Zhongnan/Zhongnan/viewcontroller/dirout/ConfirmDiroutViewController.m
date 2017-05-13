@@ -274,7 +274,9 @@
             self.order.zcwc = 0;
             self.order.zrzcwc = 0;
             self.order.isFinish = 0;
-            [self.order saveOrUpdate];
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                [self.order saveOrUpdate];
+            });
             
             //重置未完成入库材料明细
             for(PuOrderChild *inMat in self.selArray){
@@ -282,7 +284,9 @@
                 inMat.rkQty = @"0";
                 inMat.curQty = @"0";
                 inMat.isFinish = 0;
-                [inMat saveOrUpdate];
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [inMat saveOrUpdate];
+                });
             }
             //重置已完成入库材料明细
             for(PuOrderChild *inMat in self.finishArray){
@@ -290,16 +294,20 @@
                 inMat.rkQty = @"0";
                 inMat.curQty = @"0";
                 inMat.isFinish = 0;
-                [inMat saveOrUpdate];
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [inMat saveOrUpdate];
+                });
             }
             
             //删除临时数据
             //临时主表
-            [DirBill deleteObjectsByCriteria:@" where temp = 0 "];
-            
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                [DirBill deleteObjectsByCriteria:@" where temp = 0 "];
+            });
             //临时子表
-            [DirBillChild deleteObjectsByCriteria:@" where temp = 0 "];
-            
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                [DirBillChild deleteObjectsByCriteria:@" where temp = 0 "];
+            });
             
             NSArray *controllers = self.navigationController.viewControllers;
             for(UIViewController *viewController in controllers){
@@ -427,7 +435,9 @@
             self.order.type = @"zrzc";
             self.order.isFinish = 1;
             self.order.zrzcwc = 1;
-            [self.order saveOrUpdate];
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [self.order saveOrUpdate];
+            });
             
             
             //查找所有临时主表
@@ -440,7 +450,9 @@
             NSArray *childArray = [DirBillChild findByCriteria:@" where temp = 0 "];
             for(DirBillChild *tempChild in childArray){
                 tempChild.temp = 1;
-                [tempChild saveOrUpdate];
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [tempChild saveOrUpdate];
+                });
             }
             
             
@@ -483,7 +495,9 @@
     orderImage.orderId = bill.zrzcid;
     orderImage.type= @"zrzc";
     orderImage.imageData = imageData;
-    [orderImage saveOrUpdate];
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [orderImage saveOrUpdate];
+    });
     
 //    //弹出alert是否继续拍照
 //    sheet = [[IBActionSheet alloc] initWithTitle:@"选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择", nil];
@@ -526,7 +540,9 @@
                 orderImage.orderId = bill.zrzcid;
                 orderImage.type= @"zrzc";
                 orderImage.imageData = imageData;
-                [orderImage saveOrUpdate];
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [orderImage saveOrUpdate];
+                });
             }
         }
         //判断直入直出是否结束
@@ -537,7 +553,9 @@
             self.order.type = @"zrzc";
             self.order.isFinish = 1;
             self.order.zrzcwc = 1;
-            [self.order saveOrUpdate];
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                [self.order saveOrUpdate];
+            });
             
             
             //查找所有临时主表
@@ -550,7 +568,9 @@
             NSArray *childArray = [DirBillChild findByCriteria:@" where temp = 0 "];
             for(DirBillChild *tempChild in childArray){
                 tempChild.temp = 1;
-                [tempChild saveOrUpdate];
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [tempChild saveOrUpdate];
+                });
             }
             
             
@@ -590,7 +610,9 @@
     bill.consumername = self.consumer.Name;
     bill.printcount = 0;
     
-    [bill saveOrUpdate];//保存直入直出单主表
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [bill saveOrUpdate];//保存直入直出单主表
+    });
     
     for (int i = 0; i<self.selArray.count; i++) {
         PuOrderChild *inMat = self.selArray[i];
@@ -617,14 +639,17 @@
             billChild.brand = inMat.brand;
             billChild.note = inMat.note;
             billChild.price = inMat.price;
-            
-            [billChild saveOrUpdate];
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                [billChild saveOrUpdate];
+            });
             
             [self.array addObject:billChild];
             
             inMat.curQty = @"0";
             inMat.isFinish = 1;
-            [inMat saveOrUpdate];
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                [inMat saveOrUpdate];
+            });
         }
     }
     
@@ -635,7 +660,9 @@
     if([self isFinish]){
         self.order.isFinish = 1;
     }
-    [self.order saveOrUpdate];
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [self.order saveOrUpdate];
+    });
 }
 
 -(void) preparePrintString {
@@ -787,13 +814,17 @@
             //查找当前存入数据库的直入直出单,修改打印次数
             DirBill *billPrint = [DirBill findFirstByCriteria:[NSString stringWithFormat:@" WHERE zrzcid = '%@'",bill.zrzcid]];
             billPrint.printcount ++;
-            [billPrint saveOrUpdate];
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                [billPrint saveOrUpdate];
+            });
             
             //根据当前存入数据库的直入直出单,修改对应材料的打印次数
             NSArray *printArray = [DirBillChild findByCriteria:[NSString stringWithFormat:@" WHERE zrzcid = '%@'",billPrint.zrzcid]];
             for(DirBillChild *childPrint in printArray){
                 childPrint.printcount ++;
-                [childPrint saveOrUpdate];
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [childPrint saveOrUpdate];
+                });
             }
         }else{
             [self.view makeToast:@"打印机缺纸!" duration:3.0 position:CSToastPositionCenter];
