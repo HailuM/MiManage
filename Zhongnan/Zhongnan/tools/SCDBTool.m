@@ -32,6 +32,12 @@
     if (string == nil) {
         return nil;
     }
+    string = [string stringByReplacingOccurrencesOfString:@"\r\n" withString:@""];
+    
+    string = [string stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    
+    string = [string stringByReplacingOccurrencesOfString:@"\t" withString:@""];
+
     
     NSData *jsonData = [string dataUsingEncoding:NSUTF8StringEncoding];
     NSError *err;
