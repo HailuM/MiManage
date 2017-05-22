@@ -1404,7 +1404,7 @@
 					"$(PROJECT_DIR)/Zhongnan/tools",
 					"$(PROJECT_DIR)/build/Debug-iphoneos/FMDB",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = cn.zhongnangroup.fdcwzm;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hl.fdcwzm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1430,7 +1430,7 @@
 					"$(PROJECT_DIR)/Zhongnan/tools",
 					"$(PROJECT_DIR)/build/Debug-iphoneos/FMDB",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = cn.zhongnangroup.fdcwzm;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hl.fdcwzm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
